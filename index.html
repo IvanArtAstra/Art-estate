@@ -13,6 +13,9 @@
 </head>
 <body>
 
+  <!-- Прогресс прокрутки -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
   <!-- ============ ПРЕЛОАДЕР ============ -->
   <div class="preloader" id="preloader">
     <div class="preloader__inner">
@@ -98,7 +101,7 @@
   <section class="section whyus" id="whyus">
     <div class="whyus__grid">
       <div class="whyus__media reveal">
-        <video class="whyus__video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-phuket.jpg">
+        <video class="whyus__video" data-parallax="7" autoplay muted loop playsinline preload="metadata" poster="assets/hero-phuket.jpg">
           <source src="assets/flythrough-scrub.mp4" type="video/mp4" />
         </video>
         <div class="whyus__caption">Покажем сотни объектов, не выходя из дома</div>
@@ -243,7 +246,7 @@
   <!-- ============ ОБ АЛЕНЕ ============ -->
   <section class="section about" id="about">
     <div class="about__media reveal">
-      <div class="about__photo" id="aboutPhoto">
+      <div class="about__photo" id="aboutPhoto" data-parallax-bg="9">
         <span class="about__photo-note">Здесь будет фото Алены</span>
       </div>
       <div class="about__badge">
@@ -358,6 +361,11 @@
       <a href="tel:+79124869508">+7 912 486-95-08</a>
     </div>
   </footer>
+
+  <!-- Кнопка «наверх» -->
+  <button class="to-top" id="toTop" aria-label="Наверх" hidden>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
 
   <!-- ============ ПЛАВАЮЩИЕ КНОПКИ ============ -->
   <div class="floating">

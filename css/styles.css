@@ -721,11 +721,65 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .preloader__logo { animation: floatLogo 3s var(--ease-soft) infinite; }
 @keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
+/* ---------- ПРОГРЕСС ПРОКРУТКИ ---------- */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 400;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  box-shadow: 0 0 12px rgba(201,162,75,.6); transition: width .12s linear;
+}
+
+/* ---------- КНОПКА «НАВЕРХ» ---------- */
+.to-top {
+  position: fixed; left: 1.4rem; bottom: 1.4rem; z-index: 90;
+  width: 50px; height: 50px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--teal); color: var(--cream); display: grid; place-items: center;
+  opacity: 0; transform: translateY(14px) scale(.9); pointer-events: none;
+  box-shadow: 0 14px 30px -10px rgba(8,40,37,.55);
+  transition: opacity .4s var(--ease-out), transform .4s var(--ease-out), background .25s var(--ease-out);
+}
+.to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+.to-top:hover { background: var(--gold); transform: translateY(-3px); }
+
+/* ---------- SCROLLSPY (активный пункт меню) ---------- */
+.nav a.active { color: #fff; }
+.nav a.active::after { width: 100%; }
+.header.scrolled .nav a.active { color: var(--teal); }
+.drawer__nav a.active { color: var(--gold); padding-left: .4rem; }
+
+/* ---------- ЗОЛОТОЙ БЛИК НА КНОПКАХ ---------- */
+.btn--gold, .hero__enter, .fin-card--accent .btn { position: relative; overflow: hidden; }
+.btn--gold::after, .hero__enter::after, .fin-card--accent .btn::after {
+  content: ''; position: absolute; top: 0; left: -130%; width: 55%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+  transform: skewX(-18deg); transition: left .65s var(--ease-out); pointer-events: none;
+}
+.btn--gold:hover::after, .hero__enter:hover::after, .fin-card--accent .btn:hover::after { left: 140%; }
+
+/* ---------- ГРАДИЕНТ НА ФОТО КАРТОЧЕК ---------- */
+.card__media::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(6,32,29,.42), transparent 48%);
+  opacity: .55; transition: opacity .5s var(--ease-out);
+}
+.card:hover .card__media::after { opacity: 1; }
+.card__arrow { display: inline-block; transition: transform .3s var(--ease-out); }
+.card:hover .card__arrow, .card__link:hover .card__arrow { transform: translateX(5px); }
+
+/* ---------- АКЦЕНТНАЯ ЛИНИЯ У EYEBROW ---------- */
+.eyebrow { display: inline-flex; align-items: center; gap: .7rem; }
+.eyebrow::before { content: ''; width: 30px; height: 1.5px; background: var(--gold); flex: none; }
+
+/* ---------- ПАРАЛЛАКС ---------- */
+.whyus__video { will-change: transform; transform: scale(1.1); }
+[data-parallax] { will-change: transform, background-position; }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; filter: none; transition: none; }
   .card__media img, .dcard img { opacity: 1; }
   .hero__scroll-track { height: 100vh; }
   .hero__layer:not(.active) { transform: none; }
+  .whyus__video { transform: none; }
+  .scroll-progress { display: none; }
   * { animation: none !important; }
   html { scroll-behavior: auto; }
 }

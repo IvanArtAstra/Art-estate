@@ -39,6 +39,63 @@
   onScrollHeader();
   window.addEventListener('scroll', onScrollHeader, { passive: true });
 
+  /* ---------- ПРОГРЕСС ПРОКРУТКИ + КНОПКА «НАВЕРХ» ---------- */
+  const progressBar = document.getElementById('scrollProgress');
+  const toTop = document.getElementById('toTop');
+  function onScrollUI() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? window.scrollY / max : 0;
+    if (progressBar) progressBar.style.width = (p * 100).toFixed(2) + '%';
+    if (toTop) toTop.classList.toggle('show', window.scrollY > window.innerHeight * 0.9);
+  }
+  onScrollUI();
+  window.addEventListener('scroll', onScrollUI, { passive: true });
+  window.addEventListener('resize', onScrollUI);
+  toTop && toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+  /* ---------- SCROLLSPY ---------- */
+  const spyLinks = Array.from(document.querySelectorAll('.nav a[href^="#"], .drawer__nav a[href^="#"]'));
+  const spyMap = {};
+  spyLinks.forEach(a => { const id = a.getAttribute('href').slice(1); (spyMap[id] = spyMap[id] || []).push(a); });
+  if ('IntersectionObserver' in window) {
+    const spyIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          spyLinks.forEach(a => a.classList.remove('active'));
+          (spyMap[e.target.id] || []).forEach(a => a.classList.add('active'));
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    Object.keys(spyMap).forEach(id => { const s = document.getElementById(id); if (s) spyIO.observe(s); });
+  }
+
+  /* ---------- ПАРАЛЛАКС (лёгкая глубина) ---------- */
+  const parEls = Array.from(document.querySelectorAll('[data-parallax], [data-parallax-bg]'));
+  if (!reduceMotion && parEls.length) {
+    let parTick = false;
+    function applyParallax() {
+      const vh = window.innerHeight;
+      parEls.forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -120 || r.top > vh + 120) return;
+        const off = (r.top + r.height / 2 - vh / 2) / vh; // ≈ -0.5..0.5
+        if (el.hasAttribute('data-parallax')) {
+          const k = parseFloat(el.getAttribute('data-parallax')) || 6;
+          const base = el.classList.contains('whyus__video') ? 'scale(1.1) ' : '';
+          el.style.transform = base + 'translateY(' + (-off * k).toFixed(2) + '%)';
+        } else {
+          const k = parseFloat(el.getAttribute('data-parallax-bg')) || 8;
+          el.style.backgroundPosition = 'center calc(50% + ' + (-off * k).toFixed(2) + '%)';
+        }
+      });
+      parTick = false;
+    }
+    window.addEventListener('scroll', () => { if (!parTick) { parTick = true; requestAnimationFrame(applyParallax); } }, { passive: true });
+    window.addEventListener('resize', applyParallax);
+    applyParallax();
+  }
+
   /* ---------- БУРГЕР открывает боковое меню (см. логику drawer ниже) ---------- */
 
   /* ---------- HERO: СКРОЛЛ-СКРАБ ВИДЕО + СЛОИ ---------- */
@@ -218,7 +275,7 @@
         ${beach}
         <div class="card__bottom">
           <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || 'Цена по запросу')}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</span>
-          <button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее →</button>
+          <button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее <span class="card__arrow">→</span></button>
         </div>
       </div>
     </article>`;
