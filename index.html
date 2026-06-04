@@ -178,7 +178,7 @@
     <div class="catalog__toolbar reveal" id="catalogToolbar">
       <div class="filter filter--search">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="fSearch" placeholder="Поиск: название или район…" autocomplete="off" />
+        <input type="search" id="fSearch" placeholder="Поиск: название или район…" data-i18n-ph="cat_search_ph" autocomplete="off" />
       </div>
       <select id="fType" class="filter" aria-label="Тип"><option value="">Все типы</option></select>
       <select id="fDistrict" class="filter" aria-label="Район"><option value="">Все районы</option></select>
@@ -567,7 +567,7 @@
   <div class="compare-bar" id="compareBar" hidden>
     <div class="compare-bar__info">
       <b id="compareCount">0</b>
-      <span>в сравнении</span>
+      <span data-i18n="cmp_inbar">в сравнении</span>
     </div>
     <div class="compare-bar__chips" id="compareChips"></div>
     <button class="btn btn--gold" id="compareOpen">Сравнить →</button>

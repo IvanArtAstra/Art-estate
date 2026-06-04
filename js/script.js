@@ -246,9 +246,9 @@
   function metaLine(it) {
     const p = [];
     if (it.location) p.push(esc(it.location));
-    if (typeof it.beds === 'number' && it.beds > 0) p.push(it.beds + ' ' + plural(it.beds, 'спальня', 'спальни', 'спален'));
-    else if (it.beds) p.push(esc(it.beds));
-    if (it.baths) p.push(it.baths + ' с/у');
+    if (typeof it.beds === 'number' && it.beds > 0) p.push(it.beds + ' ' + (lang === 'ru' ? plural(it.beds, 'спальня', 'спальни', 'спален') : t(it.beds === 1 ? 'd_bed' : 'd_beds', 'спальни')));
+    else if (it.beds) p.push(/студия/i.test(it.beds) ? t('d_studio', 'Студия') : esc(it.beds));
+    if (it.baths) p.push(it.baths + ' ' + t('d_bath', 'с/у'));
     if (it.area) p.push(esc(it.area) + ' м²');
     return p.join(' · ');
   }
@@ -261,7 +261,7 @@
     const onFav = favorites.has(String(it.id)) ? ' is-active' : '';
     const yld = grossYield(it);
     const badges = [];
-    if (yld) badges.push(`<span class="badge badge--yield">${yld.toFixed(0)}% доходность</span>`);
+    if (yld) badges.push(`<span class="badge badge--yield">${yld.toFixed(0)}% ${t('d_yieldbadge', 'доходность')}</span>`);
     if (it.discountPct) badges.push(`<span class="badge badge--disc">−${it.discountPct}%</span>`);
     const oldPrice = it.oldPriceUSD ? `<s>${money(it.oldPriceUSD)}</s>` : '';
     return `<article class="card reveal" data-id="${esc(it.id)}">
@@ -273,7 +273,7 @@
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21s-7.5-4.6-10-9.2C.3 8.4 1.8 4.9 5.2 4.9c2 0 3.3 1.1 4.1 2.3.8-1.2 2.1-2.3 4.1-2.3 3.4 0 4.9 3.5 3.2 6.9C19.5 16.4 12 21 12 21z"/></svg>
         </button>
         <button class="card__compare${onCmp}" data-action="compare" data-id="${esc(it.id)}" type="button" aria-label="Добавить в сравнение">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6 9 17l-5-5"/></svg><span>Сравнить</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6 9 17l-5-5"/></svg><span>${t('d_compare', 'Сравнить')}</span>
         </button>
       </div>
       <div class="card__body">
@@ -281,8 +281,8 @@
         <p class="card__meta">${metaLine(it)}</p>
         ${beach}
         <div class="card__bottom">
-          <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || 'Цена по запросу')}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</span>
-          ${it.url ? `<a class="card__link" href="${esc(it.url)}">Подробнее <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее <span class="card__arrow">→</span></button>`}
+          <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || t('d_price_req', 'Цена по запросу'))}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</span>
+          ${it.url ? `<a class="card__link" href="${esc(it.url)}">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></button>`}
         </div>
       </div>
     </article>`;
@@ -329,7 +329,7 @@
     grid.innerHTML = page.map(cardHTML).join('');
     observeReveal(Array.from(grid.querySelectorAll('.reveal')));
     markLoaded(grid);
-    if (catalogCount) catalogCount.textContent = list.length ? ('Найдено объектов: ' + list.length + (favOnly ? ' · избранное' : '')) : '';
+    if (catalogCount) catalogCount.textContent = list.length ? (t('d_found', 'Найдено объектов') + ': ' + list.length + (favOnly ? ' · ' + t('d_fav', 'избранное') : '')) : '';
     if (catalogEmpty) catalogEmpty.hidden = list.length > 0;
     if (catalogMore) catalogMore.hidden = list.length <= shown;
   }
@@ -372,23 +372,23 @@
     if (compare.size < 2) return;
     const items = Array.from(compare).map(itemById).filter(Boolean);
     const rows = [
-      ['Тип', it => esc(it.type || '—')],
-      ['Цена', it => `<b>${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || '—')}</b>`],
-      ['Цена за м²', it => ppm(it) ? money(ppm(it)) : '—'],
-      ['Спальни', it => (it.beds != null ? esc(it.beds) : '—')],
-      ['Санузлы', it => (it.baths != null ? esc(it.baths) : '—')],
-      ['Площадь', it => it.area ? esc(it.area) + ' м²' : '—'],
-      ['Локация', it => esc(it.location || '—')],
-      ['У пляжа', it => esc(it.beach || '—')],
-      ['Аренда/мес', it => rentOf(it) ? money(rentOf(it)) : '—'],
-      ['Доходность, брутто', it => { const r = rentOf(it); return (r && it.priceUSD) ? (r * 12 / it.priceUSD * 100).toFixed(1) + '% годовых' : '—'; }],
+      [t('cmp_type', 'Тип'), it => esc(it.type || '—')],
+      [t('cmp_price', 'Цена'), it => `<b>${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || '—')}</b>`],
+      [t('cmp_ppm', 'Цена за м²'), it => ppm(it) ? money(ppm(it)) : '—'],
+      [t('cmp_beds', 'Спальни'), it => (it.beds != null ? esc(it.beds) : '—')],
+      [t('cmp_baths', 'Санузлы'), it => (it.baths != null ? esc(it.baths) : '—')],
+      [t('cmp_area', 'Площадь'), it => it.area ? esc(it.area) + ' м²' : '—'],
+      [t('cmp_loc', 'Локация'), it => esc(it.location || '—')],
+      [t('cmp_beach', 'У пляжа'), it => esc(it.beach || '—')],
+      [t('cmp_rent', 'Аренда/мес'), it => rentOf(it) ? money(rentOf(it)) : '—'],
+      [t('cmp_yield', 'Доходность, брутто'), it => { const r = rentOf(it); return (r && it.priceUSD) ? (r * 12 / it.priceUSD * 100).toFixed(1) + '%' : '—'; }],
     ];
     const head = '<th></th>' + items.map(it => `<th><div class="cmp-h"><img src="${esc(it.image || 'assets/hero-phuket.jpg')}" alt=""/><span>${esc(it.title || 'Объект')}</span></div></th>`).join('');
     const body = rows.map(([label, fn]) => `<tr><td class="cmp-label">${label}</td>${items.map(it => `<td>${fn(it)}</td>`).join('')}</tr>`).join('');
-    const cta = items.map(it => `<td><button class="btn btn--gold btn--sm" data-action="detail" data-id="${esc(it.id)}" type="button">Открыть</button></td>`).join('');
+    const cta = items.map(it => `<td><button class="btn btn--gold btn--sm" data-action="detail" data-id="${esc(it.id)}" type="button">${t('cmp_open', 'Открыть')}</button></td>`).join('');
     setModal('compareBox', `
       <button class="modal__close" data-close aria-label="Закрыть">×</button>
-      <h3 class="modal__title">Сравнение объектов</h3>
+      <h3 class="modal__title">${t('cmp_title', 'Сравнение объектов')}</h3>
       <div class="cmp-scroll"><table class="cmp-table"><thead><tr>${head}</tr></thead><tbody>${body}<tr><td></td>${cta}</tr></tbody></table></div>
     `);
     openModal('compareModal');
@@ -399,29 +399,29 @@
   function calcGridHTML(price, rent, fromListing) {
     return `<div class="calc-grid">
         <div class="calc" id="calcMortgage" data-price="${price}">
-          <h4>Кредитный калькулятор</h4>
-          <label class="calc__row">Стоимость, $<input type="number" id="m_price" value="${price}" min="0" step="1000"></label>
-          <label class="calc__row">Первоначальный взнос: <output id="m_down_v">30%</output><input type="range" id="m_down" min="0" max="90" value="30" step="5"></label>
-          <label class="calc__row">Ставка, % годовых<input type="number" id="m_rate" value="6" min="0" max="30" step="0.1"></label>
-          <label class="calc__row">Срок: <output id="m_term_v">20 лет</output><input type="range" id="m_term" min="5" max="30" value="20" step="1"></label>
+          <h4>${t('c_mortgage', 'Кредитный калькулятор')}</h4>
+          <label class="calc__row">${t('c_cost', 'Стоимость, $')}<input type="number" id="m_price" value="${price}" min="0" step="1000"></label>
+          <label class="calc__row">${t('c_down', 'Первоначальный взнос')}: <output id="m_down_v">30%</output><input type="range" id="m_down" min="0" max="90" value="30" step="5"></label>
+          <label class="calc__row">${t('c_rate', 'Ставка, % годовых')}<input type="number" id="m_rate" value="6" min="0" max="30" step="0.1"></label>
+          <label class="calc__row">${t('c_term', 'Срок')}: <output id="m_term_v">20</output><input type="range" id="m_term" min="5" max="30" value="20" step="1"></label>
           <div class="calc__out">
-            <div><span>Платёж / мес</span><b id="m_payment">—</b></div>
-            <div><span>Сумма кредита</span><b id="m_loan">—</b></div>
-            <div><span>Переплата</span><b id="m_interest">—</b></div>
+            <div><span>${t('c_pay', 'Платёж / мес')}</span><b id="m_payment">—</b></div>
+            <div><span>${t('c_loan', 'Сумма кредита')}</span><b id="m_loan">—</b></div>
+            <div><span>${t('c_over', 'Переплата')}</span><b id="m_interest">—</b></div>
           </div>
-          <p class="calc__note">Ориентировочный расчёт аннуитетного платежа. Условия зависят от банка и статуса покупателя.</p>
+          <p class="calc__note">${t('c_note_m', 'Ориентировочный расчёт аннуитетного платежа. Условия зависят от банка и статуса покупателя.')}</p>
         </div>
         <div class="calc" id="calcRoi">
-          <h4>Калькулятор доходности</h4>
-          <label class="calc__row">Стоимость, $<input type="number" id="r_price" value="${price}" min="0" step="1000"></label>
-          <label class="calc__row">Аренда / мес, $<input type="number" id="r_rent" value="${rent}" min="0" step="50"></label>
-          <label class="calc__row">Загрузка: <output id="r_occ_v">75%</output><input type="range" id="r_occ" min="30" max="100" value="75" step="5"></label>
+          <h4>${t('c_roi', 'Калькулятор доходности')}</h4>
+          <label class="calc__row">${t('c_cost', 'Стоимость, $')}<input type="number" id="r_price" value="${price}" min="0" step="1000"></label>
+          <label class="calc__row">${t('c_rent', 'Аренда / мес, $')}<input type="number" id="r_rent" value="${rent}" min="0" step="50"></label>
+          <label class="calc__row">${t('c_occ', 'Загрузка')}: <output id="r_occ_v">75%</output><input type="range" id="r_occ" min="30" max="100" value="75" step="5"></label>
           <div class="calc__out">
-            <div><span>Доход / год</span><b id="r_annual">—</b></div>
-            <div><span>Доходность</span><b id="r_yield">—</b></div>
-            <div><span>Окупаемость</span><b id="r_payback">—</b></div>
+            <div><span>${t('c_income', 'Доход / год')}</span><b id="r_annual">—</b></div>
+            <div><span>${t('c_yield', 'Доходность')}</span><b id="r_yield">—</b></div>
+            <div><span>${t('c_payback', 'Окупаемость')}</span><b id="r_payback">—</b></div>
           </div>
-          <p class="calc__note">${fromListing ? 'Аренда взята с объявления.' : 'Аренда оценочная (≈6% годовых). Уточните у нас.'} Расчёт без учёта налогов и комиссий УК.</p>
+          <p class="calc__note">${fromListing ? t('c_note_r1', 'Аренда взята с объявления.') : t('c_note_r2', 'Аренда оценочная (≈6% годовых).')} ${t('c_note_r3', 'Расчёт без учёта налогов и комиссий УК.')}</p>
         </div>
       </div>`;
   }
@@ -465,8 +465,8 @@
   function openCalculator() {
     setModal('detailBox', `
       <button class="modal__close" data-close aria-label="Закрыть">×</button>
-      <h3 class="modal__title">Калькуляторы покупки</h3>
-      <p class="detail__desc">Прикиньте ежемесячный платёж по кредиту и доходность от аренды. Значения примерные — точные условия рассчитаем индивидуально.</p>
+      <h3 class="modal__title">${t('c_calc_title', 'Калькуляторы покупки')}</h3>
+      <p class="detail__desc">${t('c_calc_intro', 'Прикиньте ежемесячный платёж по кредиту и доходность от аренды. Значения примерные — точные условия рассчитаем индивидуально.')}</p>
       ${calcGridHTML(300000, 1500, false)}
     `);
     openModal('detailModal');
@@ -478,7 +478,7 @@
     function recalcM() {
       const price = +m_price.value || 0, downP = +m_down.value, rate = +m_rate.value, years = +m_term.value;
       $('m_down_v').textContent = downP + '%';
-      $('m_term_v').textContent = years + ' ' + plural(years, 'год', 'года', 'лет');
+      $('m_term_v').textContent = years + ' ' + (lang === 'ru' ? plural(years, 'год', 'года', 'лет') : t('d_year', 'лет'));
       const loan = price * (1 - downP / 100);
       const i = rate / 100 / 12, n = years * 12;
       const pay = i > 0 ? loan * i / (1 - Math.pow(1 + i, -n)) : (n ? loan / n : 0);
@@ -495,7 +495,7 @@
       const annual = rent * 12 * occ;
       $('r_annual').textContent = usd(annual);
       $('r_yield').textContent = price ? (annual / price * 100).toFixed(1) + '%' : '—';
-      $('r_payback').textContent = annual ? (price / annual).toFixed(1) + ' ' + plural(Math.round(price / annual), 'год', 'года', 'лет') : '—';
+      $('r_payback').textContent = annual ? (price / annual).toFixed(1) + ' ' + (lang === 'ru' ? plural(Math.round(price / annual), 'год', 'года', 'лет') : t('d_year', 'лет')) : '—';
     }
     [r_price, r_rent, r_occ].forEach(el => el && el.addEventListener('input', recalcR));
     // связываем цену: правка в одном поле обновляет другое
@@ -558,7 +558,7 @@
     if (!pMin || !pMax) return;
     let lo = +pMin.value, hi = +pMax.value;
     if (lo > hi) { if (changed === 'min') pMax.value = lo; else pMin.value = hi; lo = +pMin.value; hi = +pMax.value; }
-    if (priceLabel) priceLabel.textContent = (lo <= 0 && hi >= priceCeil) ? 'Цена: любая' : 'Цена: ' + money(lo) + ' – ' + money(hi);
+    if (priceLabel) priceLabel.textContent = (lo <= 0 && hi >= priceCeil) ? t('d_priceany', 'Цена: любая') : t('d_price', 'Цена') + ': ' + money(lo) + ' – ' + money(hi);
   }
   function initSliders() {
     const maxP = allItems.reduce((m, it) => Math.max(m, it.priceUSD || 0), 0);
@@ -700,6 +700,13 @@
       contacts_role: 'Personal agent at Art Estate', contacts_note: 'Working across Phuket · Online viewings from anywhere in the world',
       lead_submit: 'Send request via WhatsApp', lead_consent: 'I agree to the processing of personal data and accept the <a href="privacy/" target="_blank" rel="noopener">privacy policy</a>',
       lead_name_ph: 'Your name', lead_phone_ph: 'Phone or @telegram', lead_msg_ph: 'What are you looking for: area, budget, type? (optional)',
+      d_found: 'Listings found', d_fav: 'favorites', d_more: 'Details', d_price_req: 'Price on request',
+      d_bed: 'bedroom', d_beds: 'bedrooms', d_studio: 'Studio', d_bath: 'bath', d_priceany: 'Price: any', d_price: 'Price', d_compare: 'Compare', d_yieldbadge: 'yield', cat_search_ph: 'Search: name or district…',
+      d_year: 'yr', c_calc_title: 'Purchase calculators', c_calc_intro: 'Estimate your monthly loan payment and rental yield. Figures are approximate — we calculate exact terms individually.',
+      c_mortgage: 'Mortgage calculator', c_roi: 'Yield calculator', c_cost: 'Price, $', c_down: 'Down payment', c_rate: 'Rate, % p.a.', c_term: 'Term',
+      c_pay: 'Payment / mo', c_loan: 'Loan amount', c_over: 'Overpay', c_rent: 'Rent / mo, $', c_occ: 'Occupancy', c_income: 'Income / yr', c_yield: 'Yield', c_payback: 'Payback',
+      c_note_m: 'Indicative annuity calculation. Terms depend on the bank and buyer status.', c_note_r1: 'Rent taken from the listing.', c_note_r2: 'Rent estimated (≈6% p.a.).', c_note_r3: 'Excludes taxes and management fees.',
+      cmp_title: 'Compare listings', cmp_type: 'Type', cmp_price: 'Price', cmp_ppm: 'Price per m²', cmp_beds: 'Bedrooms', cmp_baths: 'Bathrooms', cmp_area: 'Area', cmp_loc: 'Location', cmp_beach: 'Near beach', cmp_rent: 'Rent/mo', cmp_yield: 'Yield, gross', cmp_open: 'Open', cmp_inbar: 'in compare',
     },
     th: {
       nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
@@ -727,8 +734,206 @@
       contacts_role: 'ตัวแทนส่วนตัว Art Estate', contacts_note: 'ให้บริการทั่วภูเก็ต · ชมออนไลน์ได้จากทุกที่',
       lead_submit: 'ส่งคำขอผ่าน WhatsApp', lead_consent: 'ฉันยินยอมให้ประมวลผลข้อมูลส่วนบุคคลและยอมรับ <a href="privacy/" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>',
       lead_name_ph: 'ชื่อของคุณ', lead_phone_ph: 'โทรศัพท์ หรือ @telegram', lead_msg_ph: 'คุณกำลังมองหาอะไร: ทำเล งบประมาณ ประเภท? (ไม่บังคับ)',
+      d_found: 'พบรายการ', d_fav: 'รายการโปรด', d_more: 'รายละเอียด', d_price_req: 'ราคาตามสอบถาม',
+      d_bed: 'ห้องนอน', d_beds: 'ห้องนอน', d_studio: 'สตูดิโอ', d_bath: 'ห้องน้ำ', d_priceany: 'ราคา: ทั้งหมด', d_price: 'ราคา', d_compare: 'เทียบ', d_yieldbadge: 'ผลตอบแทน', cat_search_ph: 'ค้นหา: ชื่อ หรือทำเล…',
+      d_year: 'ปี', c_calc_title: 'เครื่องคำนวณการซื้อ', c_calc_intro: 'ประเมินค่างวดสินเชื่อและผลตอบแทนค่าเช่า ตัวเลขเป็นค่าประมาณ — เงื่อนไขที่แน่นอนคำนวณเป็นรายกรณี',
+      c_mortgage: 'เครื่องคำนวณสินเชื่อ', c_roi: 'เครื่องคำนวณผลตอบแทน', c_cost: 'ราคา, $', c_down: 'เงินดาวน์', c_rate: 'ดอกเบี้ย % ต่อปี', c_term: 'ระยะเวลา',
+      c_pay: 'ค่างวด/เดือน', c_loan: 'ยอดสินเชื่อ', c_over: 'ดอกเบี้ยรวม', c_rent: 'ค่าเช่า/เดือน, $', c_occ: 'อัตราเข้าพัก', c_income: 'รายได้/ปี', c_yield: 'ผลตอบแทน', c_payback: 'คืนทุน',
+      c_note_m: 'คำนวณแบบประมาณ เงื่อนไขขึ้นกับธนาคารและสถานะผู้ซื้อ', c_note_r1: 'ค่าเช่าจากประกาศ', c_note_r2: 'ค่าเช่าประมาณ (≈6% ต่อปี)', c_note_r3: 'ไม่รวมภาษีและค่าบริหาร',
+      cmp_title: 'เปรียบเทียบรายการ', cmp_type: 'ประเภท', cmp_price: 'ราคา', cmp_ppm: 'ราคาต่อ ตร.ม.', cmp_beds: 'ห้องนอน', cmp_baths: 'ห้องน้ำ', cmp_area: 'พื้นที่', cmp_loc: 'ทำเล', cmp_beach: 'ใกล้หาด', cmp_rent: 'ค่าเช่า/เดือน', cmp_yield: 'ผลตอบแทน (ก่อนหัก)', cmp_open: 'เปิด', cmp_inbar: 'ในการเปรียบเทียบ',
     },
   };
+  function t(key, ru) { return (lang !== 'ru' && I18N[lang] && I18N[lang][key] != null) ? I18N[lang][key] : ru; }
+  // Глубокий словарь содержимого (ключ — нормализованный русский текст листового узла)
+  const DEEP = { en: {
+    'Лето круглый год': 'Year-round summer',
+    'Тёплое Андаманское море, пляжи и тропическая природа 12 месяцев в году.': 'Warm Andaman Sea, beaches and tropical nature 12 months a year.',
+    'Доход от аренды': 'Rental income',
+    'Популярное туристическое направление — ликвидная аренда и доходность до 8–10% годовых.': 'A popular tourist destination — liquid rentals and yields up to 8–10% per year.',
+    'Доступность': 'Accessibility',
+    'Международный аэропорт, прямые рейсы, развитая инфраструктура и медицина.': 'International airport, direct flights, developed infrastructure and healthcare.',
+    'Понятное владение': 'Clear ownership',
+    'Freehold для кондо и leasehold для вилл — законные и проверенные схемы.': 'Freehold for condos and leasehold for villas — legal, proven schemes.',
+    'Остров, где отдых и инвестиция — это одно и то же решение.': 'An island where a holiday and an investment are the same decision.',
+    'Покажем сотни объектов, не выходя из дома': 'Explore hundreds of homes without leaving yours',
+    'Подбор и просмотры онлайн': 'Online search and viewings',
+    'Видео-туры и личные показы — выбирайте удобно из любой точки мира.': 'Video tours and in-person viewings — choose conveniently from anywhere.',
+    'Сопровождение на каждом шаге': 'Support at every step',
+    'От первого звонка до ключей: подбор, проверка, сделка, сервис после покупки.': 'From the first call to the keys: selection, due diligence, deal, after-sale service.',
+    'Прозрачность и юридическая защита': 'Transparency and legal protection',
+    'Проверяем застройщика и документы, объясняем каждый пункт договора.': 'We vet the developer and documents and explain every clause of the contract.',
+    'Прозрачный процесс без сюрпризов — вы всегда понимаете, что происходит на каждом шаге.': 'A transparent process with no surprises — you always know what happens at each step.',
+    'Знакомство': 'Introduction',
+    'Обсуждаем задачи, бюджет и цели покупки на звонке. Формирую персональную подборку.': 'We discuss your goals and budget on a call. I prepare a personal selection.',
+    'Просмотры': 'Viewings',
+    'Онлайн-туры или личные показы на острове. Честно показываю плюсы и минусы каждого варианта.': 'Online tours or in-person viewings. I honestly show the pros and cons of each option.',
+    'Проверка': 'Due diligence',
+    'Юридическая чистота объекта, репутация застройщика, документы и договор под защитой юриста.': 'Legal status of the property, developer reputation, documents and contract protected by a lawyer.',
+    'Сделка': 'The deal',
+    'Безопасные расчёты, оформление и передача ключей. Сопровождаю до последней подписи.': 'Secure payments, paperwork and handover of keys. I support you to the final signature.',
+    'После покупки': 'After purchase',
+    'Помогаю с меблировкой, управлением и сдачей в аренду для дохода.': 'I help with furnishing, management and renting out for income.',
+    'Юридическая проверка': 'Legal check',
+    'Проверяем объект, застройщика и документы до сделки.': 'We verify the property, developer and documents before the deal.',
+    'Защита сделки': 'Deal protection',
+    'Договор и расчёты сопровождает юрист — без скрытых рисков.': 'A lawyer handles the contract and payments — no hidden risks.',
+    'Безопасные расчёты': 'Secure payments',
+    'Прозрачная схема оплаты и перевода средств.': 'A transparent payment and money-transfer scheme.',
+    'Поддержка после': 'After-sale support',
+    'Меблировка, управление и сдача в аренду для дохода.': 'Furnishing, management and renting out for income.',
+    'Не только полная оплата — на Пхукете доступны рассрочка и поэтапные схемы. Поможем подобрать удобный вариант.': 'Not only full payment — instalments and staged plans are available in Phuket. We will help you find a convenient option.',
+    'Аренда с выкупом': 'Rent-to-own',
+    'Превратите аренду в собственность: платежи идут в счёт покупки, а цена фиксируется заранее.': 'Turn rent into ownership: payments count toward the purchase and the price is fixed in advance.',
+    'Рассрочка от застройщика': 'Developer instalments',
+    'Покупка напрямую у застройщика с гибким графиком платежей, часто без банка и процентов.': 'Buy directly from the developer with a flexible payment schedule, often without a bank or interest.',
+    'Поэтапная оплата': 'Staged payment',
+    'Платите частями по мере строительства — удобно для объектов на стадии возведения.': 'Pay in instalments as construction progresses — convenient for off-plan projects.',
+    'Калькулятор покупки': 'Purchase calculator',
+    'Рассчитайте платёж по кредиту и доходность от аренды за пару секунд.': 'Calculate your loan payment and rental yield in seconds.',
+    'Открыть калькулятор': 'Open calculator',
+    'Коротко о главном. Остальное — обсудим лично.': 'The essentials in short. The rest — let’s discuss in person.',
+    'Может ли иностранец купить недвижимость на Пхукете?': 'Can a foreigner buy property in Phuket?',
+    'Да. Квартиру в кондоминиуме иностранец может оформить в полную собственность (freehold) в рамках иностранной квоты. Виллы и дома обычно оформляют в долгосрочную аренду (leasehold) или через структуру владения. Подберём законную и безопасную схему.': 'Yes. A foreigner can own a condominium unit in full ownership (freehold) within the foreign quota. Villas and houses are usually held via long-term lease (leasehold) or an ownership structure. We will arrange a legal and safe scheme.',
+    'В чём разница freehold и leasehold?': 'What is the difference between freehold and leasehold?',
+    'Freehold — полная собственность (чаще для кондо). Leasehold — долгосрочная аренда земли/объекта, как правило 30 лет с возможностью продления. Для вилл leasehold — распространённая и рабочая практика.': 'Freehold is full ownership (usually for condos). Leasehold is a long-term lease of the land/property, typically 30 years with renewal. For villas, leasehold is a common and workable practice.',
+    'Какие расходы и налоги при покупке?': 'What costs and taxes are involved when buying?',
+    'Обычно это регистрационный сбор, гербовый сбор/налог и услуги по оформлению. Точная сумма зависит от объекта и типа сделки — рассчитаем заранее, без сюрпризов.': 'Usually a transfer fee, stamp duty/tax and processing services. The exact amount depends on the property and deal type — we calculate it in advance, no surprises.',
+    'Можно ли купить удалённо?': 'Can I buy remotely?',
+    'Да. Проводим онлайн-показы и видео-туры, помогаем с документами и переводом средств. Многие клиенты покупают полностью дистанционно.': 'Yes. We run online viewings and video tours and help with documents and money transfers. Many clients buy entirely remotely.',
+    'Какой доход приносит аренда?': 'What income does renting bring?',
+    'В зависимости от локации и объекта — ориентировочно 5–10% годовых брутто. На странице каждого объекта есть калькулятор доходности с вашими параметрами.': 'Depending on location and property — roughly 5–10% gross per year. Every listing page has a yield calculator with your parameters.',
+    'Помогаете ли после покупки?': 'Do you help after the purchase?',
+    'Да. Поможем с меблировкой, управляющей компанией и сдачей в аренду, чтобы недвижимость работала и приносила доход.': 'Yes. We help with furnishing, a management company and renting out, so the property works and earns.',
+    'Помогаю русскоговорящим клиентам безопасно купить недвижимость на Пхукете: от первого видеозвонка до получения ключей. Знаю остров изнутри, лично проверяю каждый объект и застройщика.': 'I help clients safely buy property in Phuket: from the first video call to getting the keys. I know the island inside out and personally vet every property and developer.',
+    'Личный подбор объектов под ваш запрос и бюджет': 'Personal selection of properties for your needs and budget',
+    'Полная юридическая проверка и сопровождение сделки': 'Full legal due diligence and deal support',
+    'Помощь с переводом средств, налогами и арендой под сдачу': 'Help with money transfers, taxes and rental income',
+    'Поддержка после покупки: управление и сервис': 'After-sale support: management and service',
+    'на рынке недвижимости Пхукета': 'in Phuket real estate',
+    'Здесь будет фото Алены': 'Alena’s photo goes here',
+    'Написать в WhatsApp': 'Message on WhatsApp',
+    'Написать в Telegram': 'Message on Telegram',
+    '«Купили виллу в Камале полностью удалённо и ни разу не пожалели. Алена вела нас за руку, объясняла каждый документ. Это и есть доверие.»': '“We bought a villa in Kamala fully remotely and never regretted it. Alena guided us by the hand and explained every document. That is real trust.”',
+    'Москва · купили виллу': 'Moscow · bought a villa',
+    '«Боялась покупать за границей, но всё прошло прозрачно. Квартира у моря уже приносит доход от аренды. Спасибо за честность!»': '“I was afraid to buy abroad, but everything was transparent. The seaside apartment already earns rental income. Thank you for your honesty!”',
+    'Санкт-Петербург · квартира у моря': 'St. Petersburg · seaside apartment',
+    '«Профессионал высочайшего уровня. Подобрала пентхаус мечты быстрее, чем мы ожидали, и помогла даже после сделки.»': '“A top-level professional. She found our dream penthouse faster than we expected and helped even after the deal.”',
+    'Дубай · пентхаус': 'Dubai · penthouse',
+    'Выберите район — покажем подходящие объекты из каталога.': 'Choose a district — we’ll show matching listings from the catalog.',
+    'Проверенные виллы и квартиры в лучших локациях острова — от уютных резиденций до премиальных пентхаусов с видом на Андаманское море.': 'Vetted villas and apartments in the island’s best locations — from cozy residences to premium penthouses overlooking the Andaman Sea.',
+    'Объекты со сниженной ценой. Что-то приглянулось — напишите, поможем оформить выгодно.': 'Listings with reduced prices. Like something? Message us — we’ll help you get a great deal.',
+    'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'Tap a marker to see the price and open the listing.',
+    'Короткие гайды, которые помогут разобраться до первого звонка.': 'Short guides to help you get oriented before the first call.',
+    'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'Didn’t find the right option? We’ll find a property for your budget and goals.',
+    'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'Nothing found for your query. Try relaxing the filters or message us — we’ll find it manually.',
+    'Все типы': 'All types', 'Все районы': 'All districts', 'Спальни: любые': 'Bedrooms: any',
+    '1 спальня': '1 bedroom', '2 спальни': '2 bedrooms', '3 спальни': '3 bedrooms', '4+ спальни': '4+ bedrooms',
+    'Площадь: любая': 'Area: any', 'от 50 м²': 'from 50 m²', 'от 100 м²': 'from 100 m²', 'от 150 м²': 'from 150 m²', 'от 250 м²': 'from 250 m²',
+    'Сортировка: по умолчанию': 'Sort: default', 'Цена ↑': 'Price ↑', 'Цена ↓': 'Price ↓', 'Площадь ↓': 'Area ↓', '$ за м² ↑': '$ per m² ↑',
+    '🏖 У пляжа': '🏖 Near beach', '♥ Избранное': '♥ Favorites', 'Сбросить': 'Reset', 'Показать ещё': 'Show more',
+  }, th: {
+    'Лето круглый год': 'ฤดูร้อนตลอดทั้งปี',
+    'Тёплое Андаманское море, пляжи и тропическая природа 12 месяцев в году.': 'ทะเลอันดามันอันอบอุ่น ชายหาด และธรรมชาติเขตร้อนตลอด 12 เดือน',
+    'Доход от аренды': 'รายได้จากค่าเช่า',
+    'Популярное туристическое направление — ликвидная аренда и доходность до 8–10% годовых.': 'จุดหมายปลายทางยอดนิยม — ปล่อยเช่าง่าย ผลตอบแทนสูงถึง 8–10% ต่อปี',
+    'Доступность': 'การเดินทางสะดวก',
+    'Международный аэропорт, прямые рейсы, развитая инфраструктура и медицина.': 'สนามบินนานาชาติ เที่ยวบินตรง โครงสร้างพื้นฐานและการแพทย์ที่พร้อม',
+    'Понятное владение': 'การถือครองที่ชัดเจน',
+    'Freehold для кондо и leasehold для вилл — законные и проверенные схемы.': 'Freehold สำหรับคอนโดและ leasehold สำหรับวิลล่า — ถูกกฎหมายและผ่านการตรวจสอบ',
+    'Остров, где отдых и инвестиция — это одно и то же решение.': 'เกาะที่การพักผ่อนและการลงทุนคือการตัดสินใจเดียวกัน',
+    'Покажем сотни объектов, не выходя из дома': 'ชมอสังหาฯ นับร้อยได้โดยไม่ต้องออกจากบ้าน',
+    'Подбор и просмотры онлайн': 'ค้นหาและชมออนไลน์',
+    'Видео-туры и личные показы — выбирайте удобно из любой точки мира.': 'ทัวร์วิดีโอและชมจริง — เลือกได้สะดวกจากทุกที่ทั่วโลก',
+    'Сопровождение на каждом шаге': 'ดูแลทุกขั้นตอน',
+    'От первого звонка до ключей: подбор, проверка, сделка, сервис после покупки.': 'ตั้งแต่โทรครั้งแรกจนรับกุญแจ: คัดเลือก ตรวจสอบ ทำสัญญา และบริการหลังการขาย',
+    'Прозрачность и юридическая защита': 'ความโปร่งใสและการคุ้มครองทางกฎหมาย',
+    'Проверяем застройщика и документы, объясняем каждый пункт договора.': 'ตรวจสอบผู้พัฒนาและเอกสาร อธิบายทุกข้อในสัญญา',
+    'Прозрачный процесс без сюрпризов — вы всегда понимаете, что происходит на каждом шаге.': 'กระบวนการโปร่งใส ไม่มีเซอร์ไพรส์ — คุณเข้าใจทุกขั้นตอนเสมอ',
+    'Знакомство': 'ทำความรู้จัก',
+    'Обсуждаем задачи, бюджет и цели покупки на звонке. Формирую персональную подборку.': 'พูดคุยเป้าหมายและงบประมาณทางโทรศัพท์ แล้วจัดรายการที่เหมาะกับคุณ',
+    'Просмотры': 'การเข้าชม',
+    'Онлайн-туры или личные показы на острове. Честно показываю плюсы и минусы каждого варианта.': 'ทัวร์ออนไลน์หรือชมจริงบนเกาะ บอกข้อดีข้อเสียอย่างตรงไปตรงมา',
+    'Проверка': 'การตรวจสอบ',
+    'Юридическая чистота объекта, репутация застройщика, документы и договор под защитой юриста.': 'สถานะทางกฎหมาย ชื่อเสียงผู้พัฒนา เอกสารและสัญญาภายใต้การดูแลของทนาย',
+    'Сделка': 'การทำสัญญา',
+    'Безопасные расчёты, оформление и передача ключей. Сопровождаю до последней подписи.': 'การชำระเงินที่ปลอดภัย จัดการเอกสารและส่งมอบกุญแจ ดูแลจนลายเซ็นสุดท้าย',
+    'После покупки': 'หลังการซื้อ',
+    'Помогаю с меблировкой, управлением и сдачей в аренду для дохода.': 'ช่วยเรื่องเฟอร์นิเจอร์ การบริหาร และปล่อยเช่าเพื่อสร้างรายได้',
+    'Юридическая проверка': 'ตรวจสอบทางกฎหมาย',
+    'Проверяем объект, застройщика и документы до сделки.': 'ตรวจสอบทรัพย์ ผู้พัฒนา และเอกสารก่อนทำสัญญา',
+    'Защита сделки': 'คุ้มครองการทำสัญญา',
+    'Договор и расчёты сопровождает юрист — без скрытых рисков.': 'ทนายดูแลสัญญาและการชำระเงิน — ไม่มีความเสี่ยงแอบแฝง',
+    'Безопасные расчёты': 'ชำระเงินปลอดภัย',
+    'Прозрачная схема оплаты и перевода средств.': 'รูปแบบการชำระและโอนเงินที่โปร่งใส',
+    'Поддержка после': 'ดูแลหลังการขาย',
+    'Меблировка, управление и сдача в аренду для дохода.': 'เฟอร์นิเจอร์ การบริหาร และปล่อยเช่าเพื่อรายได้',
+    'Не только полная оплата — на Пхукете доступны рассрочка и поэтапные схемы. Поможем подобрать удобный вариант.': 'ไม่ใช่แค่จ่ายเต็ม — ภูเก็ตมีผ่อนชำระและแบบเป็นงวด เราช่วยเลือกแบบที่สะดวก',
+    'Аренда с выкупом': 'เช่าพร้อมสิทธิ์ซื้อ',
+    'Превратите аренду в собственность: платежи идут в счёт покупки, а цена фиксируется заранее.': 'เปลี่ยนค่าเช่าเป็นกรรมสิทธิ์: เงินงวดนับเป็นค่าซื้อ และล็อกราคาไว้ล่วงหน้า',
+    'Рассрочка от застройщика': 'ผ่อนกับผู้พัฒนา',
+    'Покупка напрямую у застройщика с гибким графиком платежей, часто без банка и процентов.': 'ซื้อตรงจากผู้พัฒนา ผ่อนยืดหยุ่น มักไม่ผ่านธนาคารและไม่มีดอกเบี้ย',
+    'Поэтапная оплата': 'ชำระเป็นงวด',
+    'Платите частями по мере строительства — удобно для объектов на стадии возведения.': 'จ่ายตามความคืบหน้าการก่อสร้าง — เหมาะกับโครงการที่กำลังสร้าง',
+    'Калькулятор покупки': 'เครื่องคำนวณการซื้อ',
+    'Рассчитайте платёж по кредиту и доходность от аренды за пару секунд.': 'คำนวณค่างวดสินเชื่อและผลตอบแทนค่าเช่าได้ในไม่กี่วินาที',
+    'Открыть калькулятор': 'เปิดเครื่องคำนวณ',
+    'Коротко о главном. Остальное — обсудим лично.': 'สรุปสั้น ๆ ส่วนที่เหลือคุยกันส่วนตัว',
+    'Может ли иностранец купить недвижимость на Пхукете?': 'ชาวต่างชาติซื้ออสังหาฯ ในภูเก็ตได้ไหม?',
+    'Да. Квартиру в кондоминиуме иностранец может оформить в полную собственность (freehold) в рамках иностранной квоты. Виллы и дома обычно оформляют в долгосрочную аренду (leasehold) или через структуру владения. Подберём законную и безопасную схему.': 'ได้ ชาวต่างชาติถือครองคอนโดแบบ freehold ได้ภายในโควตาต่างชาติ ส่วนวิลล่าและบ้านมักทำเป็นสัญญาเช่าระยะยาว (leasehold) หรือผ่านโครงสร้างการถือครอง เราจะจัดรูปแบบที่ถูกกฎหมายและปลอดภัย',
+    'В чём разница freehold и leasehold?': 'freehold กับ leasehold ต่างกันอย่างไร?',
+    'Freehold — полная собственность (чаще для кондо). Leasehold — долгосрочная аренда земли/объекта, как правило 30 лет с возможностью продления. Для вилл leasehold — распространённая и рабочая практика.': 'Freehold คือกรรมสิทธิ์เต็ม (มักเป็นคอนโด) ส่วน leasehold คือเช่าระยะยาว ปกติ 30 ปี ต่ออายุได้ สำหรับวิลล่า leasehold เป็นแนวทางที่ใช้กันทั่วไป',
+    'Какие расходы и налоги при покупке?': 'มีค่าใช้จ่ายและภาษีอะไรบ้างตอนซื้อ?',
+    'Обычно это регистрационный сбор, гербовый сбор/налог и услуги по оформлению. Точная сумма зависит от объекта и типа сделки — рассчитаем заранее, без сюрпризов.': 'โดยทั่วไปมีค่าธรรมเนียมโอน อากรแสตมป์/ภาษี และค่าดำเนินการ ยอดที่แน่นอนขึ้นกับทรัพย์และประเภทธุรกรรม — เราคำนวณให้ล่วงหน้า ไม่มีเซอร์ไพรส์',
+    'Можно ли купить удалённо?': 'ซื้อแบบทางไกลได้ไหม?',
+    'Да. Проводим онлайн-показы и видео-туры, помогаем с документами и переводом средств. Многие клиенты покупают полностью дистанционно.': 'ได้ เราจัดชมออนไลน์และทัวร์วิดีโอ ช่วยเรื่องเอกสารและการโอนเงิน ลูกค้าหลายรายซื้อทางไกลทั้งหมด',
+    'Какой доход приносит аренда?': 'ค่าเช่าให้ผลตอบแทนเท่าไร?',
+    'В зависимости от локации и объекта — ориентировочно 5–10% годовых брутто. На странице каждого объекта есть калькулятор доходности с вашими параметрами.': 'ขึ้นกับทำเลและทรัพย์ — ราว 5–10% ต่อปี (ก่อนหักค่าใช้จ่าย) แต่ละรายการมีเครื่องคำนวณผลตอบแทนตามค่าของคุณ',
+    'Помогаете ли после покупки?': 'มีบริการหลังการซื้อไหม?',
+    'Да. Поможем с меблировкой, управляющей компанией и сдачей в аренду, чтобы недвижимость работала и приносила доход.': 'มี เราช่วยเรื่องเฟอร์นิเจอร์ บริษัทบริหาร และปล่อยเช่า เพื่อให้ทรัพย์สร้างรายได้',
+    'Помогаю русскоговорящим клиентам безопасно купить недвижимость на Пхукете: от первого видеозвонка до получения ключей. Знаю остров изнутри, лично проверяю каждый объект и застройщика.': 'ช่วยลูกค้าซื้ออสังหาฯ ในภูเก็ตอย่างปลอดภัย ตั้งแต่วิดีโอคอลครั้งแรกจนรับกุญแจ รู้จักเกาะอย่างลึกซึ้ง และตรวจสอบทุกทรัพย์และผู้พัฒนาด้วยตนเอง',
+    'Личный подбор объектов под ваш запрос и бюджет': 'คัดเลือกทรัพย์ส่วนตัวตามความต้องการและงบของคุณ',
+    'Полная юридическая проверка и сопровождение сделки': 'ตรวจสอบทางกฎหมายครบถ้วนและดูแลการทำสัญญา',
+    'Помощь с переводом средств, налогами и арендой под сдачу': 'ช่วยเรื่องการโอนเงิน ภาษี และการปล่อยเช่า',
+    'Поддержка после покупки: управление и сервис': 'ดูแลหลังการซื้อ: บริหารและบริการ',
+    'на рынке недвижимости Пхукета': 'ในวงการอสังหาฯ ภูเก็ต',
+    'Здесь будет фото Алены': 'รูปของอาเลน่าจะอยู่ที่นี่',
+    'Написать в WhatsApp': 'แชทผ่าน WhatsApp',
+    'Написать в Telegram': 'แชทผ่าน Telegram',
+    '«Купили виллу в Камале полностью удалённо и ни разу не пожалели. Алена вела нас за руку, объясняла каждый документ. Это и есть доверие.»': '“ซื้อวิลล่าที่กมลาแบบทางไกลทั้งหมด ไม่เคยเสียใจเลย อาเลน่าดูแลทุกขั้นตอนและอธิบายทุกเอกสาร นี่แหละความไว้วางใจ”',
+    'Москва · купили виллу': 'มอสโก · ซื้อวิลล่า',
+    '«Боялась покупать за границей, но всё прошло прозрачно. Квартира у моря уже приносит доход от аренды. Спасибо за честность!»': '“กลัวการซื้อในต่างประเทศ แต่ทุกอย่างโปร่งใส คอนโดริมทะเลสร้างรายได้ค่าเช่าแล้ว ขอบคุณในความจริงใจ!”',
+    'Санкт-Петербург · квартира у моря': 'เซนต์ปีเตอร์สเบิร์ก · คอนโดริมทะเล',
+    '«Профессионал высочайшего уровня. Подобрала пентхаус мечты быстрее, чем мы ожидали, и помогла даже после сделки.»': '“มืออาชีพระดับสูง หาเพนต์เฮาส์ในฝันได้เร็วกว่าที่คิด และช่วยแม้หลังปิดการขาย”',
+    'Дубай · пентхаус': 'ดูไบ · เพนต์เฮาส์',
+    'Выберите район — покажем подходящие объекты из каталога.': 'เลือกทำเล — เราจะแสดงรายการที่ตรงจากแคตตาล็อก',
+    'Проверенные виллы и квартиры в лучших локациях острова — от уютных резиденций до премиальных пентхаусов с видом на Андаманское море.': 'วิลล่าและคอนโดที่ผ่านการตรวจสอบในทำเลที่ดีที่สุดของเกาะ — ตั้งแต่เรสซิเดนซ์อบอุ่นถึงเพนต์เฮาส์หรูวิวทะเลอันดามัน',
+    'Объекты со сниженной ценой. Что-то приглянулось — напишите, поможем оформить выгодно.': 'รายการลดราคา ถูกใจรายการไหน ทักมาได้เลย เราช่วยให้ได้ดีล',
+    'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'แตะหมุดเพื่อดูราคาและเปิดรายละเอียดทรัพย์',
+    'Короткие гайды, которые помогут разобраться до первого звонка.': 'คู่มือสั้น ๆ ช่วยให้เข้าใจก่อนโทรครั้งแรก',
+    'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'ยังไม่เจอที่ใช่? เราจะหาทรัพย์ให้ตรงงบและความต้องการของคุณ',
+    'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'ไม่พบผลลัพธ์ ลองผ่อนตัวกรองหรือทักมาหาเรา — เราจะช่วยหาด้วยตนเอง',
+    'Все типы': 'ทุกประเภท', 'Все районы': 'ทุกทำเล', 'Спальни: любые': 'ห้องนอน: ทั้งหมด',
+    '1 спальня': '1 ห้องนอน', '2 спальни': '2 ห้องนอน', '3 спальни': '3 ห้องนอน', '4+ спальни': '4+ ห้องนอน',
+    'Площадь: любая': 'พื้นที่: ทั้งหมด', 'от 50 м²': 'ตั้งแต่ 50 ตร.ม.', 'от 100 м²': 'ตั้งแต่ 100 ตร.ม.', 'от 150 м²': 'ตั้งแต่ 150 ตร.ม.', 'от 250 м²': 'ตั้งแต่ 250 ตร.ม.',
+    'Сортировка: по умолчанию': 'จัดเรียง: ค่าเริ่มต้น', 'Цена ↑': 'ราคา ↑', 'Цена ↓': 'ราคา ↓', 'Площадь ↓': 'พื้นที่ ↓', '$ за м² ↑': '$ ต่อ ตร.ม. ↑',
+    '🏖 У пляжа': '🏖 ใกล้หาด', '♥ Избранное': '♥ รายการโปรด', 'Сбросить': 'ล้างค่า', 'Показать ещё': 'แสดงเพิ่ม',
+  } };
+  const DEEP_SEL = 'h1,h2,h3,h4,p,li,summary,b,span,a,button,option,output';
+  const DEEP_EXCL = '#catalogGrid,#urgentGrid,#districtsGrid,#searchChips,#mapAll,.compare-bar,.modal,script,style,noscript';
+  function deepTranslate(l) {
+    document.querySelectorAll(DEEP_SEL).forEach(el => {
+      if (el.children.length) return;
+      if (el.hasAttribute('data-i18n') || el.hasAttribute('data-count')) return;
+      if (el.closest(DEEP_EXCL)) return;
+      if (el.id === 'catalogCount' || el.id === 'priceLabel' || el.id === 'catalogUpdated') return; // \u0442\u0435\u043a\u0441\u0442 \u0441\u0442\u0430\u0432\u0438\u0442 JS
+      if (el.dataset.dru == null) el.dataset.dru = el.textContent;
+      if (!el.dataset.dru.trim()) return;
+      const key = el.dataset.dru.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+      const tr = (l !== 'ru' && DEEP[l]) ? DEEP[l][key] : null;
+      el.textContent = (tr != null) ? tr : el.dataset.dru;
+    });
+  }
+
   let lang = 'ru';
   try { const l = localStorage.getItem('ae_lang'); if (l === 'en' || l === 'th' || l === 'ru') lang = l; } catch (e) {}
   const langSwitch = document.getElementById('langSwitch');
@@ -749,6 +954,8 @@
       el.setAttribute('placeholder', (tr != null) ? tr : el.dataset.phru);
     });
     if (langSwitch) langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+    deepTranslate(l);
+    if (allItems.length) { render(); renderUrgent(); if (typeof clampSliders === 'function') clampSliders(); }
   }
   langSwitch && langSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (b) applyLang(b.dataset.lang); });
   applyLang(lang);
