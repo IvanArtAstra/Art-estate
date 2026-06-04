@@ -672,6 +672,87 @@
   }
   currSwitch && currSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-curr]'); if (b) setCurrency(b.dataset.curr); });
 
+  /* ---------- ЯЗЫК ИНТЕРФЕЙСА (RU/EN/TH) ---------- */
+  const I18N = {
+    en: {
+      nav_districts: 'Districts', nav_objects: 'Listings', nav_map: 'Map', nav_finance: 'Financing',
+      nav_journal: 'Journal', nav_about: 'About Alena', nav_steps: 'Process', nav_reviews: 'Reviews', nav_contacts: 'Contacts',
+      cta_request: 'Request a call', drawer_price: 'Currency',
+      hero_eyebrow: 'Real estate in Phuket', hero_title: 'Your dream home <em>by the ocean</em>',
+      hero_sub: 'Villas and apartments in Phuket with full personal support of your deal from A to Z.',
+      hero_big2: 'Villas<br>with infinity<br>pools', hero_big3: 'Step<br>inside the dream', hero_enter: 'View listings →',
+      sb_eyebrow: 'Find your property', sb_title: 'Find your home in Phuket', sb_btn: 'Search', sb_ph: 'District, type or property name…',
+      trust_families: 'happy families', trust_years: 'years on the island', trust_legal: '% legal protection', trust_objects: 'verified listings',
+      districts_eyebrow: 'Locations', districts_title: 'Districts of Phuket',
+      catalog_eyebrow: 'Catalog', catalog_title: 'Featured Phuket listings',
+      urgent_eyebrow: 'Best value', urgent_title: 'Urgent sale',
+      map_eyebrow: 'On the map', map_title: 'Listings on the Phuket map',
+      finance_eyebrow: 'Financing', finance_title: 'Flexible ways to buy',
+      whyphuket_eyebrow: 'Dream location', whyphuket_title: 'Why Phuket',
+      whyus_eyebrow: 'Why us', whyus_title: 'Buying in Phuket — easy and safe',
+      steps_eyebrow: 'How we work', steps_title: 'Your path to property',
+      faq_eyebrow: 'Q&A', faq_title: 'Frequently asked questions',
+      journal_eyebrow: 'Journal', journal_title: 'Useful guides about buying in Phuket',
+      reviews_eyebrow: 'Reviews', reviews_title: 'Trusted by clients',
+      about_eyebrow: 'Your personal agent', contacts_eyebrow: 'Contacts', contacts_title: 'Let’s find your home in Phuket',
+      catalog_cta_btn: 'Get a selection', whyus_cta: 'Get a consultation', journal_all: 'All journal articles',
+      contacts_lead: 'Leave a request — I’ll reply personally and help you take the first step to your dream property.',
+      contacts_role: 'Personal agent at Art Estate', contacts_note: 'Working across Phuket · Online viewings from anywhere in the world',
+      lead_submit: 'Send request via WhatsApp', lead_consent: 'I agree to the processing of personal data and accept the <a href="privacy/" target="_blank" rel="noopener">privacy policy</a>',
+      lead_name_ph: 'Your name', lead_phone_ph: 'Phone or @telegram', lead_msg_ph: 'What are you looking for: area, budget, type? (optional)',
+    },
+    th: {
+      nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
+      nav_journal: 'บทความ', nav_about: 'เกี่ยวกับอาเลน่า', nav_steps: 'ขั้นตอน', nav_reviews: 'รีวิว', nav_contacts: 'ติดต่อ',
+      cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน',
+      hero_eyebrow: 'อสังหาริมทรัพย์ในภูเก็ต', hero_title: 'บ้านในฝัน <em>ริมทะเล</em>',
+      hero_sub: 'วิลล่าและคอนโดในภูเก็ต พร้อมบริการดูแลการซื้อขายแบบครบวงจร',
+      hero_big2: 'วิลล่า<br>พร้อมสระว่ายน้ำ<br>อินฟินิตี้', hero_big3: 'ก้าวเข้าสู่<br>บ้านในฝัน', hero_enter: 'ดูรายการ →',
+      sb_eyebrow: 'ค้นหาอสังหาฯ', sb_title: 'ค้นหาบ้านของคุณในภูเก็ต', sb_btn: 'ค้นหา', sb_ph: 'ทำเล ประเภท หรือชื่อโครงการ…',
+      trust_families: 'ครอบครัวที่พึงพอใจ', trust_years: 'ปีบนเกาะ', trust_legal: '% คุ้มครองทางกฎหมาย', trust_objects: 'รายการที่ตรวจสอบแล้ว',
+      districts_eyebrow: 'ทำเล', districts_title: 'ทำเลในภูเก็ต',
+      catalog_eyebrow: 'แคตตาล็อก', catalog_title: 'รายการแนะนำในภูเก็ต',
+      urgent_eyebrow: 'คุ้มค่า', urgent_title: 'ขายด่วน',
+      map_eyebrow: 'บนแผนที่', map_title: 'รายการบนแผนที่ภูเก็ต',
+      finance_eyebrow: 'การเงิน', finance_title: 'วิธีการซื้อที่ยืดหยุ่น',
+      whyphuket_eyebrow: 'ทำเลในฝัน', whyphuket_title: 'ทำไมต้องภูเก็ต',
+      whyus_eyebrow: 'ทำไมต้องเรา', whyus_title: 'ซื้อในภูเก็ต — ง่ายและปลอดภัย',
+      steps_eyebrow: 'ขั้นตอนการทำงาน', steps_title: 'เส้นทางสู่อสังหาฯ ของคุณ',
+      faq_eyebrow: 'คำถาม', faq_title: 'คำถามที่พบบ่อย',
+      journal_eyebrow: 'บทความ', journal_title: 'คู่มือการซื้ออสังหาฯ ในภูเก็ต',
+      reviews_eyebrow: 'รีวิว', reviews_title: 'ลูกค้าไว้วางใจเรา',
+      about_eyebrow: 'ตัวแทนส่วนตัวของคุณ', contacts_eyebrow: 'ติดต่อ', contacts_title: 'มาหาบ้านของคุณในภูเก็ตกัน',
+      catalog_cta_btn: 'ขอรายการที่คัดสรร', whyus_cta: 'ขอคำปรึกษา', journal_all: 'บทความทั้งหมด',
+      contacts_lead: 'ฝากข้อมูลไว้ — ฉันจะตอบกลับด้วยตนเองและช่วยคุณเริ่มต้น',
+      contacts_role: 'ตัวแทนส่วนตัว Art Estate', contacts_note: 'ให้บริการทั่วภูเก็ต · ชมออนไลน์ได้จากทุกที่',
+      lead_submit: 'ส่งคำขอผ่าน WhatsApp', lead_consent: 'ฉันยินยอมให้ประมวลผลข้อมูลส่วนบุคคลและยอมรับ <a href="privacy/" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>',
+      lead_name_ph: 'ชื่อของคุณ', lead_phone_ph: 'โทรศัพท์ หรือ @telegram', lead_msg_ph: 'คุณกำลังมองหาอะไร: ทำเล งบประมาณ ประเภท? (ไม่บังคับ)',
+    },
+  };
+  let lang = 'ru';
+  try { const l = localStorage.getItem('ae_lang'); if (l === 'en' || l === 'th' || l === 'ru') lang = l; } catch (e) {}
+  const langSwitch = document.getElementById('langSwitch');
+  function applyLang(l) {
+    lang = l;
+    try { localStorage.setItem('ae_lang', l); } catch (e) {}
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if (el.dataset.ru == null) el.dataset.ru = el.innerHTML;
+      const tr = (l !== 'ru' && I18N[l]) ? I18N[l][k] : null;
+      el.innerHTML = (tr != null) ? tr : el.dataset.ru;
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const k = el.getAttribute('data-i18n-ph');
+      if (el.dataset.phru == null) el.dataset.phru = el.getAttribute('placeholder') || '';
+      const tr = (l !== 'ru' && I18N[l]) ? I18N[l][k] : null;
+      el.setAttribute('placeholder', (tr != null) ? tr : el.dataset.phru);
+    });
+    if (langSwitch) langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+  }
+  langSwitch && langSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (b) applyLang(b.dataset.lang); });
+  applyLang(lang);
+
   /* ---------- СРОЧНАЯ ПРОДАЖА (объекты со скидкой) ---------- */
   const urgentGrid = document.getElementById('urgentGrid');
   const urgentSection = document.getElementById('urgent');

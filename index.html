@@ -56,11 +56,11 @@
   <header class="header" id="header">
     <a href="#hero" class="logo">ART <span>ESTATE</span></a>
     <nav class="nav" id="nav">
-      <a href="#catalog">Объекты</a>
-      <a href="#about">Об Алене</a>
-      <a href="#steps">Этапы</a>
-      <a href="#reviews">Отзывы</a>
-      <a href="#contacts">Контакты</a>
+      <a href="#catalog" data-i18n="nav_objects">Объекты</a>
+      <a href="#about" data-i18n="nav_about">Об Алене</a>
+      <a href="#steps" data-i18n="nav_steps">Этапы</a>
+      <a href="#reviews" data-i18n="nav_reviews">Отзывы</a>
+      <a href="#contacts" data-i18n="nav_contacts">Контакты</a>
     </nav>
     <a href="tel:+79124869508" class="header__cta">+7 912 486-95-08</a>
     <button class="burger" id="burger" data-drawer-open aria-label="Открыть меню"><span></span><span></span><span></span></button>
@@ -81,20 +81,20 @@
 
         <!-- Слой 1: заголовок -->
         <div class="hero__layer" data-layer="1">
-          <p class="hero__eyebrow">Недвижимость на Пхукете</p>
-          <h1 class="hero__title">Дом мечты <em>у океана</em></h1>
-          <p class="hero__sub">Виллы и квартиры на острове Пхукет с персональным сопровождением сделки от&nbsp;А&nbsp;до&nbsp;Я.</p>
+          <p class="hero__eyebrow" data-i18n="hero_eyebrow">Недвижимость на Пхукете</p>
+          <h1 class="hero__title" data-i18n="hero_title">Дом мечты <em>у океана</em></h1>
+          <p class="hero__sub" data-i18n="hero_sub">Виллы и квартиры на острове Пхукет с персональным сопровождением сделки от&nbsp;А&nbsp;до&nbsp;Я.</p>
         </div>
 
         <!-- Слой 2: над виллами -->
         <div class="hero__layer" data-layer="2">
-          <h2 class="hero__big">Виллы<br>с бесконечными<br>бассейнами</h2>
+          <h2 class="hero__big" data-i18n="hero_big2">Виллы<br>с бесконечными<br>бассейнами</h2>
         </div>
 
         <!-- Слой 3: влёт в интерьер -->
         <div class="hero__layer" data-layer="3">
-          <h2 class="hero__big">Заходите<br>внутрь мечты</h2>
-          <a href="#catalog" class="hero__enter">Смотреть объекты →</a>
+          <h2 class="hero__big" data-i18n="hero_big3">Заходите<br>внутрь мечты</h2>
+          <a href="#catalog" class="hero__enter" data-i18n="hero_enter">Смотреть объекты →</a>
         </div>
 
         <div class="hero__scroll-hint" id="scrollHint">
@@ -108,11 +108,11 @@
   <!-- ============ ПОИСКОВАЯ ПАНЕЛЬ ============ -->
   <section class="searchband reveal">
     <div class="searchband__inner">
-      <p class="eyebrow">Подбор недвижимости</p>
-      <h2 class="searchband__title">Найдите свой объект на Пхукете</h2>
+      <p class="eyebrow" data-i18n="sb_eyebrow">Подбор недвижимости</p>
+      <h2 class="searchband__title" data-i18n="sb_title">Найдите свой объект на Пхукете</h2>
       <form class="searchband__form" id="searchForm">
-        <input type="search" id="heroSearch" placeholder="Район, тип или название объекта…" autocomplete="off" />
-        <button type="submit" class="btn btn--gold">Найти</button>
+        <input type="search" id="heroSearch" placeholder="Район, тип или название объекта…" data-i18n-ph="sb_ph" autocomplete="off" />
+        <button type="submit" class="btn btn--gold" data-i18n="sb_btn">Найти</button>
       </form>
       <div class="searchband__chips" id="searchChips"></div>
     </div>
@@ -120,10 +120,10 @@
 
   <!-- ============ ДОВЕРИЕ / ЦИФРЫ ============ -->
   <section class="trust reveal">
-    <div class="trust__item"><b data-count="120">0</b><span>довольных семей</span></div>
-    <div class="trust__item"><b data-count="8">0</b><span>лет на острове</span></div>
-    <div class="trust__item"><b data-count="100">0</b><span>% юридическая защита</span></div>
-    <div class="trust__item"><b data-count="50">0</b><span>проверенных объектов</span></div>
+    <div class="trust__item"><b data-count="120">0</b><span data-i18n="trust_families">довольных семей</span></div>
+    <div class="trust__item"><b data-count="8">0</b><span data-i18n="trust_years">лет на острове</span></div>
+    <div class="trust__item"><b data-count="100">0</b><span data-i18n="trust_legal">% юридическая защита</span></div>
+    <div class="trust__item"><b data-count="50">0</b><span data-i18n="trust_objects">проверенных объектов</span></div>
   </section>
 
   <!-- ============ ПОЧЕМУ С НАМИ (видео) ============ -->
@@ -136,8 +136,8 @@
         <div class="whyus__caption">Покажем сотни объектов, не выходя из дома</div>
       </div>
       <div class="whyus__content reveal">
-        <p class="eyebrow">Почему с нами</p>
-        <h2 class="section__title">Покупать на Пхукете — легко и безопасно</h2>
+        <p class="eyebrow" data-i18n="whyus_eyebrow">Почему с нами</p>
+        <h2 class="section__title" data-i18n="whyus_title">Покупать на Пхукете — легко и безопасно</h2>
         <ul class="whyus__list">
           <li>
             <b>Подбор и просмотры онлайн</b>
@@ -152,7 +152,7 @@
             <span>Проверяем застройщика и документы, объясняем каждый пункт договора.</span>
           </li>
         </ul>
-        <a href="#contacts" class="btn btn--gold">Получить консультацию</a>
+        <a href="#contacts" class="btn btn--gold" data-i18n="whyus_cta">Получить консультацию</a>
       </div>
     </div>
   </section>
@@ -160,8 +160,8 @@
   <!-- ============ РАЙОНЫ ПХУКЕТА ============ -->
   <section class="section districts" id="districts">
     <div class="section__head reveal">
-      <p class="eyebrow">Локации</p>
-      <h2 class="section__title">Районы Пхукета</h2>
+      <p class="eyebrow" data-i18n="districts_eyebrow">Локации</p>
+      <h2 class="section__title" data-i18n="districts_title">Районы Пхукета</h2>
       <p class="section__lead">Выберите район — покажем подходящие объекты из каталога.</p>
     </div>
     <div class="districts__grid" id="districtsGrid"></div>
@@ -170,8 +170,8 @@
   <!-- ============ КАТАЛОГ ОБЪЕКТОВ ============ -->
   <section class="section catalog" id="catalog">
     <div class="section__head reveal">
-      <p class="eyebrow">Каталог</p>
-      <h2 class="section__title">Избранные объекты Пхукета</h2>
+      <p class="eyebrow" data-i18n="catalog_eyebrow">Каталог</p>
+      <h2 class="section__title" data-i18n="catalog_title">Избранные объекты Пхукета</h2>
       <p class="section__lead">Проверенные виллы и квартиры в лучших локациях острова — от&nbsp;уютных резиденций до&nbsp;премиальных пентхаусов с видом на&nbsp;Андаманское море.</p>
     </div>
 
@@ -223,15 +223,15 @@
 
     <div class="catalog__cta reveal">
       <p>Не нашли подходящий вариант? Подберём объект под ваш бюджет и&nbsp;задачи.</p>
-      <a href="#contacts" class="btn btn--gold">Получить подборку</a>
+      <a href="#contacts" class="btn btn--gold" data-i18n="catalog_cta_btn">Получить подборку</a>
     </div>
   </section>
 
   <!-- ============ СРОЧНАЯ ПРОДАЖА ============ -->
   <section class="section urgent" id="urgent" hidden>
     <div class="section__head reveal">
-      <p class="eyebrow">Выгодно</p>
-      <h2 class="section__title">Срочная продажа</h2>
+      <p class="eyebrow" data-i18n="urgent_eyebrow">Выгодно</p>
+      <h2 class="section__title" data-i18n="urgent_title">Срочная продажа</h2>
       <p class="section__lead">Объекты со сниженной ценой. Что-то приглянулось — напишите, поможем оформить выгодно.</p>
     </div>
     <div class="catalog__grid" id="urgentGrid"></div>
@@ -240,8 +240,8 @@
   <!-- ============ ОБЪЕКТЫ НА КАРТЕ ============ -->
   <section class="section mapsec" id="map">
     <div class="section__head reveal">
-      <p class="eyebrow">На карте</p>
-      <h2 class="section__title">Объекты на карте Пхукета</h2>
+      <p class="eyebrow" data-i18n="map_eyebrow">На карте</p>
+      <h2 class="section__title" data-i18n="map_title">Объекты на карте Пхукета</h2>
       <p class="section__lead">Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.</p>
     </div>
     <div class="mapsec__map reveal" id="mapAll"></div>
@@ -250,8 +250,8 @@
   <!-- ============ ПОЧЕМУ ПХУКЕТ ============ -->
   <section class="section whyphuket" id="why-phuket">
     <div class="section__head reveal">
-      <p class="eyebrow">Локация мечты</p>
-      <h2 class="section__title">Почему Пхукет</h2>
+      <p class="eyebrow" data-i18n="whyphuket_eyebrow">Локация мечты</p>
+      <h2 class="section__title" data-i18n="whyphuket_title">Почему Пхукет</h2>
       <p class="section__lead">Остров, где отдых и инвестиция — это одно и&nbsp;то&nbsp;же решение.</p>
     </div>
     <div class="whyphuket__grid">
@@ -265,8 +265,8 @@
   <!-- ============ СПОСОБЫ ПОКУПКИ / ФИНАНСИРОВАНИЕ ============ -->
   <section class="section finance" id="finance">
     <div class="section__head reveal">
-      <p class="eyebrow">Финансирование</p>
-      <h2 class="section__title">Гибкие способы покупки</h2>
+      <p class="eyebrow" data-i18n="finance_eyebrow">Финансирование</p>
+      <h2 class="section__title" data-i18n="finance_title">Гибкие способы покупки</h2>
       <p class="section__lead">Не только полная оплата — на Пхукете доступны рассрочка и поэтапные схемы. Поможем подобрать удобный вариант.</p>
     </div>
     <div class="finance__grid">
@@ -306,7 +306,7 @@
       </div>
     </div>
     <div class="about__content reveal">
-      <p class="eyebrow">Ваш персональный агент</p>
+      <p class="eyebrow" data-i18n="about_eyebrow">Ваш персональный агент</p>
       <h2 class="section__title">Артемьева Алена Николаевна</h2>
       <p class="about__text">Помогаю русскоговорящим клиентам безопасно купить недвижимость на&nbsp;Пхукете: от&nbsp;первого видеозвонка до&nbsp;получения ключей. Знаю остров изнутри, лично проверяю каждый объект и&nbsp;застройщика.</p>
       <ul class="about__list">
@@ -325,8 +325,8 @@
   <!-- ============ ЭТАПЫ ПОКУПКИ ============ -->
   <section class="section steps" id="steps">
     <div class="section__head reveal">
-      <p class="eyebrow">Как мы работаем</p>
-      <h2 class="section__title">Путь к вашей недвижимости</h2>
+      <p class="eyebrow" data-i18n="steps_eyebrow">Как мы работаем</p>
+      <h2 class="section__title" data-i18n="steps_title">Путь к вашей недвижимости</h2>
       <p class="section__lead">Прозрачный процесс без сюрпризов — вы&nbsp;всегда понимаете, что происходит на&nbsp;каждом шаге.</p>
     </div>
     <div class="steps__grid">
@@ -351,8 +351,8 @@
   <!-- ============ ОТЗЫВЫ ============ -->
   <section class="section reviews" id="reviews">
     <div class="section__head reveal">
-      <p class="eyebrow">Отзывы</p>
-      <h2 class="section__title">Нам доверяют</h2>
+      <p class="eyebrow" data-i18n="reviews_eyebrow">Отзывы</p>
+      <h2 class="section__title" data-i18n="reviews_title">Нам доверяют</h2>
     </div>
     <div class="reviews__grid">
       <blockquote class="review reveal">
@@ -376,8 +376,8 @@
   <!-- ============ FAQ ============ -->
   <section class="section faq" id="faq">
     <div class="section__head reveal">
-      <p class="eyebrow">Вопросы и ответы</p>
-      <h2 class="section__title">Частые вопросы</h2>
+      <p class="eyebrow" data-i18n="faq_eyebrow">Вопросы и ответы</p>
+      <h2 class="section__title" data-i18n="faq_title">Частые вопросы</h2>
       <p class="section__lead">Коротко о&nbsp;главном. Остальное — обсудим лично.</p>
     </div>
     <div class="faq__list reveal">
@@ -411,8 +411,8 @@
   <!-- ============ ЖУРНАЛ ============ -->
   <section class="section journal" id="journal">
     <div class="section__head reveal">
-      <p class="eyebrow">Журнал</p>
-      <h2 class="section__title">Полезное о покупке на Пхукете</h2>
+      <p class="eyebrow" data-i18n="journal_eyebrow">Журнал</p>
+      <h2 class="section__title" data-i18n="journal_title">Полезное о покупке на Пхукете</h2>
       <p class="section__lead">Короткие гайды, которые помогут разобраться до&nbsp;первого звонка.</p>
     </div>
     <div class="journal__grid">
@@ -429,27 +429,27 @@
         <div class="jcard__body"><span class="jcard__tag">Локации</span><h3>Районы Пхукета: где&nbsp;покупать</h3><span class="jcard__more">Читать →</span></div>
       </a>
     </div>
-    <div class="journal__all reveal"><a href="blog/" class="btn btn--gold">Все статьи журнала</a></div>
+    <div class="journal__all reveal"><a href="blog/" class="btn btn--gold" data-i18n="journal_all">Все статьи журнала</a></div>
   </section>
 
   <!-- ============ КОНТАКТЫ ============ -->
   <section class="section contacts" id="contacts">
     <div class="contacts__inner reveal">
-      <p class="eyebrow">Контакты</p>
-      <h2 class="section__title">Найдём ваш дом на Пхукете</h2>
-      <p class="contacts__lead">Оставьте заявку — отвечу лично и&nbsp;помогу сделать первый шаг к&nbsp;недвижимости вашей мечты.</p>
+      <p class="eyebrow" data-i18n="contacts_eyebrow">Контакты</p>
+      <h2 class="section__title" data-i18n="contacts_title">Найдём ваш дом на Пхукете</h2>
+      <p class="contacts__lead" data-i18n="contacts_lead">Оставьте заявку — отвечу лично и&nbsp;помогу сделать первый шаг к&nbsp;недвижимости вашей мечты.</p>
 
       <form class="lead" id="leadForm" novalidate>
         <div class="lead__row">
-          <input type="text" id="leadName" name="name" placeholder="Ваше имя" autocomplete="name" required />
-          <input type="text" id="leadPhone" name="phone" placeholder="Телефон или @telegram" autocomplete="tel" required />
+          <input type="text" id="leadName" name="name" placeholder="Ваше имя" data-i18n-ph="lead_name_ph" autocomplete="name" required />
+          <input type="text" id="leadPhone" name="phone" placeholder="Телефон или @telegram" data-i18n-ph="lead_phone_ph" autocomplete="tel" required />
         </div>
-        <input type="text" id="leadMsg" name="msg" placeholder="Что ищете: район, бюджет, тип? (необязательно)" />
+        <input type="text" id="leadMsg" name="msg" placeholder="Что ищете: район, бюджет, тип? (необязательно)" data-i18n-ph="lead_msg_ph" />
         <label class="lead__consent">
           <input type="checkbox" id="leadConsent" />
-          <span>Согласен на обработку персональных данных и принимаю <a href="privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+          <span data-i18n="lead_consent">Согласен на обработку персональных данных и принимаю <a href="privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
         </label>
-        <button type="submit" class="btn btn--gold btn--lg lead__submit">Отправить заявку в WhatsApp</button>
+        <button type="submit" class="btn btn--gold btn--lg lead__submit" data-i18n="lead_submit">Отправить заявку в WhatsApp</button>
         <p class="lead__hint" id="leadHint" aria-live="polite"></p>
       </form>
 
@@ -457,7 +457,7 @@
         <div class="contacts__avatar">АА</div>
         <div>
           <b>Артемьева Алена Николаевна</b>
-          <span>Персональный агент Art Estate</span>
+          <span data-i18n="contacts_role">Персональный агент Art Estate</span>
         </div>
       </div>
 
@@ -474,7 +474,7 @@
         </a>
       </div>
 
-      <p class="contacts__note">Работаю по&nbsp;всему острову Пхукет · Онлайн-показы из&nbsp;любой точки мира</p>
+      <p class="contacts__note" data-i18n="contacts_note">Работаю по&nbsp;всему острову Пхукет · Онлайн-показы из&nbsp;любой точки мира</p>
     </div>
   </section>
 
@@ -520,10 +520,19 @@
         <button class="drawer__close" data-drawer-close aria-label="Закрыть">×</button>
       </div>
 
-      <a href="#contacts" class="btn btn--gold drawer__cta" data-drawer-close>Оставить заявку</a>
+      <a href="#contacts" class="btn btn--gold drawer__cta" data-drawer-close data-i18n="cta_request">Оставить заявку</a>
 
       <div class="drawer__group">
-        <span class="drawer__label">Отображение цены</span>
+        <span class="drawer__label">Язык / Language</span>
+        <div class="curr-switch" id="langSwitch" role="group" aria-label="Язык">
+          <button data-lang="ru" class="is-active" type="button">RU</button>
+          <button data-lang="en" type="button">EN</button>
+          <button data-lang="th" type="button">TH</button>
+        </div>
+      </div>
+
+      <div class="drawer__group">
+        <span class="drawer__label" data-i18n="drawer_price">Отображение цены</span>
         <div class="curr-switch" id="currSwitch" role="group" aria-label="Валюта">
           <button data-curr="USD" class="is-active" type="button">$ USD</button>
           <button data-curr="RUB" type="button">₽ RUB</button>
@@ -532,15 +541,15 @@
       </div>
 
       <nav class="drawer__nav">
-        <a href="#districts" data-drawer-close>Районы</a>
-        <a href="#catalog" data-drawer-close>Объекты</a>
-        <a href="#map" data-drawer-close>Карта</a>
-        <a href="#finance" data-drawer-close>Финансирование</a>
-        <a href="blog/">Журнал</a>
-        <a href="#about" data-drawer-close>Об Алене</a>
-        <a href="#steps" data-drawer-close>Этапы</a>
-        <a href="#reviews" data-drawer-close>Отзывы</a>
-        <a href="#contacts" data-drawer-close>Контакты</a>
+        <a href="#districts" data-drawer-close data-i18n="nav_districts">Районы</a>
+        <a href="#catalog" data-drawer-close data-i18n="nav_objects">Объекты</a>
+        <a href="#map" data-drawer-close data-i18n="nav_map">Карта</a>
+        <a href="#finance" data-drawer-close data-i18n="nav_finance">Финансирование</a>
+        <a href="blog/" data-i18n="nav_journal">Журнал</a>
+        <a href="#about" data-drawer-close data-i18n="nav_about">Об Алене</a>
+        <a href="#steps" data-drawer-close data-i18n="nav_steps">Этапы</a>
+        <a href="#reviews" data-drawer-close data-i18n="nav_reviews">Отзывы</a>
+        <a href="#contacts" data-drawer-close data-i18n="nav_contacts">Контакты</a>
       </nav>
 
       <div class="drawer__contacts">
