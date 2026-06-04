@@ -21,6 +21,14 @@ import datetime as dt
 SITE = "https://ivanartastra.github.io/Art-estate"
 RATES = {"RUB": 92, "THB": 36.5}  # курс USD→валюта (синхронно с js/script.js)
 
+# Статические контент-страницы для sitemap (privacy исключаем — noindex)
+STATIC_URLS = [
+    "/blog/",
+    "/blog/kak-kupit-nedvizhimost-na-phukete/",
+    "/blog/freehold-vs-leasehold/",
+    "/blog/rayony-phuketa/",
+]
+
 TRANSLIT = {
     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
     'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
@@ -344,7 +352,9 @@ def build():
     with open(catalog_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # sitemap.xml
+    # sitemap.xml (объекты + статические контент-страницы)
+    for s in STATIC_URLS:
+        urls.append(SITE + s)
     today = dt.date.today().isoformat()
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
