@@ -25,7 +25,9 @@
       "lat": 7.779955,
       "lng": 98.314691,
       "image": "assets/catalog/u5346015.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-nai-harn-beach-condominium-в-раваи-пхукет-u5346015"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-nai-harn-beach-condominium-в-раваи-пхукет-u5346015",
+      "slug": "nai-harn-beach-condominium-u5346015",
+      "url": "object/nai-harn-beach-condominium-u5346015/"
     },
     {
       "id": "5350611",
@@ -48,7 +50,9 @@
       "lat": 7.9150693,
       "lng": 98.3935525,
       "image": "assets/catalog/u5350611.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-supalai-city-resort-phuket-в-ratsada-пхукет-u5350611"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-supalai-city-resort-phuket-в-ratsada-пхукет-u5350611",
+      "slug": "supalai-city-resort-phuket-u5350611",
+      "url": "object/supalai-city-resort-phuket-u5350611/"
     },
     {
       "id": "6416545",
@@ -71,7 +75,9 @@
       "lat": 7.976437,
       "lng": 98.284909,
       "image": "assets/catalog/u6416545.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-baan-thai-surin-hill-в-чернг-талай-пхукет-u6416545"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-baan-thai-surin-hill-в-чернг-талай-пхукет-u6416545",
+      "slug": "baan-thai-surin-hill-u6416545",
+      "url": "object/baan-thai-surin-hill-u6416545/"
     },
     {
       "id": "6145848",
@@ -94,7 +100,9 @@
       "lat": 7.9919018222168,
       "lng": 98.299223321081,
       "image": "assets/catalog/u6145848.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-пентхаус-в-diamond-condominium-bang-tao-в-чернг-талай-пхукет-u6145848"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-пентхаус-в-diamond-condominium-bang-tao-в-чернг-талай-пхукет-u6145848",
+      "slug": "diamond-condominium-bang-tao-u6145848",
+      "url": "object/diamond-condominium-bang-tao-u6145848/"
     },
     {
       "id": "1393422",
@@ -117,7 +125,9 @@
       "lat": 7.8251608,
       "lng": 98.3022261,
       "image": "assets/catalog/u1393422.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-the-view-luxury-condominium-в-карон-пхукет-u1393422"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-the-view-luxury-condominium-в-карон-пхукет-u1393422",
+      "slug": "the-view-luxury-condominium-u1393422",
+      "url": "object/the-view-luxury-condominium-u1393422/"
     },
     {
       "id": "5592671",
@@ -140,7 +150,9 @@
       "lat": 7.823265,
       "lng": 98.338642,
       "image": "assets/catalog/u5592671.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-dlux-condominium-в-чалонг-пхукет-u5592671"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-dlux-condominium-в-чалонг-пхукет-u5592671",
+      "slug": "dlux-condominium-u5592671",
+      "url": "object/dlux-condominium-u5592671/"
     },
     {
       "id": "6414679",
@@ -163,7 +175,9 @@
       "lat": 7.8839226,
       "lng": 98.2742644,
       "image": "assets/catalog/u6414679.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-absolute-twin-sands-i-в-патонг-пхукет-u6414679"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-absolute-twin-sands-i-в-патонг-пхукет-u6414679",
+      "slug": "absolute-twin-sands-i-u6414679",
+      "url": "object/absolute-twin-sands-i-u6414679/"
     },
     {
       "id": "6381441",
@@ -186,7 +200,9 @@
       "lat": 7.99103,
       "lng": 98.2963236,
       "image": "assets/catalog/u6381441.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-modeva-в-чернг-талай-пхукет-u6381441"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-modeva-в-чернг-талай-пхукет-u6381441",
+      "slug": "the-modeva-u6381441",
+      "url": "object/the-modeva-u6381441/"
     },
     {
       "id": "6257851",
@@ -209,7 +225,9 @@
       "lat": 7.980045,
       "lng": 98.283391,
       "image": "assets/catalog/u6257851.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-aristo-1-в-чернг-талай-пхукет-u6257851"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-aristo-1-в-чернг-талай-пхукет-u6257851",
+      "slug": "aristo-1-u6257851",
+      "url": "object/aristo-1-u6257851/"
     },
     {
       "id": "6416032",
@@ -232,7 +250,9 @@
       "lat": 8.013934,
       "lng": 98.3335784,
       "image": "assets/catalog/u6416032.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-дом-в-nai-home-srisunthon-3-в-si-sunthon-пхукет-u6416032"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-дом-в-nai-home-srisunthon-3-в-si-sunthon-пхукет-u6416032",
+      "slug": "nai-home-srisunthon-3-u6416032",
+      "url": "object/nai-home-srisunthon-3-u6416032/"
     },
     {
       "id": "5946968",
@@ -255,7 +275,9 @@
       "lat": 8.0864406,
       "lng": 98.3002969,
       "image": "assets/catalog/u5946968.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-title-halo-1-в-sakhu-пхукет-u5946968"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-title-halo-1-в-sakhu-пхукет-u5946968",
+      "slug": "the-title-halo-1-u5946968",
+      "url": "object/the-title-halo-1-u5946968/"
     },
     {
       "id": "6400743",
@@ -278,7 +300,9 @@
       "lat": 7.823868,
       "lng": 98.3383833,
       "image": "assets/catalog/u6400743.jpeg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-noon-village-tower-ii-в-чалонг-пхукет-u6400743"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-noon-village-tower-ii-в-чалонг-пхукет-u6400743",
+      "slug": "noon-village-tower-ii-u6400743",
+      "url": "object/noon-village-tower-ii-u6400743/"
     },
     {
       "id": "6415070",
@@ -301,7 +325,9 @@
       "lat": 7.9849487,
       "lng": 98.2961127,
       "image": "assets/catalog/u6415070.png",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-serene-raya-villas-bang-tao-в-чернг-талай-пхукет-u6415070"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-serene-raya-villas-bang-tao-в-чернг-талай-пхукет-u6415070",
+      "slug": "serene-raya-villas-bang-tao-u6415070",
+      "url": "object/serene-raya-villas-bang-tao-u6415070/"
     },
     {
       "id": "6419432",
@@ -324,7 +350,9 @@
       "lat": 7.7816414,
       "lng": 98.3149422,
       "image": "assets/catalog/u6419432.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-calypso-condo-в-раваи-пхукет-u6419432"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-calypso-condo-в-раваи-пхукет-u6419432",
+      "slug": "calypso-condo-u6419432",
+      "url": "object/calypso-condo-u6419432/"
     },
     {
       "id": "6403216",
@@ -347,7 +375,9 @@
       "lat": 7.8347133,
       "lng": 98.3010893,
       "image": "assets/catalog/u6403216.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-utopia-karon-в-карон-пхукет-u6403216"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-utopia-karon-в-карон-пхукет-u6403216",
+      "slug": "utopia-karon-u6403216",
+      "url": "object/utopia-karon-u6403216/"
     },
     {
       "id": "6419068",
@@ -370,7 +400,9 @@
       "lat": 7.781135,
       "lng": 98.314417,
       "image": "assets/catalog/u6419068.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-relife-the-windy-в-раваи-пхукет-u6419068"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-relife-the-windy-в-раваи-пхукет-u6419068",
+      "slug": "relife-the-windy-u6419068",
+      "url": "object/relife-the-windy-u6419068/"
     },
     {
       "id": "6401761",
@@ -393,7 +425,9 @@
       "lat": 7.9943152,
       "lng": 98.2938836,
       "image": "assets/catalog/u6401761.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-laguna-beachside-в-чернг-талай-пхукет-u6401761"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-laguna-beachside-в-чернг-талай-пхукет-u6401761",
+      "slug": "laguna-beachside-u6401761",
+      "url": "object/laguna-beachside-u6401761/"
     },
     {
       "id": "6247449",
@@ -416,7 +450,9 @@
       "lat": 7.9998696,
       "lng": 98.3059654,
       "image": "assets/catalog/u6247449.jpg",
-      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-fifth-element-в-чернг-талай-пхукет-u6247449"
+      "source_url": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-fifth-element-в-чернг-талай-пхукет-u6247449",
+      "slug": "fifth-element-u6247449",
+      "url": "object/fifth-element-u6247449/"
     }
   ]
 }

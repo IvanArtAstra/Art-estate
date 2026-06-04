@@ -275,7 +275,7 @@
         ${beach}
         <div class="card__bottom">
           <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || 'Цена по запросу')}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</span>
-          <button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее <span class="card__arrow">→</span></button>
+          ${it.url ? `<a class="card__link" href="${esc(it.url)}">Подробнее <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее <span class="card__arrow">→</span></button>`}
         </div>
       </div>
     </article>`;
@@ -505,6 +505,7 @@
   function destroyMap() { if (mapInst) { mapInst.remove(); mapInst = null; } }
   function openDetail(id) {
     const it = itemById(id); if (!it) return;
+    if (it.url) { window.location.href = it.url; return; }  // отдельная SEO-страница объекта
     setModal('detailBox', buildDetail(it));
     openModal('detailModal');
     wireCalculators();

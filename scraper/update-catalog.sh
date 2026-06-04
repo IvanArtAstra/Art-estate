@@ -19,7 +19,11 @@ python3 scraper/scrape_fazwaz.py \
   --pages "$PAGES" \
   --limit "$LIMIT" \
   --delay "$DELAY"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Готово."
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Генерирую SEO-страницы объектов…"
+python3 scraper/build_pages.py
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Готово. Не забудьте: git add -A && git commit && git push"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ЗАПУСК ПО РАСПИСАНИЮ
