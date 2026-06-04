@@ -202,6 +202,7 @@
   const catalogMore = document.getElementById('catalogMore');
 
   let allItems = [];
+  let districtPages = null; // [{name,slug,url,count,image}] из catalog.json
   const compare = new Set();
   const MAX_COMPARE = 4;
   const PAGE_SIZE = 9;
@@ -584,13 +585,15 @@
   }
   function renderDistricts() {
     const wrap = document.getElementById('districtsGrid'); if (!wrap) return;
-    const ds = districtStats().slice(0, 8);
-    wrap.innerHTML = ds.map(d => `
-      <button class="dcard reveal" data-district="${esc(d.name)}" type="button">
-        <img src="${esc(d.image || 'assets/hero-phuket.jpg')}" alt="${esc(d.name)}" loading="lazy" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>
+    const ds = (districtPages && districtPages.length ? districtPages : districtStats()).slice(0, 8);
+    wrap.innerHTML = ds.map(d => {
+      const inner = `<img src="${esc(d.image || 'assets/hero-phuket.jpg')}" alt="${esc(d.name)}" loading="lazy" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>
         <span class="dcard__name">${esc(d.name)}</span>
-        <span class="dcard__count">${d.count} ${plural(d.count, 'объект', 'объекта', 'объектов')}</span>
-      </button>`).join('');
+        <span class="dcard__count">${d.count} ${plural(d.count, 'объект', 'объекта', 'объектов')}</span>`;
+      return d.url
+        ? `<a class="dcard reveal" href="${esc(d.url)}">${inner}</a>`
+        : `<button class="dcard reveal" data-district="${esc(d.name)}" type="button">${inner}</button>`;
+    }).join('');
     observeReveal(Array.from(wrap.querySelectorAll('.reveal')));
     markLoaded(wrap);
     wrap.querySelectorAll('[data-district]').forEach(b => b.addEventListener('click', () => applyDistrict(b.dataset.district)));
@@ -679,6 +682,7 @@
   function initCatalog(data) {
     const items = (data && data.items && data.items.length) ? data.items : FALLBACK_CATALOG.items;
     allItems = items.map((it, i) => Object.assign({}, it, { id: it.id != null ? String(it.id) : 'demo' + i }));
+    districtPages = (data && data.districts && data.districts.length) ? data.districts : null;
     // типы для фильтра
     if (fType) {
       const types = Array.from(new Set(allItems.map(it => it.type).filter(Boolean))).sort();

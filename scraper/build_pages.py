@@ -219,6 +219,72 @@ PAGE = """<!DOCTYPE html>
 """
 
 
+DISTRICT_PAGE = """<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Недвижимость в районе __NAME__, Пхукет — купить | Art Estate</title>
+<meta name="description" content="__METADESC__" />
+<meta name="theme-color" content="#0f3f3a" />
+<link rel="canonical" href="__CANON__" />
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:title" content="Недвижимость в районе __NAME__ — Art Estate" />
+<meta property="og:description" content="__METADESC__" />
+<meta property="og:url" content="__CANON__" />
+<meta property="og:image" content="__OGIMG__" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="../../css/styles.css" />
+<style>
+  body { background: var(--sand); }
+  .pp-header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1rem clamp(1.2rem,4vw,3rem); background: rgba(246,241,231,.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(20,32,31,.08); }
+  .pp-wrap { max-width: 1180px; margin: 0 auto; padding: clamp(1.4rem,4vw,2.6rem); }
+  .crumbs { font-size: .85rem; color: var(--ink-soft); margin: .4rem 0 1.2rem; }
+  .crumbs a { color: var(--ink-soft); } .crumbs a:hover { color: var(--gold); } .crumbs span { color: var(--gold); }
+  .d-intro h1 { font-size: clamp(2rem,5vw,3.2rem); color: var(--teal); margin-bottom: .5rem; }
+  .d-intro p { color: var(--ink-soft); font-size: 1.1rem; max-width: 760px; }
+  .d-map { height: 340px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin: 1.8rem 0 2.4rem; z-index: 0; }
+  .pp-back { display: inline-flex; gap: .4rem; color: var(--teal); font-weight: 700; margin-top: 2.4rem; }
+</style>
+<script type="application/ld+json">__JSONLD__</script>
+</head>
+<body>
+<header class="pp-header">
+  <a href="../../" class="logo" style="color:var(--teal)">ART <span style="color:var(--gold)">ESTATE</span></a>
+  <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
+</header>
+<div class="pp-wrap">
+  <nav class="crumbs"><a href="../../">Главная</a> / <a href="../../#catalog">Каталог</a> / <span>__NAME__</span></nav>
+  <div class="d-intro">
+    <p class="eyebrow">Район Пхукета</p>
+    <h1>Недвижимость в районе __NAME__</h1>
+    <p>__INTRO__</p>
+  </div>
+  <div class="d-map" id="dMap"></div>
+  <div class="catalog__grid">__CARDS__</div>
+  <a class="pp-back" href="../../#districts">← Все районы</a>
+</div>
+<footer class="footer" style="margin-top:3rem">
+  <div class="footer__bottom" style="border:0">
+    <span>© __YEAR__ Art Estate · Недвижимость на Пхукете · <a href="../../privacy/">Политика конфиденциальности</a></span>
+    <a href="tel:+79124869508">+7 912 486-95-08</a>
+  </div>
+</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function(){
+  var pts=__POINTS__;
+  if(pts.length&&window.L){var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
+})();
+</script>
+</body>
+</html>
+"""
+
+
 def build():
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
@@ -348,7 +414,67 @@ def build():
         urls.append(canon)
         print(f"  ✓ {rel}")
 
-    # обновляем catalog.json (со slug/url)
+    # ----- СТРАНИЦЫ РАЙОНОВ -----
+    groups = {}
+    for it in items:
+        d = (it.get("location") or "").split(",")[0].strip()
+        if not d:
+            continue
+        groups.setdefault(d, []).append(it)
+
+    districts_meta = []
+    for name, objs in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+        dslug = slugify(name, None)
+        durl = f"district/{dslug}/"
+        canon = f"{SITE}/{durl}"
+        cover = next((o.get("image") for o in objs if o.get("image")), "assets/hero-phuket.jpg")
+        districts_meta.append({"name": name, "slug": dslug, "url": durl, "count": len(objs), "image": cover})
+
+        cards, points = [], []
+        for o in objs:
+            usd_v = o.get("priceUSD") or 0
+            meta = []
+            if o.get("beds") not in (None, ""):
+                b = o["beds"]
+                meta.append(f"{int(b)} {plural(b,'спальня','спальни','спален')}" if isinstance(b, (int, float)) and b > 0 else esc(b))
+            if o.get("area"):
+                meta.append(f"{esc(o['area'])} м²")
+            tag = f'<span class="card__tag">{esc(o["type"])}</span>' if o.get("type") else ""
+            cards.append(
+                f'<article class="card"><div class="card__media"><img src="../../{esc(o.get("image") or "assets/hero-phuket.jpg")}" alt="{esc(o.get("title"))}" loading="lazy" onerror="this.onerror=null;this.src=\'../../assets/hero-phuket.jpg\'"/>{tag}</div>'
+                f'<div class="card__body"><h3>{esc(o.get("title"))}</h3><p class="card__meta">{esc(o.get("location"))} · {" · ".join(meta)}</p>'
+                f'<div class="card__bottom"><span class="card__price">{money_usd(usd_v)}</span><a class="card__link" href="../../{esc(o.get("url"))}">Подробнее →</a></div></div></article>'
+            )
+            if o.get("lat") and o.get("lng"):
+                points.append([o["lat"], o["lng"], (o.get("title") or "Объект").replace("'", ""), "../../" + (o.get("url") or "")])
+
+        cnt = len(objs)
+        intro = f"{cnt} {plural(cnt,'объект','объекта','объектов')} в районе {name} — виллы и квартиры. Поможем выбрать, проверить и безопасно оформить сделку, в том числе удалённо."
+        meta_desc = esc(f"Купить недвижимость в районе {name} на Пхукете: {cnt} {plural(cnt,'объект','объекта','объектов')}. Подбор и сопровождение сделки от Art Estate.")
+        jsonld = json.dumps({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Главная", "item": SITE + "/"},
+            {"@type": "ListItem", "position": 2, "name": "Каталог", "item": SITE + "/#catalog"},
+            {"@type": "ListItem", "position": 3, "name": name, "item": canon},
+        ]}, ensure_ascii=False)
+
+        html = DISTRICT_PAGE
+        for k, v in {
+            "__NAME__": esc(name), "__METADESC__": meta_desc, "__CANON__": canon,
+            "__OGIMG__": f"{SITE}/{cover}", "__INTRO__": esc(intro),
+            "__CARDS__": "".join(cards), "__POINTS__": json.dumps(points, ensure_ascii=False),
+            "__JSONLD__": jsonld, "__YEAR__": str(year),
+        }.items():
+            html = html.replace(k, v)
+        out_dir = os.path.join(root, "district", dslug)
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+        urls.append(canon)
+        print(f"  ▸ district/{dslug}/ ({cnt})")
+
+    data["districts"] = districts_meta
+
+    # обновляем catalog.json (со slug/url + districts)
     with open(catalog_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 

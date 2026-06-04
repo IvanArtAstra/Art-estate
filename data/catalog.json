@@ -454,5 +454,63 @@
       "slug": "fifth-element-u6247449",
       "url": "object/fifth-element-u6247449/"
     }
+  ],
+  "districts": [
+    {
+      "name": "Чернг Талай",
+      "slug": "cherng-talay",
+      "url": "district/cherng-talay/",
+      "count": 7,
+      "image": "assets/catalog/u6416545.jpeg"
+    },
+    {
+      "name": "Раваи",
+      "slug": "ravai",
+      "url": "district/ravai/",
+      "count": 3,
+      "image": "assets/catalog/u5346015.jpeg"
+    },
+    {
+      "name": "Карон",
+      "slug": "karon",
+      "url": "district/karon/",
+      "count": 2,
+      "image": "assets/catalog/u1393422.jpg"
+    },
+    {
+      "name": "Чалонг",
+      "slug": "chalong",
+      "url": "district/chalong/",
+      "count": 2,
+      "image": "assets/catalog/u5592671.jpeg"
+    },
+    {
+      "name": "Ratsada",
+      "slug": "ratsada",
+      "url": "district/ratsada/",
+      "count": 1,
+      "image": "assets/catalog/u5350611.jpg"
+    },
+    {
+      "name": "Патонг",
+      "slug": "patong",
+      "url": "district/patong/",
+      "count": 1,
+      "image": "assets/catalog/u6414679.jpg"
+    },
+    {
+      "name": "Si Sunthon",
+      "slug": "si-sunthon",
+      "url": "district/si-sunthon/",
+      "count": 1,
+      "image": "assets/catalog/u6416032.jpg"
+    },
+    {
+      "name": "Sakhu",
+      "slug": "sakhu",
+      "url": "district/sakhu/",
+      "count": 1,
+      "image": "assets/catalog/u5946968.jpeg"
+    }
   ]
 }
