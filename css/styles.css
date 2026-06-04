@@ -773,6 +773,29 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .whyus__video { will-change: transform; transform: scale(1.1); }
 [data-parallax] { will-change: transform, background-position; }
 
+/* ---------- ПЛАВНЫЕ ВОЛНЫ-ПЕРЕХОДЫ МЕЖДУ СЕКЦИЯМИ ---------- */
+.trust, .steps, .footer { position: relative; }
+.trust::before, .trust::after,
+.steps::before, .steps::after,
+.footer::before {
+  content: ''; position: absolute; left: 0; right: 0; height: 46px; z-index: 1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 48' preserveAspectRatio='none'%3E%3Cpath d='M0,0H1440V22Q1080,50,720,30Q360,10,0,30Z' fill='%23f6f1e7'/%3E%3C/svg%3E") no-repeat top center;
+  background-size: 100% 100%; pointer-events: none;
+}
+.trust::before, .steps::before, .footer::before { top: -1px; }
+.trust::after, .steps::after { bottom: -1px; transform: scaleY(-1); }
+
+/* ---------- ФОРМА ЗАЯВКИ ---------- */
+.lead { position: relative; max-width: 520px; margin: 0 auto 1.8rem; display: flex; flex-direction: column; gap: .7rem; }
+.lead__row { display: flex; gap: .7rem; }
+.lead input { flex: 1; width: 100%; font: inherit; font-size: 1rem; color: var(--cream); background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.18); border-radius: 100px; padding: .9rem 1.3rem; outline: none; transition: border-color .25s var(--ease-out), background .25s var(--ease-out), box-shadow .25s var(--ease-out); }
+.lead input::placeholder { color: rgba(255,253,248,.55); }
+.lead input:focus { border-color: var(--gold); background: rgba(255,255,255,.13); box-shadow: 0 0 0 3px rgba(201,162,75,.2); }
+.lead input.err { border-color: #e8a0a0; background: rgba(192,57,43,.14); }
+.lead__submit { width: 100%; margin-top: .3rem; }
+.lead__hint { font-size: .88rem; color: var(--gold-light); min-height: 1.15em; margin: .2rem 0 0; }
+@media (max-width: 560px) { .lead__row { flex-direction: column; } }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; filter: none; transition: none; }
   .card__media img, .dcard img { opacity: 1; }

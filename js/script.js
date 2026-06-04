@@ -705,6 +705,27 @@
       .catch(() => initCatalog(FALLBACK_CATALOG));
   }
 
+  /* ---------- ФОРМА ЗАЯВКИ → WhatsApp ---------- */
+  const leadForm = document.getElementById('leadForm');
+  if (leadForm) {
+    const nameEl = document.getElementById('leadName');
+    const phoneEl = document.getElementById('leadPhone');
+    const msgEl = document.getElementById('leadMsg');
+    const hintEl = document.getElementById('leadHint');
+    leadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let ok = true;
+      [nameEl, phoneEl].forEach(el => { const bad = !el.value.trim(); el.classList.toggle('err', bad); if (bad) ok = false; });
+      if (!ok) { if (hintEl) hintEl.textContent = 'Укажите имя и контакт — и я свяжусь с вами.'; return; }
+      const text = 'Заявка с сайта Art Estate\nИмя: ' + nameEl.value.trim() +
+        '\nКонтакт: ' + phoneEl.value.trim() +
+        (msgEl && msgEl.value.trim() ? '\nЗапрос: ' + msgEl.value.trim() : '');
+      if (hintEl) hintEl.textContent = 'Открываем WhatsApp с вашей заявкой…';
+      window.open('https://wa.me/79124869508?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    });
+    [nameEl, phoneEl].forEach(el => el && el.addEventListener('input', () => el.classList.remove('err')));
+  }
+
   /* ---------- СЧЁТЧИКИ ЦИФР ---------- */
   const counters = document.querySelectorAll('[data-count]');
   let countersDone = false;
