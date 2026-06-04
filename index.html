@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Art Estate — Недвижимость на Пхукете премиум-класса</title>
+  <meta name="description" content="Art Estate — подбор и сопровождение покупки вилл и квартир на Пхукете. Персональный агент Алена Артемьева. Прозрачные сделки, юридическая защита, объекты у океана." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ============ ПРЕЛОАДЕР ============ -->
+  <div class="preloader" id="preloader">
+    <div class="preloader__inner">
+      <div class="preloader__logo">ART <span>ESTATE</span></div>
+      <div class="preloader__bar"><span id="preloaderBar"></span></div>
+    </div>
+  </div>
+
+  <!-- ============ ШАПКА ============ -->
+  <header class="header" id="header">
+    <a href="#hero" class="logo">ART <span>ESTATE</span></a>
+    <nav class="nav" id="nav">
+      <a href="#catalog">Объекты</a>
+      <a href="#about">Об Алене</a>
+      <a href="#steps">Этапы</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a href="tel:+79124869508" class="header__cta">+7 912 486-95-08</a>
+    <button class="burger" id="burger" data-drawer-open aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </header>
+
+  <!-- ============ HERO: СКРОЛЛ-ОБЛЁТ ============ -->
+  <section class="hero" id="hero">
+    <div class="hero__scroll-track" id="heroTrack">
+      <div class="hero__sticky">
+        <!-- Видео-полёт, скрабится скроллом -->
+        <video class="hero__video" id="heroVideo" muted playsinline preload="auto" webkit-playsinline poster="assets/hero-phuket.jpg">
+          <source src="assets/flythrough-long.mp4" type="video/mp4" />
+        </video>
+        <!-- Фолбэк-изображение, пока нет видео -->
+        <div class="hero__fallback" id="heroFallback" style="background-image:url('assets/hero-phuket.jpg')"></div>
+        <div class="hero__veil"></div>
+
+        <!-- Слой 1: заголовок -->
+        <div class="hero__layer" data-layer="1">
+          <p class="hero__eyebrow">Недвижимость на Пхукете</p>
+          <h1 class="hero__title">Дом мечты <em>у океана</em></h1>
+          <p class="hero__sub">Виллы и квартиры на острове Пхукет с персональным сопровождением сделки от&nbsp;А&nbsp;до&nbsp;Я.</p>
+        </div>
+
+        <!-- Слой 2: над виллами -->
+        <div class="hero__layer" data-layer="2">
+          <h2 class="hero__big">Виллы<br>с бесконечными<br>бассейнами</h2>
+        </div>
+
+        <!-- Слой 3: влёт в интерьер -->
+        <div class="hero__layer" data-layer="3">
+          <h2 class="hero__big">Заходите<br>внутрь мечты</h2>
+          <a href="#catalog" class="hero__enter">Смотреть объекты →</a>
+        </div>
+
+        <div class="hero__scroll-hint" id="scrollHint">
+          <span>Листайте вниз</span>
+          <i></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ПОИСКОВАЯ ПАНЕЛЬ ============ -->
+  <section class="searchband reveal">
+    <div class="searchband__inner">
+      <p class="eyebrow">Подбор недвижимости</p>
+      <h2 class="searchband__title">Найдите свой объект на Пхукете</h2>
+      <form class="searchband__form" id="searchForm">
+        <input type="search" id="heroSearch" placeholder="Район, тип или название объекта…" autocomplete="off" />
+        <button type="submit" class="btn btn--gold">Найти</button>
+      </form>
+      <div class="searchband__chips" id="searchChips"></div>
+    </div>
+  </section>
+
+  <!-- ============ ДОВЕРИЕ / ЦИФРЫ ============ -->
+  <section class="trust reveal">
+    <div class="trust__item"><b data-count="120">0</b><span>довольных семей</span></div>
+    <div class="trust__item"><b data-count="8">0</b><span>лет на острове</span></div>
+    <div class="trust__item"><b data-count="100">0</b><span>% юридическая защита</span></div>
+    <div class="trust__item"><b data-count="50">0</b><span>проверенных объектов</span></div>
+  </section>
+
+  <!-- ============ ПОЧЕМУ С НАМИ (видео) ============ -->
+  <section class="section whyus" id="whyus">
+    <div class="whyus__grid">
+      <div class="whyus__media reveal">
+        <video class="whyus__video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-phuket.jpg">
+          <source src="assets/flythrough-scrub.mp4" type="video/mp4" />
+        </video>
+        <div class="whyus__caption">Покажем сотни объектов, не выходя из дома</div>
+      </div>
+      <div class="whyus__content reveal">
+        <p class="eyebrow">Почему с нами</p>
+        <h2 class="section__title">Покупать на Пхукете — легко и безопасно</h2>
+        <ul class="whyus__list">
+          <li>
+            <b>Подбор и просмотры онлайн</b>
+            <span>Видео-туры и личные показы — выбирайте удобно из любой точки мира.</span>
+          </li>
+          <li>
+            <b>Сопровождение на каждом шаге</b>
+            <span>От первого звонка до ключей: подбор, проверка, сделка, сервис после покупки.</span>
+          </li>
+          <li>
+            <b>Прозрачность и юридическая защита</b>
+            <span>Проверяем застройщика и документы, объясняем каждый пункт договора.</span>
+          </li>
+        </ul>
+        <a href="#contacts" class="btn btn--gold">Получить консультацию</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ РАЙОНЫ ПХУКЕТА ============ -->
+  <section class="section districts" id="districts">
+    <div class="section__head reveal">
+      <p class="eyebrow">Локации</p>
+      <h2 class="section__title">Районы Пхукета</h2>
+      <p class="section__lead">Выберите район — покажем подходящие объекты из каталога.</p>
+    </div>
+    <div class="districts__grid" id="districtsGrid"></div>
+  </section>
+
+  <!-- ============ КАТАЛОГ ОБЪЕКТОВ ============ -->
+  <section class="section catalog" id="catalog">
+    <div class="section__head reveal">
+      <p class="eyebrow">Каталог</p>
+      <h2 class="section__title">Избранные объекты Пхукета</h2>
+      <p class="section__lead">Проверенные виллы и квартиры в лучших локациях острова — от&nbsp;уютных резиденций до&nbsp;премиальных пентхаусов с видом на&nbsp;Андаманское море.</p>
+    </div>
+
+    <div class="catalog__toolbar reveal" id="catalogToolbar">
+      <div class="filter filter--search">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="fSearch" placeholder="Поиск: название или район…" autocomplete="off" />
+      </div>
+      <select id="fType" class="filter" aria-label="Тип"><option value="">Все типы</option></select>
+      <select id="fDistrict" class="filter" aria-label="Район"><option value="">Все районы</option></select>
+      <select id="fBeds" class="filter" aria-label="Спальни">
+        <option value="">Спальни: любые</option>
+        <option value="1">1 спальня</option>
+        <option value="2">2 спальни</option>
+        <option value="3">3 спальни</option>
+        <option value="4">4+ спальни</option>
+      </select>
+      <select id="fPrice" class="filter" aria-label="Цена">
+        <option value="">Цена: любая</option>
+        <option value="0-100000">до $100k</option>
+        <option value="100000-250000">$100k–250k</option>
+        <option value="250000-500000">$250k–500k</option>
+        <option value="500000-1000000">$500k–1M</option>
+        <option value="1000000-999999999">от $1M</option>
+      </select>
+      <select id="fSort" class="filter" aria-label="Сортировка">
+        <option value="default">Сортировка: по умолчанию</option>
+        <option value="price-asc">Цена ↑</option>
+        <option value="price-desc">Цена ↓</option>
+        <option value="area-desc">Площадь ↓</option>
+        <option value="ppm-asc">$ за м² ↑</option>
+      </select>
+      <button id="fFav" class="filter filter--fav" type="button" aria-pressed="false">♥ Избранное</button>
+      <button id="fReset" class="filter filter--reset" type="button">Сбросить</button>
+    </div>
+
+    <p class="catalog__count" id="catalogCount"></p>
+    <div class="catalog__grid" id="catalogGrid" data-src="data/catalog.json"></div>
+    <p class="catalog__empty" id="catalogEmpty" hidden>По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или <a href="#contacts">напишите нам</a> — подберём вручную.</p>
+    <div class="catalog__more"><button id="catalogMore" class="btn btn--gold" type="button" hidden>Показать ещё</button></div>
+    <p class="catalog__updated" id="catalogUpdated"></p>
+
+    <div class="catalog__cta reveal">
+      <p>Не нашли подходящий вариант? Подберём объект под ваш бюджет и&nbsp;задачи.</p>
+      <a href="#contacts" class="btn btn--gold">Получить подборку</a>
+    </div>
+  </section>
+
+  <!-- ============ СРОЧНАЯ ПРОДАЖА ============ -->
+  <section class="section urgent" id="urgent" hidden>
+    <div class="section__head reveal">
+      <p class="eyebrow">Выгодно</p>
+      <h2 class="section__title">Срочная продажа</h2>
+      <p class="section__lead">Объекты со сниженной ценой. Что-то приглянулось — напишите, поможем оформить выгодно.</p>
+    </div>
+    <div class="catalog__grid" id="urgentGrid"></div>
+  </section>
+
+  <!-- ============ ОБЪЕКТЫ НА КАРТЕ ============ -->
+  <section class="section mapsec" id="map">
+    <div class="section__head reveal">
+      <p class="eyebrow">На карте</p>
+      <h2 class="section__title">Объекты на карте Пхукета</h2>
+      <p class="section__lead">Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.</p>
+    </div>
+    <div class="mapsec__map reveal" id="mapAll"></div>
+  </section>
+
+  <!-- ============ СПОСОБЫ ПОКУПКИ / ФИНАНСИРОВАНИЕ ============ -->
+  <section class="section finance" id="finance">
+    <div class="section__head reveal">
+      <p class="eyebrow">Финансирование</p>
+      <h2 class="section__title">Гибкие способы покупки</h2>
+      <p class="section__lead">Не только полная оплата — на Пхукете доступны рассрочка и поэтапные схемы. Поможем подобрать удобный вариант.</p>
+    </div>
+    <div class="finance__grid">
+      <div class="fin-card reveal">
+        <div class="fin-card__ico">🔑</div>
+        <h3>Аренда с выкупом</h3>
+        <p>Превратите аренду в собственность: платежи идут в счёт покупки, а цена фиксируется заранее.</p>
+      </div>
+      <div class="fin-card reveal">
+        <div class="fin-card__ico">🏠</div>
+        <h3>Рассрочка от застройщика</h3>
+        <p>Покупка напрямую у застройщика с гибким графиком платежей, часто без банка и процентов.</p>
+      </div>
+      <div class="fin-card reveal">
+        <div class="fin-card__ico">💸</div>
+        <h3>Поэтапная оплата</h3>
+        <p>Платите частями по мере строительства — удобно для объектов на стадии возведения.</p>
+      </div>
+      <div class="fin-card fin-card--accent reveal">
+        <div class="fin-card__ico">🧮</div>
+        <h3>Калькулятор покупки</h3>
+        <p>Рассчитайте платёж по кредиту и доходность от аренды за пару секунд.</p>
+        <button class="btn btn--gold btn--sm" id="openCalcBtn" type="button">Открыть калькулятор</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ОБ АЛЕНЕ ============ -->
+  <section class="section about" id="about">
+    <div class="about__media reveal">
+      <div class="about__photo" id="aboutPhoto">
+        <span class="about__photo-note">Здесь будет фото Алены</span>
+      </div>
+      <div class="about__badge">
+        <b>8 лет</b>
+        <span>на рынке недвижимости Пхукета</span>
+      </div>
+    </div>
+    <div class="about__content reveal">
+      <p class="eyebrow">Ваш персональный агент</p>
+      <h2 class="section__title">Артемьева Алена Николаевна</h2>
+      <p class="about__text">Помогаю русскоговорящим клиентам безопасно купить недвижимость на&nbsp;Пхукете: от&nbsp;первого видеозвонка до&nbsp;получения ключей. Знаю остров изнутри, лично проверяю каждый объект и&nbsp;застройщика.</p>
+      <ul class="about__list">
+        <li>Личный подбор объектов под ваш запрос и&nbsp;бюджет</li>
+        <li>Полная юридическая проверка и&nbsp;сопровождение сделки</li>
+        <li>Помощь с&nbsp;переводом средств, налогами и&nbsp;арендой под сдачу</li>
+        <li>Поддержка после покупки: управление и&nbsp;сервис</li>
+      </ul>
+      <div class="about__actions">
+        <a href="https://wa.me/79124869508" target="_blank" rel="noopener" class="btn btn--wa">Написать в WhatsApp</a>
+        <a href="https://t.me/+79124869508" target="_blank" rel="noopener" class="btn btn--tg">Написать в Telegram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ЭТАПЫ ПОКУПКИ ============ -->
+  <section class="section steps" id="steps">
+    <div class="section__head reveal">
+      <p class="eyebrow">Как мы работаем</p>
+      <h2 class="section__title">Путь к вашей недвижимости</h2>
+      <p class="section__lead">Прозрачный процесс без сюрпризов — вы&nbsp;всегда понимаете, что происходит на&nbsp;каждом шаге.</p>
+    </div>
+    <div class="steps__grid">
+      <div class="step reveal"><span class="step__num">01</span><h3>Знакомство</h3><p>Обсуждаем задачи, бюджет и&nbsp;цели покупки на&nbsp;звонке. Формирую персональную подборку.</p></div>
+      <div class="step reveal"><span class="step__num">02</span><h3>Просмотры</h3><p>Онлайн-туры или личные показы на&nbsp;острове. Честно показываю плюсы и&nbsp;минусы каждого варианта.</p></div>
+      <div class="step reveal"><span class="step__num">03</span><h3>Проверка</h3><p>Юридическая чистота объекта, репутация застройщика, документы и&nbsp;договор под защитой юриста.</p></div>
+      <div class="step reveal"><span class="step__num">04</span><h3>Сделка</h3><p>Безопасные расчёты, оформление и&nbsp;передача ключей. Сопровождаю до&nbsp;последней подписи.</p></div>
+      <div class="step reveal"><span class="step__num">05</span><h3>После покупки</h3><p>Помогаю с&nbsp;меблировкой, управлением и&nbsp;сдачей в&nbsp;аренду для дохода.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ ОТЗЫВЫ ============ -->
+  <section class="section reviews" id="reviews">
+    <div class="section__head reveal">
+      <p class="eyebrow">Отзывы</p>
+      <h2 class="section__title">Нам доверяют</h2>
+    </div>
+    <div class="reviews__grid">
+      <blockquote class="review reveal">
+        <div class="review__stars">★★★★★</div>
+        <p>«Купили виллу в&nbsp;Камале полностью удалённо и&nbsp;ни&nbsp;разу не&nbsp;пожалели. Алена вела нас за&nbsp;руку, объясняла каждый документ. Это&nbsp;и&nbsp;есть доверие.»</p>
+        <footer><b>Дмитрий и&nbsp;Ольга</b><span>Москва</span></footer>
+      </blockquote>
+      <blockquote class="review reveal">
+        <div class="review__stars">★★★★★</div>
+        <p>«Боялась покупать за&nbsp;границей, но&nbsp;всё прошло прозрачно. Квартира у&nbsp;моря уже приносит доход от&nbsp;аренды. Спасибо за&nbsp;честность!»</p>
+        <footer><b>Екатерина</b><span>Санкт-Петербург</span></footer>
+      </blockquote>
+      <blockquote class="review reveal">
+        <div class="review__stars">★★★★★</div>
+        <p>«Профессионал высочайшего уровня. Подобрала пентхаус мечты быстрее, чем&nbsp;мы&nbsp;ожидали, и&nbsp;помогла даже после сделки.»</p>
+        <footer><b>Артём</b><span>Дубай</span></footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ============ КОНТАКТЫ ============ -->
+  <section class="section contacts" id="contacts">
+    <div class="contacts__inner reveal">
+      <p class="eyebrow">Контакты</p>
+      <h2 class="section__title">Найдём ваш дом на Пхукете</h2>
+      <p class="contacts__lead">Напишите или позвоните — отвечу лично и&nbsp;помогу сделать первый шаг к&nbsp;недвижимости вашей мечты.</p>
+
+      <div class="contacts__person">
+        <div class="contacts__avatar">АА</div>
+        <div>
+          <b>Артемьева Алена Николаевна</b>
+          <span>Персональный агент Art Estate</span>
+        </div>
+      </div>
+
+      <a href="tel:+79124869508" class="contacts__phone">+7 912 486-95-08</a>
+
+      <div class="contacts__actions">
+        <a href="https://wa.me/79124869508" target="_blank" rel="noopener" class="btn btn--wa btn--lg">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.074-.148-.668-1.611-.916-2.206-.241-.579-.486-.5-.668-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.078 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          WhatsApp
+        </a>
+        <a href="https://t.me/+79124869508" target="_blank" rel="noopener" class="btn btn--tg btn--lg">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram
+        </a>
+      </div>
+
+      <p class="contacts__note">Работаю по&nbsp;всему острову Пхукет · Онлайн-показы из&nbsp;любой точки мира</p>
+    </div>
+  </section>
+
+  <!-- ============ ФУТЕР ============ -->
+  <footer class="footer">
+    <div class="footer__top">
+      <a href="#hero" class="logo logo--footer">ART <span>ESTATE</span></a>
+      <nav class="footer__nav">
+        <a href="#catalog">Объекты</a>
+        <a href="#about">Об Алене</a>
+        <a href="#steps">Этапы</a>
+        <a href="#reviews">Отзывы</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Art Estate · Недвижимость на Пхукете</span>
+      <a href="tel:+79124869508">+7 912 486-95-08</a>
+    </div>
+  </footer>
+
+  <!-- ============ ПЛАВАЮЩИЕ КНОПКИ ============ -->
+  <div class="floating">
+    <a href="https://wa.me/79124869508" target="_blank" rel="noopener" class="floating__btn floating__btn--wa" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.074-.148-.668-1.611-.916-2.206-.241-.579-.486-.5-.668-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.078 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    </a>
+    <a href="https://t.me/+79124869508" target="_blank" rel="noopener" class="floating__btn floating__btn--tg" aria-label="Telegram">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    </a>
+  </div>
+
+  <!-- ============ БОКОВОЕ МЕНЮ (DRAWER) ============ -->
+  <div class="drawer" id="drawer" hidden aria-hidden="true">
+    <div class="drawer__overlay" data-drawer-close></div>
+    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="drawer__top">
+        <span class="logo logo--drawer">ART <span>ESTATE</span></span>
+        <button class="drawer__close" data-drawer-close aria-label="Закрыть">×</button>
+      </div>
+
+      <a href="#contacts" class="btn btn--gold drawer__cta" data-drawer-close>Оставить заявку</a>
+
+      <div class="drawer__group">
+        <span class="drawer__label">Отображение цены</span>
+        <div class="curr-switch" id="currSwitch" role="group" aria-label="Валюта">
+          <button data-curr="USD" class="is-active" type="button">$ USD</button>
+          <button data-curr="RUB" type="button">₽ RUB</button>
+          <button data-curr="THB" type="button">฿ THB</button>
+        </div>
+      </div>
+
+      <nav class="drawer__nav">
+        <a href="#districts" data-drawer-close>Районы</a>
+        <a href="#catalog" data-drawer-close>Объекты</a>
+        <a href="#map" data-drawer-close>Карта</a>
+        <a href="#finance" data-drawer-close>Финансирование</a>
+        <a href="#about" data-drawer-close>Об Алене</a>
+        <a href="#steps" data-drawer-close>Этапы</a>
+        <a href="#reviews" data-drawer-close>Отзывы</a>
+        <a href="#contacts" data-drawer-close>Контакты</a>
+      </nav>
+
+      <div class="drawer__contacts">
+        <span class="drawer__label">Артемьева Алена Николаевна</span>
+        <a href="tel:+79124869508" class="drawer__phone">+7 912 486-95-08</a>
+        <div class="drawer__social">
+          <a href="https://wa.me/79124869508" target="_blank" rel="noopener" class="btn btn--wa">WhatsApp</a>
+          <a href="https://t.me/+79124869508" target="_blank" rel="noopener" class="btn btn--tg">Telegram</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============ ПАНЕЛЬ СРАВНЕНИЯ ============ -->
+  <div class="compare-bar" id="compareBar" hidden>
+    <div class="compare-bar__info">
+      <b id="compareCount">0</b>
+      <span>в сравнении</span>
+    </div>
+    <div class="compare-bar__chips" id="compareChips"></div>
+    <button class="btn btn--gold" id="compareOpen">Сравнить →</button>
+    <button class="compare-bar__clear" id="compareClear" aria-label="Очистить">Очистить</button>
+  </div>
+
+  <!-- ============ МОДАЛКА ОБЪЕКТА ============ -->
+  <div class="modal" id="detailModal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <div class="modal__box" id="detailBox"></div>
+  </div>
+
+  <!-- ============ МОДАЛКА СРАВНЕНИЯ ============ -->
+  <div class="modal" id="compareModal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <div class="modal__box modal__box--wide" id="compareBox"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

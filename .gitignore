@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Локальные настройки Claude / редактора
+.claude/
+.vscode/
+
+# Логи и временное
+*.log
+/tmp/
+__pycache__/
+*.pyc
