@@ -712,12 +712,18 @@
     const nameEl = document.getElementById('leadName');
     const phoneEl = document.getElementById('leadPhone');
     const msgEl = document.getElementById('leadMsg');
+    const consentEl = document.getElementById('leadConsent');
     const hintEl = document.getElementById('leadHint');
     leadForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let ok = true;
       [nameEl, phoneEl].forEach(el => { const bad = !el.value.trim(); el.classList.toggle('err', bad); if (bad) ok = false; });
       if (!ok) { if (hintEl) hintEl.textContent = 'Укажите имя и контакт — и я свяжусь с вами.'; return; }
+      if (consentEl && !consentEl.checked) {
+        const c = consentEl.closest('.lead__consent'); if (c) c.classList.add('err');
+        if (hintEl) hintEl.textContent = 'Отметьте согласие на обработку персональных данных.';
+        return;
+      }
       const text = 'Заявка с сайта Art Estate\nИмя: ' + nameEl.value.trim() +
         '\nКонтакт: ' + phoneEl.value.trim() +
         (msgEl && msgEl.value.trim() ? '\nЗапрос: ' + msgEl.value.trim() : '');
@@ -725,6 +731,7 @@
       window.open('https://wa.me/79124869508?text=' + encodeURIComponent(text), '_blank', 'noopener');
     });
     [nameEl, phoneEl].forEach(el => el && el.addEventListener('input', () => el.classList.remove('err')));
+    consentEl && consentEl.addEventListener('change', () => { const c = consentEl.closest('.lead__consent'); if (c) c.classList.remove('err'); });
   }
 
   /* ---------- СЧЁТЧИКИ ЦИФР ---------- */

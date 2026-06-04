@@ -794,6 +794,11 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .lead input.err { border-color: #e8a0a0; background: rgba(192,57,43,.14); }
 .lead__submit { width: 100%; margin-top: .3rem; }
 .lead__hint { font-size: .88rem; color: var(--gold-light); min-height: 1.15em; margin: .2rem 0 0; }
+.lead__consent { display: flex; align-items: flex-start; gap: .6rem; text-align: left; font-size: .82rem; line-height: 1.4; color: rgba(255,253,248,.78); cursor: pointer; transition: color .2s; }
+.lead__consent input { margin-top: .15rem; width: 16px; height: 16px; accent-color: var(--gold); flex: none; cursor: pointer; }
+.lead__consent a { color: var(--gold-light); text-decoration: underline; }
+.lead__consent.err { color: #f0b8b8; }
+.lead__consent.err input { outline: 2px solid #e8a0a0; outline-offset: 2px; }
 @media (max-width: 560px) { .lead__row { flex-direction: column; } }
 
 @media (prefers-reduced-motion: reduce) {
