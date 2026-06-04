@@ -20,7 +20,10 @@ python3 scraper/scrape_fazwaz.py \
   --limit "$LIMIT" \
   --delay "$DELAY"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Генерирую SEO-страницы объектов…"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Скачиваю галерею фото объектов…"
+python3 scraper/enrich_gallery.py --max 6 --delay 0.6 || true
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Генерирую SEO-страницы объектов и районов…"
 python3 scraper/build_pages.py
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Готово. Не забудьте: git add -A && git commit && git push"

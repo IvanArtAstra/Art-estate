@@ -193,7 +193,11 @@
   const fType = document.getElementById('fType');
   const fDistrict = document.getElementById('fDistrict');
   const fBeds = document.getElementById('fBeds');
-  const fPrice = document.getElementById('fPrice');
+  const fArea = document.getElementById('fArea');
+  const pMin = document.getElementById('pMin');
+  const pMax = document.getElementById('pMax');
+  const priceLabel = document.getElementById('priceLabel');
+  const fBeach = document.getElementById('fBeach');
   const fSort = document.getElementById('fSort');
   const fFav = document.getElementById('fFav');
   const fReset = document.getElementById('fReset');
@@ -208,6 +212,8 @@
   const PAGE_SIZE = 9;
   let shown = PAGE_SIZE;
   let favOnly = false;
+  let beachOnly = false;
+  let priceCeil = 0; // верхняя граница слайдера цены
 
   // Избранное — в localStorage
   const FAV_KEY = 'ae_favorites';
@@ -288,17 +294,21 @@
       type: fType && fType.value || '',
       district: fDistrict && fDistrict.value || '',
       beds: fBeds && fBeds.value || '',
-      price: fPrice && fPrice.value || '',
+      area: fArea && fArea.value ? +fArea.value : 0,
+      pmin: pMin ? +pMin.value : 0,
+      pmax: pMax ? +pMax.value : Infinity,
       sort: fSort && fSort.value || 'default',
     };
   }
   function matches(it, f) {
     if (favOnly && !favorites.has(String(it.id))) return false;
+    if (beachOnly && !it.beach) return false;
     if (f.q) { const hay = ((it.title || '') + ' ' + (it.location || '') + ' ' + (it.type || '')).toLowerCase(); if (!hay.includes(f.q)) return false; }
     if (f.type && it.type !== f.type) return false;
     if (f.district && district(it) !== f.district) return false;
     if (f.beds) { const b = typeof it.beds === 'number' ? it.beds : 0; if (f.beds === '4') { if (b < 4) return false; } else if (String(b) !== f.beds) return false; }
-    if (f.price) { const [lo, hi] = f.price.split('-').map(Number); const p = it.priceUSD || 0; if (p < lo || p > hi) return false; }
+    if (f.area && (!it.area || it.area < f.area)) return false;
+    if (it.priceUSD) { if (it.priceUSD < f.pmin || it.priceUSD > f.pmax) return false; }
     return true;
   }
   function sortItems(arr, sort) {
@@ -544,7 +554,29 @@
     if (card) openDetail(card.dataset.id);
   }
   if (grid) grid.addEventListener('click', cardClick);
-  [fSearch, fType, fDistrict, fBeds, fPrice, fSort].forEach(el => el && el.addEventListener('input', () => render(true)));
+  function clampSliders(changed) {
+    if (!pMin || !pMax) return;
+    let lo = +pMin.value, hi = +pMax.value;
+    if (lo > hi) { if (changed === 'min') pMax.value = lo; else pMin.value = hi; lo = +pMin.value; hi = +pMax.value; }
+    if (priceLabel) priceLabel.textContent = (lo <= 0 && hi >= priceCeil) ? 'Цена: любая' : 'Цена: ' + money(lo) + ' – ' + money(hi);
+  }
+  function initSliders() {
+    const maxP = allItems.reduce((m, it) => Math.max(m, it.priceUSD || 0), 0);
+    priceCeil = Math.ceil(maxP / 50000) * 50000 || 1000000;
+    if (pMin && pMax) {
+      [pMin, pMax].forEach(s => { s.min = 0; s.max = priceCeil; s.step = 10000; });
+      pMin.value = 0; pMax.value = priceCeil; clampSliders();
+    }
+  }
+  [fSearch, fType, fDistrict, fBeds, fArea, fSort].forEach(el => el && el.addEventListener('input', () => render(true)));
+  pMin && pMin.addEventListener('input', () => { clampSliders('min'); render(true); });
+  pMax && pMax.addEventListener('input', () => { clampSliders('max'); render(true); });
+  fBeach && fBeach.addEventListener('click', () => {
+    beachOnly = !beachOnly;
+    fBeach.classList.toggle('is-active', beachOnly);
+    fBeach.setAttribute('aria-pressed', beachOnly ? 'true' : 'false');
+    render(true);
+  });
   fFav && fFav.addEventListener('click', () => {
     favOnly = !favOnly;
     fFav.classList.toggle('is-active', favOnly);
@@ -552,10 +584,12 @@
     render(true);
   });
   fReset && fReset.addEventListener('click', () => {
-    [fSearch, fType, fDistrict, fBeds, fPrice].forEach(el => el && (el.value = ''));
+    [fSearch, fType, fDistrict, fBeds, fArea].forEach(el => el && (el.value = ''));
     if (fSort) fSort.value = 'default';
-    favOnly = false;
+    if (pMin) pMin.value = 0; if (pMax) pMax.value = priceCeil; clampSliders();
+    favOnly = false; beachOnly = false;
     if (fFav) { fFav.classList.remove('is-active'); fFav.setAttribute('aria-pressed', 'false'); }
+    if (fBeach) { fBeach.classList.remove('is-active'); fBeach.setAttribute('aria-pressed', 'false'); }
     render(true);
   });
   catalogMore && catalogMore.addEventListener('click', () => { shown += PAGE_SIZE; render(); });
@@ -631,6 +665,7 @@
     currency = c;
     try { localStorage.setItem('ae_currency', c); } catch (e) {}
     if (currSwitch) currSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.curr === c));
+    if (typeof clampSliders === 'function') clampSliders();
     render();
     renderUrgent();
     refreshAllMap();
@@ -652,22 +687,23 @@
   }
 
   /* ---------- КАРТА ВСЕХ ОБЪЕКТОВ ---------- */
-  let allMap = null, allMarkers = [];
+  let allMap = null, clusterGroup = null;
   function refreshAllMap() {
     if (typeof L === 'undefined') return;
     const el = document.getElementById('mapAll'); if (!el) return;
     const pts = allItems.filter(it => it.lat && it.lng);
     if (!pts.length) return;
-    if (allMap) { allMarkers.forEach(m => allMap.removeLayer(m)); allMarkers = []; }
-    else {
+    if (!allMap) {
       allMap = L.map(el, { scrollWheelZoom: false });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(allMap);
     }
+    if (clusterGroup) clusterGroup.clearLayers();
+    else { clusterGroup = (L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 50, showCoverageOnHover: false }) : L.layerGroup()); allMap.addLayer(clusterGroup); }
     const group = [];
     pts.forEach(it => {
-      const m = L.marker([it.lat, it.lng]).addTo(allMap);
+      const m = L.marker([it.lat, it.lng]);
       m.bindPopup(`<div class="mappopup"><b>${esc(it.title || 'Объект')}</b><span>${money(it.priceUSD)}</span><button data-action="detail" data-id="${esc(it.id)}" type="button">Подробнее</button></div>`);
-      allMarkers.push(m); group.push([it.lat, it.lng]);
+      clusterGroup.addLayer(m); group.push([it.lat, it.lng]);
     });
     allMap.fitBounds(group, { padding: [40, 40], maxZoom: 13 });
     setTimeout(() => allMap && allMap.invalidateSize(), 200);
@@ -694,6 +730,7 @@
     }
     // активная валюта в переключателе
     if (currSwitch) currSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.curr === currency));
+    initSliders();
     render(true);
     renderDistricts();
     renderSearchChips();

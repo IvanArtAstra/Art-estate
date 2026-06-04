@@ -409,6 +409,18 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .catalog__more { text-align: center; margin-top: 2.2rem; }
 .filter--fav { background: var(--cream); }
 .filter--fav.is-active { background: #e23b54; color: #fff; border-color: #e23b54; }
+.filter--toggle { background: var(--cream); }
+.filter--toggle.is-active { background: var(--ocean); color: #fff; border-color: var(--ocean); }
+
+/* Диапазон цены (двойной слайдер) */
+.price-range { display: flex; flex-direction: column; gap: .4rem; min-width: 200px; padding: .5rem 1.2rem; }
+.price-range__label { font-size: .8rem; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+.price-range__sliders { position: relative; height: 16px; }
+.price-range__sliders input[type=range] { position: absolute; inset: 0; width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: none; pointer-events: none; }
+.price-range__sliders input[type=range]::-webkit-slider-runnable-track { height: 4px; background: var(--sand-deep); border-radius: 4px; }
+.price-range__sliders input[type=range]::-moz-range-track { height: 4px; background: var(--sand-deep); border-radius: 4px; }
+.price-range__sliders input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%; background: var(--gold); cursor: pointer; box-shadow: 0 2px 6px rgba(201,162,75,.6); }
+.price-range__sliders input[type=range]::-moz-range-thumb { pointer-events: auto; width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--gold); cursor: pointer; }
 
 /* ---------- РАЙОНЫ ---------- */
 .districts__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(.9rem, 2vw, 1.4rem); }

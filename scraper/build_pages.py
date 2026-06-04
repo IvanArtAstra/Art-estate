@@ -115,6 +115,18 @@ PAGE = """<!DOCTYPE html>
   .pp-desc { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.7; }
   .pp-map { height: 360px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); z-index: 0; }
   .pp-back { display: inline-flex; align-items: center; gap: .4rem; color: var(--teal); font-weight: 700; margin-top: 2.6rem; }
+  .pp-gallery { display: flex; flex-direction: column; gap: .7rem; }
+  .pp-media { cursor: zoom-in; }
+  .pp-thumbs { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .pp-thumb { width: 84px; height: 60px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; padding: 0; cursor: pointer; background: none; transition: border-color .2s; }
+  .pp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pp-thumb.is-active { border-color: var(--gold); }
+  .lb { position: fixed; inset: 0; z-index: 500; background: rgba(6,32,29,.93); display: grid; place-items: center; }
+  .lb[hidden] { display: none; }
+  .lb img { max-width: 92vw; max-height: 84vh; border-radius: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .lb__btn { position: absolute; background: rgba(255,255,255,.14); color: #fff; border: 0; width: 52px; height: 52px; border-radius: 50%; font-size: 1.7rem; cursor: pointer; display: grid; place-items: center; transition: background .2s; }
+  .lb__btn:hover { background: rgba(255,255,255,.28); }
+  .lb__prev { left: 3vw; } .lb__next { right: 3vw; } .lb__close { top: 3vh; right: 3vw; width: 46px; height: 46px; }
   @media (max-width: 820px) { .pp-hero { grid-template-columns: 1fr; } }
 </style>
 <script type="application/ld+json">__JSONLD__</script>
@@ -131,9 +143,12 @@ PAGE = """<!DOCTYPE html>
   </nav>
 
   <div class="pp-hero">
-    <div class="pp-media">
-      <img src="__IMG__" alt="__TITLE__ — фото" />
-      <div class="pp-badges">__BADGES__</div>
+    <div class="pp-gallery">
+      <div class="pp-media">
+        <img id="ppMain" src="__IMG__" alt="__TITLE__ — фото" data-i="0" />
+        <div class="pp-badges">__BADGES__</div>
+      </div>
+      <div class="pp-thumbs">__THUMBS__</div>
     </div>
     <div class="pp-info">
       <span class="pp-type">__TYPE__</span>
@@ -187,9 +202,16 @@ PAGE = """<!DOCTYPE html>
   <a class="pp-back" href="../../#catalog">← Все объекты каталога</a>
 </div>
 
+<div class="lb" id="lb" hidden>
+  <button class="lb__btn lb__close" id="lbClose" aria-label="Закрыть">×</button>
+  <button class="lb__btn lb__prev" id="lbPrev" aria-label="Предыдущее">‹</button>
+  <img id="lbImg" src="" alt="Фото объекта" />
+  <button class="lb__btn lb__next" id="lbNext" aria-label="Следующее">›</button>
+</div>
+
 <footer class="footer" style="margin-top:3rem">
   <div class="footer__bottom" style="border:0">
-    <span>© __YEAR__ Art Estate · Недвижимость на Пхукете</span>
+    <span>© __YEAR__ Art Estate · Недвижимость на Пхукете · <a href="../../privacy/" style="color:rgba(255,253,248,.7)">Политика конфиденциальности</a></span>
     <a href="tel:+79124869508">+7 912 486-95-08</a>
   </div>
 </footer>
@@ -212,6 +234,19 @@ PAGE = """<!DOCTYPE html>
   recalcM();recalcR();
   var ll=__LATLNG__;
   if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);L.marker(ll).addTo(m).bindPopup(__TITLEJS__).openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+
+  // Галерея + лайтбокс
+  var IMAGES=__IMAGES_JS__, idx=0;
+  var main=$('ppMain'), lb=$('lb'), lbImg=$('lbImg');
+  function setMain(i){ idx=i; if(main&&IMAGES[i])main.src=IMAGES[i]; document.querySelectorAll('.pp-thumb').forEach(function(t,k){t.classList.toggle('is-active',k===i);}); }
+  function showLb(i){ if(!IMAGES.length)return; idx=(i+IMAGES.length)%IMAGES.length; lbImg.src=IMAGES[idx]; lb.hidden=false; }
+  document.querySelectorAll('.pp-thumb').forEach(function(t){ t.addEventListener('click',function(){ setMain(+t.dataset.i); }); });
+  main&&main.addEventListener('click',function(){ showLb(idx); });
+  $('lbClose')&&$('lbClose').addEventListener('click',function(){ lb.hidden=true; });
+  $('lbPrev')&&$('lbPrev').addEventListener('click',function(){ showLb(idx-1); });
+  $('lbNext')&&$('lbNext').addEventListener('click',function(){ showLb(idx+1); });
+  lb&&lb.addEventListener('click',function(e){ if(e.target===lb)lb.hidden=true; });
+  document.addEventListener('keydown',function(e){ if(lb.hidden)return; if(e.key==='Escape')lb.hidden=true; else if(e.key==='ArrowLeft')showLb(idx-1); else if(e.key==='ArrowRight')showLb(idx+1); });
 })();
 </script>
 </body>
@@ -306,7 +341,14 @@ def build():
         rent = it.get("rentMonthUSD") or (round(usd_v * 0.06 / 12) if usd_v else 0)
         img_rel = (it.get("image") or "assets/hero-phuket.jpg")
         og_img = f"{SITE}/{img_rel}"
-        img_src = "../../" + img_rel
+        gallery = it.get("images") or [img_rel]
+        gallery_rel = ["../../" + p for p in gallery]
+        img_src = gallery_rel[0]
+        thumbs = "".join(
+            f'<button class="pp-thumb{" is-active" if i == 0 else ""}" data-i="{i}" type="button"><img src="{esc(u)}" alt="" loading="lazy"></button>'
+            for i, u in enumerate(gallery_rel)
+        ) if len(gallery_rel) > 1 else ""
+        images_js = json.dumps(gallery_rel, ensure_ascii=False)
 
         # подцены в ₽ и ฿
         sub = []
@@ -386,6 +428,8 @@ def build():
             "__CANON__": canon,
             "__OGIMG__": og_img,
             "__IMG__": esc(img_src),
+            "__THUMBS__": thumbs,
+            "__IMAGES_JS__": images_js,
             "__TYPE__": esc(it.get("type") or "Объект"),
             "__LOC__": loc,
             "__OLD__": old,
