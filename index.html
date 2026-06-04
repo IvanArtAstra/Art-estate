@@ -7,6 +7,7 @@
   <meta name="description" content="Art Estate — подбор и сопровождение покупки вилл и квартир на Пхукете. Персональный агент Алена Артемьева. Прозрачные сделки, юридическая защита, объекты у океана." />
   <meta name="theme-color" content="#0f3f3a" />
   <link rel="canonical" href="https://ivanartastra.github.io/Art-estate/" />
+  <link rel="preload" as="image" href="assets/hero-phuket.webp" type="image/webp" />
 
   <!-- Иконки -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
@@ -71,10 +72,11 @@
       <div class="hero__sticky">
         <!-- Видео-полёт, скрабится скроллом -->
         <video class="hero__video" id="heroVideo" muted playsinline preload="auto" webkit-playsinline poster="assets/hero-phuket.jpg">
+          <source src="assets/flythrough-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
           <source src="assets/flythrough-long.mp4" type="video/mp4" />
         </video>
         <!-- Фолбэк-изображение, пока нет видео -->
-        <div class="hero__fallback" id="heroFallback" style="background-image:url('assets/hero-phuket.jpg')"></div>
+        <div class="hero__fallback" id="heroFallback"></div>
         <div class="hero__veil"></div>
 
         <!-- Слой 1: заголовок -->
@@ -415,15 +417,15 @@
     </div>
     <div class="journal__grid">
       <a class="jcard reveal" href="blog/kak-kupit-nedvizhimost-na-phukete/">
-        <div class="jcard__media"><img src="assets/hero-phuket.jpg" alt="Как купить недвижимость на Пхукете" loading="lazy" /></div>
+        <div class="jcard__media"><picture><source srcset="assets/hero-phuket.webp" type="image/webp" /><img src="assets/hero-phuket.jpg" alt="Как купить недвижимость на Пхукете" loading="lazy" /></picture></div>
         <div class="jcard__body"><span class="jcard__tag">Гайд</span><h3>Как иностранцу купить недвижимость на&nbsp;Пхукете</h3><span class="jcard__more">Читать →</span></div>
       </a>
       <a class="jcard reveal" href="blog/freehold-vs-leasehold/">
-        <div class="jcard__media"><img src="assets/villa.jpg" alt="Freehold и leasehold" loading="lazy" /></div>
+        <div class="jcard__media"><picture><source srcset="assets/villa.webp" type="image/webp" /><img src="assets/villa.jpg" alt="Freehold и leasehold" loading="lazy" /></picture></div>
         <div class="jcard__body"><span class="jcard__tag">Право и налоги</span><h3>Freehold и&nbsp;leasehold: владение и&nbsp;налоги</h3><span class="jcard__more">Читать →</span></div>
       </a>
       <a class="jcard reveal" href="blog/rayony-phuketa/">
-        <div class="jcard__media"><img src="assets/pool.jpg" alt="Районы Пхукета" loading="lazy" /></div>
+        <div class="jcard__media"><picture><source srcset="assets/pool.webp" type="image/webp" /><img src="assets/pool.jpg" alt="Районы Пхукета" loading="lazy" /></picture></div>
         <div class="jcard__body"><span class="jcard__tag">Локации</span><h3>Районы Пхукета: где&nbsp;покупать</h3><span class="jcard__more">Читать →</span></div>
       </a>
     </div>

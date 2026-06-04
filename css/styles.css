@@ -149,7 +149,9 @@ h1, h2, h3, h4 {
   object-fit: cover; will-change: transform;
 }
 .hero__fallback {
-  background: linear-gradient(160deg, #1a5e6e, #0f3f3a 60%, #082825);
+  background-color: #0f3f3a;
+  background-image: -webkit-image-set(url('../assets/hero-phuket.webp') type('image/webp'), url('../assets/hero-phuket.jpg') type('image/jpeg'));
+  background-image: image-set(url('../assets/hero-phuket.webp') type('image/webp'), url('../assets/hero-phuket.jpg') type('image/jpeg'));
   background-size: cover; background-position: center;
   transition: opacity .8s var(--ease);
 }
@@ -518,7 +520,8 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .about__media { position: relative; }
 .about__photo {
   aspect-ratio: 3/4; border-radius: var(--radius); overflow: hidden;
-  background-image: linear-gradient(to top, rgba(8,40,37,.55), rgba(8,40,37,.05) 50%), url('../assets/pool.jpg');
+  background-image: linear-gradient(to top, rgba(8,40,37,.55), rgba(8,40,37,.05) 50%), -webkit-image-set(url('../assets/pool.webp') type('image/webp'), url('../assets/pool.jpg') type('image/jpeg'));
+  background-image: linear-gradient(to top, rgba(8,40,37,.55), rgba(8,40,37,.05) 50%), image-set(url('../assets/pool.webp') type('image/webp'), url('../assets/pool.jpg') type('image/jpeg'));
   background-size: cover; background-position: center;
   box-shadow: var(--shadow); display: grid; place-items: end center; padding-bottom: 1.4rem;
 }
