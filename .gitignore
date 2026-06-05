@@ -11,3 +11,6 @@ Thumbs.db
 /tmp/
 __pycache__/
 *.pyc
+
+# Админка: учётные данные (НЕ коммитить)
+admin/admin_config.json

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Art Estate · Админ-панель</title>
+<meta name="robots" content="noindex,nofollow" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--sand:#f6f1e7;--sand2:#ece3d2;--cream:#fffdf8;--ink:#14201f;--soft:#38514d;--teal:#0f3f3a;--teal2:#082825;--gold:#c9a24b;--gold2:#e3c378;--wa:#25d366;--red:#c0392b;--ok:#1f6f63}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--sand);color:var(--ink);line-height:1.5}
+  h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif}
+  a{color:var(--gold)}
+  .logo{font-family:'Cormorant Garamond',serif;font-weight:700;letter-spacing:.18em;font-size:1.3rem;color:var(--teal)}
+  .logo span{color:var(--gold)}
+  button{font-family:inherit;cursor:pointer}
+  .btn{border:0;border-radius:100px;padding:.7rem 1.4rem;font-weight:700;font-size:.95rem;background:var(--gold);color:#fff;transition:transform .2s,opacity .2s}
+  .btn:hover{transform:translateY(-2px)} .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn--teal{background:var(--teal)} .btn--ghost{background:transparent;color:var(--soft);border:1.5px solid rgba(15,63,58,.25)}
+  .btn--sm{padding:.4rem .8rem;font-size:.82rem}
+  input,textarea,select{font:inherit;width:100%;padding:.55rem .8rem;border:1.5px solid rgba(15,63,58,.18);border-radius:10px;background:#fff;color:var(--ink);outline:none}
+  input:focus,textarea:focus{border-color:var(--gold)}
+  label{font-size:.78rem;font-weight:600;color:var(--soft);display:block;margin-bottom:.25rem}
+
+  /* Login */
+  .login{min-height:100vh;display:grid;place-items:center;padding:1.5rem;
+    background:linear-gradient(150deg,#1a5e6e,#0f3f3a 60%,#082825)}
+  .login__card{background:var(--cream);border-radius:22px;box-shadow:0 30px 70px -30px rgba(0,0,0,.5);padding:2.4rem;width:min(380px,100%)}
+  .login__card h1{font-size:2rem;color:var(--teal);text-align:center;margin-bottom:.3rem}
+  .login__card p{text-align:center;color:var(--soft);font-size:.9rem;margin-bottom:1.6rem}
+  .login__card label{margin-top:.9rem}
+  .login__err{color:var(--red);font-size:.85rem;margin-top:.8rem;min-height:1.1em;text-align:center}
+
+  /* App */
+  .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
+    padding:1rem clamp(1rem,4vw,2.5rem);background:rgba(246,241,231,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(20,32,31,.08)}
+  .top__r{display:flex;gap:.6rem;align-items:center}
+  .top__site{font-size:.85rem}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(1rem,4vw,2rem)}
+  .card{background:var(--cream);border-radius:18px;box-shadow:0 16px 40px -24px rgba(8,40,37,.35);padding:1.4rem 1.6rem;margin-bottom:1.4rem}
+  .card>h2{color:var(--teal);font-size:1.6rem;margin-bottom:1rem}
+  .muted{color:var(--soft);font-size:.85rem}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem}
+  .stat{background:var(--teal);color:var(--cream);border-radius:14px;padding:1rem 1.1rem}
+  .stat b{display:block;font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--gold2);line-height:1}
+  .stat span{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,253,248,.7)}
+  .bars{margin-top:1rem;display:grid;gap:.5rem}
+  .bar{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;gap:.6rem;font-size:.85rem}
+  .bar__track{height:8px;background:var(--sand2);border-radius:6px;overflow:hidden}
+  .bar__fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+
+  .run__opts{display:flex;flex-wrap:wrap;gap:1rem;align-items:end;margin-bottom:1rem}
+  .run__opts>div{flex:0 0 auto}
+  .run__opts input{width:90px}
+  .chk{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:var(--ink)}
+  .chk input{width:auto}
+  .log{background:var(--teal2);color:#cfe6df;border-radius:12px;padding:1rem;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;white-space:pre-wrap;max-height:280px;overflow:auto;margin-top:1rem;display:none}
+  .log.show{display:block}
+
+  .item{border:1px solid rgba(15,63,58,.12);border-radius:14px;padding:1rem;margin-bottom:.9rem;background:#fff}
+  .item.hidden{opacity:.55}
+  .item__head{display:flex;gap:.8rem;align-items:center;margin-bottom:.8rem}
+  .item__thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;flex:none;background:var(--sand2)}
+  .item__title{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item__acts{display:flex;gap:.4rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem}
+  .grid--full{grid-template-columns:1fr}
+  .iconbtn{border:0;background:rgba(15,63,58,.08);color:var(--teal);border-radius:8px;width:32px;height:32px;font-size:1rem}
+  .iconbtn:hover{background:rgba(15,63,58,.18)}
+  .iconbtn--del{background:rgba(192,57,43,.12);color:var(--red)}
+  .toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;padding:.8rem 1.4rem;border-radius:100px;box-shadow:0 14px 30px -10px rgba(0,0,0,.4);opacity:0;transition:opacity .3s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ЭКРАН ВХОДА -->
+<div class="login" id="loginScreen">
+  <form class="login__card" id="loginForm">
+    <h1>ART <span>ESTATE</span></h1>
+    <p>Админ-панель · вход</p>
+    <label>Логин</label>
+    <input id="luser" autocomplete="username" autofocus />
+    <label>Пароль</label>
+    <input id="lpass" type="password" autocomplete="current-password" />
+    <div class="login__err" id="lerr"></div>
+    <button class="btn" style="width:100%;margin-top:1rem" type="submit">Войти</button>
+  </form>
+</div>
+
+<!-- ПРИЛОЖЕНИЕ -->
+<div id="app" class="hide">
+  <div class="top">
+    <span class="logo">ART <span>ESTATE</span> · админ</span>
+    <div class="top__r">
+      <a class="top__site" href="../" target="_blank" rel="noopener">Открыть сайт ↗</a>
+      <button class="btn btn--ghost btn--sm" id="logoutBtn">Выйти</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- СТАТИСТИКА -->
+    <div class="card">
+      <h2>Статистика каталога</h2>
+      <div class="stats" id="stats"></div>
+      <div class="bars" id="bars"></div>
+      <p class="muted" id="statsMeta" style="margin-top:1rem"></p>
+    </div>
+
+    <!-- ПАРСИНГ -->
+    <div class="card">
+      <h2>Спарсить и обновить объекты</h2>
+      <p class="muted">Запустит парсер fazwaz.ru → галерею → генерацию страниц и sitemap. Перезапишет текущий каталог.</p>
+      <div class="run__opts" style="margin-top:1rem">
+        <div><label>Страниц</label><input id="rpages" type="number" value="1" min="1" max="10"></div>
+        <div><label>Объектов</label><input id="rlimit" type="number" value="18" min="1" max="60"></div>
+        <label class="chk"><input id="rgallery" type="checkbox" checked> Скачивать галерею фото</label>
+        <button class="btn btn--teal" id="runBtn">▶ Спарсить и обновить</button>
+      </div>
+      <div class="log" id="runLog"></div>
+    </div>
+
+    <!-- РЕДАКТОР КАТАЛОГА -->
+    <div class="card">
+      <h2 style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
+        <span>Каталог объектов</span>
+        <span><button class="btn btn--sm btn--ghost" id="reloadBtn">Обновить</button>
+        <button class="btn btn--sm" id="saveBtn">Сохранить изменения</button></span>
+      </h2>
+      <p class="muted" id="editHint"></p>
+      <div id="editor"></div>
+    </div>
+
+    <!-- ПУБЛИКАЦИЯ -->
+    <div class="card">
+      <h2>Опубликовать на сайт</h2>
+      <p class="muted">Закоммитит и запушит изменения в GitHub — публичный сайт обновится за ~1 минуту.</p>
+      <div style="display:flex;gap:.7rem;align-items:end;margin-top:1rem;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px"><label>Комментарий к публикации</label>
+          <input id="pubMsg" value="Обновление каталога через админку"></div>
+        <button class="btn" id="pubBtn">Опубликовать</button>
+      </div>
+      <div class="log" id="pubLog"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = (p, opt) => fetch('/admin/api/' + p, Object.assign({headers:{'Content-Type':'application/json'}}, opt));
+let CATALOG = null;
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function nsep(n){ return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+function usd(n){ return n||n===0 ? '$'+nsep(n) : '—'; }
+
+/* ---- вход ---- */
+async function checkAuth(){
+  const r = await api('me'); const j = await r.json();
+  if (j.authed){ showApp(); } else { $('#loginScreen').classList.remove('hide'); $('#app').classList.add('hide'); }
+}
+$('#loginForm').addEventListener('submit', async e=>{
+  e.preventDefault(); $('#lerr').textContent='';
+  const r = await api('login',{method:'POST',body:JSON.stringify({user:$('#luser').value,pass:$('#lpass').value})});
+  if (r.ok){ showApp(); } else { const j=await r.json().catch(()=>({})); $('#lerr').textContent=j.error||'Ошибка входа'; }
+});
+$('#logoutBtn').addEventListener('click', async ()=>{ await api('logout',{method:'POST'}); location.reload(); });
+
+function showApp(){ $('#loginScreen').classList.add('hide'); $('#app').classList.remove('hide'); loadStats(); loadCatalog(); }
+
+/* ---- статистика ---- */
+async function loadStats(){
+  const s = await (await api('stats')).json();
+  const cards = [
+    ['Объектов', s.count], ['Скрыто', s.hidden], ['Средняя цена', usd(s.priceAvg)],
+    ['Портфель', usd(s.portfolio)], ['Сред. доходность', s.avgYield+'%'],
+    ['Со скидкой', s.withDiscount], ['С галереей', s.withGallery], ['На карте', s.withGeo],
+  ];
+  $('#stats').innerHTML = cards.map(([t,v])=>`<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
+  const top = Object.entries(s.byType||{}).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1,...top.map(x=>x[1]));
+  $('#bars').innerHTML = '<div class="muted" style="margin:.4rem 0">По типам:</div>' + top.map(([k,v])=>
+    `<div class="bar"><span>${k}</span><div class="bar__track"><div class="bar__fill" style="width:${v/max*100}%"></div></div><span>${v}</span></div>`).join('');
+  $('#statsMeta').textContent = `Обновлён: ${s.updated||'—'} · источник: ${s.source||'—'} · цены $${nsep(s.priceMin)}–$${nsep(s.priceMax)}`;
+}
+
+/* ---- редактор ---- */
+async function loadCatalog(){
+  CATALOG = await (await api('catalog')).json();
+  renderEditor();
+}
+function renderEditor(){
+  const items = CATALOG.items||[];
+  $('#editHint').textContent = `${items.length} объектов. Изменения сохраняются в data/catalog.json, затем опубликуйте.`;
+  $('#editor').innerHTML = items.map((it,i)=>itemHTML(it,i)).join('');
+}
+function field(label,val,key,i,type){ type=type||'text';
+  return `<div><label>${label}</label><input data-i="${i}" data-k="${key}" type="${type}" value="${(val??'').toString().replace(/"/g,'&quot;')}"></div>`; }
+function itemHTML(it,i){
+  return `<div class="item ${it.hidden?'hidden':''}" data-item="${i}">
+    <div class="item__head">
+      <img class="item__thumb" src="/${it.image||'assets/hero-phuket.jpg'}" onerror="this.src='/assets/hero-phuket.jpg'">
+      <span class="item__title">${(it.title||'—')}</span>
+      <div class="item__acts">
+        <button class="iconbtn" title="Вверх" onclick="move(${i},-1)">↑</button>
+        <button class="iconbtn" title="Вниз" onclick="move(${i},1)">↓</button>
+        <label class="chk" style="font-size:.78rem"><input type="checkbox" data-i="${i}" data-k="hidden" ${it.hidden?'checked':''}> скрыть</label>
+        <button class="iconbtn iconbtn--del" title="Удалить" onclick="del(${i})">✕</button>
+      </div>
+    </div>
+    <div class="grid">
+      ${field('Название',it.title,'title',i)}
+      ${field('Тип',it.type,'type',i)}
+      ${field('Цена, $',it.priceUSD,'priceUSD',i,'number')}
+      ${field('Спальни',it.beds,'beds',i)}
+      ${field('Санузлы',it.baths,'baths',i)}
+      ${field('Площадь, м²',it.area,'area',i,'number')}
+      ${field('Локация',it.location,'location',i)}
+      ${field('У пляжа',it.beach,'beach',i)}
+    </div>
+    <div class="grid grid--full" style="margin-top:.7rem">
+      <div><label>Описание</label><textarea data-i="${i}" data-k="description" rows="2">${(it.description||'')}</textarea></div>
+    </div>
+  </div>`;
+}
+window.move=(i,d)=>{ const a=CATALOG.items; const j=i+d; if(j<0||j>=a.length)return; [a[i],a[j]]=[a[j],a[i]]; collect(); renderEditor(); };
+window.del=(i)=>{ if(!confirm('Удалить объект из каталога?'))return; CATALOG.items.splice(i,1); collect(); renderEditor(); };
+function collect(){
+  document.querySelectorAll('#editor [data-i]').forEach(el=>{
+    const it = CATALOG.items[+el.dataset.i]; if(!it)return; const k=el.dataset.k;
+    if(el.type==='checkbox'){ it[k]=el.checked; }
+    else if(el.type==='number'){ it[k]= el.value===''?null:+el.value; }
+    else { it[k]= el.value; }
+  });
+  // пересчёт производных
+  CATALOG.items.forEach(it=>{
+    if(it.priceUSD){ it.priceLabel='$'+nsep(it.priceUSD); if(it.area) it.pricePerM2=Math.round(it.priceUSD/it.area); }
+  });
+}
+$('#editor').addEventListener('change', e=>{ if(e.target.dataset.k==='hidden'){ collect(); const it=CATALOG.items[+e.target.dataset.i]; e.target.closest('.item').classList.toggle('hidden',it.hidden);} });
+$('#saveBtn').addEventListener('click', async ()=>{
+  collect();
+  const r = await api('catalog',{method:'POST',body:JSON.stringify({items:CATALOG.items})});
+  if(r.ok){ toast('Сохранено в catalog.json'); loadStats(); } else { toast('Ошибка сохранения'); }
+});
+$('#reloadBtn').addEventListener('click', loadCatalog);
+
+/* ---- парсинг ---- */
+$('#runBtn').addEventListener('click', async ()=>{
+  const log=$('#runLog'); log.classList.add('show'); log.textContent='Запуск…';
+  $('#runBtn').disabled=true;
+  const r = await api('run-parser',{method:'POST',body:JSON.stringify({
+    pages:+$('#rpages').value, limit:+$('#rlimit').value, gallery:$('#rgallery').checked})});
+  if(!r.ok){ const j=await r.json().catch(()=>({})); log.textContent=j.error||'Ошибка'; $('#runBtn').disabled=false; return; }
+  poll();
+});
+async function poll(){
+  const j = await (await api('run-status')).json();
+  const log=$('#runLog'); log.textContent=(j.log||[]).join('\n'); log.scrollTop=log.scrollHeight;
+  if(j.running){ setTimeout(poll,1200); }
+  else { $('#runBtn').disabled=false; if(j.done){ toast(j.ok?'Парсинг завершён':'Завершено с ошибкой'); loadStats(); loadCatalog(); } }
+}
+
+/* ---- публикация ---- */
+$('#pubBtn').addEventListener('click', async ()=>{
+  const log=$('#pubLog'); log.classList.add('show'); log.textContent='Публикуем…'; $('#pubBtn').disabled=true;
+  const r = await api('publish',{method:'POST',body:JSON.stringify({message:$('#pubMsg').value})});
+  const j = await r.json().catch(()=>({}));
+  log.textContent=(j.log||'').trim()||'Готово'; $('#pubBtn').disabled=false;
+  toast(j.ok?'Опубликовано — сайт обновится ~1 мин':'Публикация: проверьте лог');
+});
+
+checkAuth();
+</script>
+</body>
+</html>

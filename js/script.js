@@ -1005,7 +1005,7 @@
   /* ---------- ИНИЦИАЛИЗАЦИЯ КАТАЛОГА ---------- */
   function initCatalog(data) {
     const items = (data && data.items && data.items.length) ? data.items : FALLBACK_CATALOG.items;
-    allItems = items.map((it, i) => Object.assign({}, it, { id: it.id != null ? String(it.id) : 'demo' + i }));
+    allItems = items.filter(it => !it.hidden).map((it, i) => Object.assign({}, it, { id: it.id != null ? String(it.id) : 'demo' + i }));
     districtPages = (data && data.districts && data.districts.length) ? data.districts : null;
     // типы для фильтра
     if (fType) {
