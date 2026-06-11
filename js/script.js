@@ -277,11 +277,12 @@
         </button>
       </div>
       <div class="card__body">
+        <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || t('d_price_req', 'Цена по запросу'))}</span>
         <h3>${esc(it.title || 'Объект на Пхукете')}</h3>
         <p class="card__meta">${metaLine(it)}</p>
         ${beach}
         <div class="card__bottom">
-          <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || t('d_price_req', 'Цена по запросу'))}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</span>
+          <span class="card__ppm">${per ? `≈ ${money(per)}/м²` : ''}</span>
           ${it.url ? `<a class="card__link" href="${esc(it.url)}">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></button>`}
         </div>
       </div>
