@@ -1,5 +1,5 @@
 /* ============================================================
-   ART ESTATE — интерактив
+   ESTATE ART — интерактив
    ============================================================ */
 (function () {
   'use strict';
@@ -272,7 +272,7 @@
         <button class="card__fav${onFav}" data-action="fav" data-id="${esc(it.id)}" type="button" aria-label="В избранное" aria-pressed="${onFav ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21s-7.5-4.6-10-9.2C.3 8.4 1.8 4.9 5.2 4.9c2 0 3.3 1.1 4.1 2.3.8-1.2 2.1-2.3 4.1-2.3 3.4 0 4.9 3.5 3.2 6.9C19.5 16.4 12 21 12 21z"/></svg>
         </button>
-        <button class="card__compare${onCmp}" data-action="compare" data-id="${esc(it.id)}" type="button" aria-label="Добавить в сравнение">
+        <button class="card__compare${onCmp}" data-action="compare" data-id="${esc(it.id)}" type="button" aria-label="Добавить в сравнение" aria-pressed="${onCmp ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6 9 17l-5-5"/></svg><span>${t('d_compare', 'Сравнить')}</span>
         </button>
       </div>
@@ -357,7 +357,13 @@
     if (favOnly) render(true);
   }
   function syncCompareUI() {
-    grid && grid.querySelectorAll('.card__compare').forEach(btn => btn.classList.toggle('is-active', compare.has(String(btn.dataset.id))));
+    grid && grid.querySelectorAll('.card__compare').forEach(btn => {
+      const on = compare.has(String(btn.dataset.id));
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    // панель сравнения перекрывает плавающие кнопки — приподнимаем их
+    document.body.classList.toggle('has-compare', compare.size > 0);
     if (!compareBar) return;
     compareBar.hidden = compare.size === 0;
     if (compareCount) compareCount.textContent = compare.size;
@@ -430,7 +436,7 @@
     const img = it.image || 'assets/hero-phuket.jpg';
     const per = ppm(it);
     const beds = (typeof it.beds === 'number' && it.beds > 0) ? it.beds + ' ' + plural(it.beds, 'спальня', 'спальни', 'спален') : (it.beds ? esc(it.beds) : '');
-    const wa = 'https://wa.me/79124869508?text=' + encodeURIComponent('Здравствуйте! Интересует объект «' + (it.title || '') + '» с сайта Art Estate.');
+    const wa = 'https://wa.me/79124869508?text=' + encodeURIComponent('Здравствуйте! Интересует объект «' + (it.title || '') + '» с сайта Estate Art.');
     const tg = 'https://t.me/+79124869508';
     const src = (it.source_url && /^https?:/.test(it.source_url)) ? `<a class="detail__source" href="${esc(it.source_url)}" target="_blank" rel="noopener">Источник: fazwaz.ru ↗</a>` : '';
     const price = it.priceUSD || 200000;
@@ -651,8 +657,23 @@
 
   /* ---------- БОКОВОЕ МЕНЮ (DRAWER) ---------- */
   const drawer = document.getElementById('drawer');
-  function openDrawer() { if (!drawer) return; drawer.hidden = false; drawer.setAttribute('aria-hidden', 'false'); requestAnimationFrame(() => drawer.classList.add('open')); document.body.style.overflow = 'hidden'; }
-  function closeDrawer() { if (!drawer) return; drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); setTimeout(() => { drawer.hidden = true; }, 350); document.body.style.overflow = ''; }
+  const burger = document.getElementById('burger');
+  function openDrawer() {
+    if (!drawer) return;
+    drawer.hidden = false; drawer.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => drawer.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+    if (burger) burger.setAttribute('aria-expanded', 'true');
+    const first = drawer.querySelector('.drawer__close');
+    if (first) setTimeout(() => first.focus(), 120);
+  }
+  function closeDrawer() {
+    if (!drawer || drawer.hidden) return;
+    drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+    setTimeout(() => { drawer.hidden = true; }, 350);
+    document.body.style.overflow = '';
+    if (burger) { burger.setAttribute('aria-expanded', 'false'); burger.focus({ preventScroll: true }); }
+  }
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-drawer-open]')) { e.preventDefault(); openDrawer(); }
     if (e.target.closest('[data-drawer-close]')) closeDrawer();
@@ -678,7 +699,13 @@
     en: {
       nav_districts: 'Districts', nav_objects: 'Listings', nav_map: 'Map', nav_finance: 'Financing',
       nav_journal: 'Journal', nav_about: 'About Alena', nav_steps: 'Process', nav_reviews: 'Reviews', nav_contacts: 'Contacts',
-      cta_request: 'Request a call', drawer_price: 'Currency',
+      nav_relocation: 'Relocation',
+      cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
+      reloc_eyebrow: 'Relocation', reloc_title: 'Free relocation consultation',
+      reloc_cta: 'Send a request on the site',
+      reloc_wa_vn: 'Vietnam · WhatsApp', reloc_wa_th: 'Thailand · WhatsApp',
+      channels_label: 'Our channels', chan_studio: 'Our studio', chan_studio_sub: 'Websites, AI, video · @IISoSArt',
+      chan_ai: 'On AI and tech', chan_ai_sub: 'Deep dives and practice · @IvanArtxJarvis',
       hero_eyebrow: 'Real estate in Phuket', hero_title: 'Your dream home <em>by the ocean</em>',
       hero_sub: 'Villas and apartments in Phuket with full personal support of your deal from A to Z.',
       hero_big2: 'Villas<br>with infinity<br>pools', hero_big3: 'Step<br>inside the dream', hero_enter: 'View listings →',
@@ -698,7 +725,7 @@
       about_eyebrow: 'Your personal agent', contacts_eyebrow: 'Contacts', contacts_title: 'Let’s find your home in Phuket',
       catalog_cta_btn: 'Get a selection', whyus_cta: 'Get a consultation', journal_all: 'All journal articles',
       contacts_lead: 'Leave a request — I’ll reply personally and help you take the first step to your dream property.',
-      contacts_role: 'Personal agent at Art Estate', contacts_note: 'Working across Phuket · Online viewings from anywhere in the world',
+      contacts_role: 'Personal agent at Estate Art', contacts_note: 'Working across Phuket · Online viewings from anywhere in the world',
       lead_submit: 'Send request via WhatsApp', lead_consent: 'I agree to the processing of personal data and accept the <a href="privacy/" target="_blank" rel="noopener">privacy policy</a>',
       lead_name_ph: 'Your name', lead_phone_ph: 'Phone or @telegram', lead_msg_ph: 'What are you looking for: area, budget, type? (optional)',
       d_found: 'Listings found', d_fav: 'favorites', d_more: 'Details', d_price_req: 'Price on request',
@@ -712,7 +739,13 @@
     th: {
       nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
       nav_journal: 'บทความ', nav_about: 'เกี่ยวกับอาเลน่า', nav_steps: 'ขั้นตอน', nav_reviews: 'รีวิว', nav_contacts: 'ติดต่อ',
-      cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน',
+      nav_relocation: 'ย้ายถิ่นฐาน',
+      cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
+      reloc_eyebrow: 'ย้ายถิ่นฐาน', reloc_title: 'ปรึกษาการย้ายถิ่นฐานฟรี',
+      reloc_cta: 'ส่งคำขอผ่านเว็บไซต์',
+      reloc_wa_vn: 'เวียดนาม · WhatsApp', reloc_wa_th: 'ไทย · WhatsApp',
+      channels_label: 'ช่องของเรา', chan_studio: 'สตูดิโอของเรา', chan_studio_sub: 'เว็บไซต์ AI วิดีโอ · @IISoSArt',
+      chan_ai: 'เรื่อง AI และเทคโนโลยี', chan_ai_sub: 'บทวิเคราะห์และการใช้งานจริง · @IvanArtxJarvis',
       hero_eyebrow: 'อสังหาริมทรัพย์ในภูเก็ต', hero_title: 'บ้านในฝัน <em>ริมทะเล</em>',
       hero_sub: 'วิลล่าและคอนโดในภูเก็ต พร้อมบริการดูแลการซื้อขายแบบครบวงจร',
       hero_big2: 'วิลล่า<br>พร้อมสระว่ายน้ำ<br>อินฟินิตี้', hero_big3: 'ก้าวเข้าสู่<br>บ้านในฝัน', hero_enter: 'ดูรายการ →',
@@ -732,7 +765,7 @@
       about_eyebrow: 'ตัวแทนส่วนตัวของคุณ', contacts_eyebrow: 'ติดต่อ', contacts_title: 'มาหาบ้านของคุณในภูเก็ตกัน',
       catalog_cta_btn: 'ขอรายการที่คัดสรร', whyus_cta: 'ขอคำปรึกษา', journal_all: 'บทความทั้งหมด',
       contacts_lead: 'ฝากข้อมูลไว้ — ฉันจะตอบกลับด้วยตนเองและช่วยคุณเริ่มต้น',
-      contacts_role: 'ตัวแทนส่วนตัว Art Estate', contacts_note: 'ให้บริการทั่วภูเก็ต · ชมออนไลน์ได้จากทุกที่',
+      contacts_role: 'ตัวแทนส่วนตัว Estate Art', contacts_note: 'ให้บริการทั่วภูเก็ต · ชมออนไลน์ได้จากทุกที่',
       lead_submit: 'ส่งคำขอผ่าน WhatsApp', lead_consent: 'ฉันยินยอมให้ประมวลผลข้อมูลส่วนบุคคลและยอมรับ <a href="privacy/" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>',
       lead_name_ph: 'ชื่อของคุณ', lead_phone_ph: 'โทรศัพท์ หรือ @telegram', lead_msg_ph: 'คุณกำลังมองหาอะไร: ทำเล งบประมาณ ประเภท? (ไม่บังคับ)',
       d_found: 'พบรายการ', d_fav: 'รายการโปรด', d_more: 'รายละเอียด', d_price_req: 'ราคาตามสอบถาม',
@@ -826,11 +859,12 @@
     'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'Tap a marker to see the price and open the listing.',
     'Короткие гайды, которые помогут разобраться до первого звонка.': 'Short guides to help you get oriented before the first call.',
     'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'Didn’t find the right option? We’ll find a property for your budget and goals.',
+    'Разберём вашу ситуацию целиком: виза и статус, жильё, банковский счёт, школа детям, налоги. Без общих слов — по вашим вводным.': 'We go through your whole situation: visa and status, housing, a bank account, schools for the kids, taxes. No generic advice — only your case.',
     'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'Nothing found for your query. Try relaxing the filters or message us — we’ll find it manually.',
     'Все типы': 'All types', 'Все районы': 'All districts', 'Спальни: любые': 'Bedrooms: any',
     '1 спальня': '1 bedroom', '2 спальни': '2 bedrooms', '3 спальни': '3 bedrooms', '4+ спальни': '4+ bedrooms',
     'Площадь: любая': 'Area: any', 'от 50 м²': 'from 50 m²', 'от 100 м²': 'from 100 m²', 'от 150 м²': 'from 150 m²', 'от 250 м²': 'from 250 m²',
-    'Сортировка: по умолчанию': 'Sort: default', 'Цена ↑': 'Price ↑', 'Цена ↓': 'Price ↓', 'Площадь ↓': 'Area ↓', '$ за м² ↑': '$ per m² ↑',
+    'Сортировка': 'Sort', 'Цена ↑': 'Price ↑', 'Цена ↓': 'Price ↓', 'Площадь ↓': 'Area ↓', '$ за м² ↑': '$ per m² ↑',
     '🏖 У пляжа': '🏖 Near beach', '♥ Избранное': '♥ Favorites', 'Сбросить': 'Reset', 'Показать ещё': 'Show more',
   }, th: {
     'Лето круглый год': 'ฤดูร้อนตลอดทั้งปี',
@@ -912,11 +946,12 @@
     'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'แตะหมุดเพื่อดูราคาและเปิดรายละเอียดทรัพย์',
     'Короткие гайды, которые помогут разобраться до первого звонка.': 'คู่มือสั้น ๆ ช่วยให้เข้าใจก่อนโทรครั้งแรก',
     'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'ยังไม่เจอที่ใช่? เราจะหาทรัพย์ให้ตรงงบและความต้องการของคุณ',
+    'Разберём вашу ситуацию целиком: виза и статус, жильё, банковский счёт, школа детям, налоги. Без общих слов — по вашим вводным.': 'เราดูสถานการณ์ของคุณทั้งหมด: วีซ่าและสถานะ ที่พัก บัญชีธนาคาร โรงเรียนของลูก และภาษี — ตามเคสของคุณจริง ๆ',
     'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'ไม่พบผลลัพธ์ ลองผ่อนตัวกรองหรือทักมาหาเรา — เราจะช่วยหาด้วยตนเอง',
     'Все типы': 'ทุกประเภท', 'Все районы': 'ทุกทำเล', 'Спальни: любые': 'ห้องนอน: ทั้งหมด',
     '1 спальня': '1 ห้องนอน', '2 спальни': '2 ห้องนอน', '3 спальни': '3 ห้องนอน', '4+ спальни': '4+ ห้องนอน',
     'Площадь: любая': 'พื้นที่: ทั้งหมด', 'от 50 м²': 'ตั้งแต่ 50 ตร.ม.', 'от 100 м²': 'ตั้งแต่ 100 ตร.ม.', 'от 150 м²': 'ตั้งแต่ 150 ตร.ม.', 'от 250 м²': 'ตั้งแต่ 250 ตร.ม.',
-    'Сортировка: по умолчанию': 'จัดเรียง: ค่าเริ่มต้น', 'Цена ↑': 'ราคา ↑', 'Цена ↓': 'ราคา ↓', 'Площадь ↓': 'พื้นที่ ↓', '$ за м² ↑': '$ ต่อ ตร.ม. ↑',
+    'Сортировка': 'จัดเรียง', 'Цена ↑': 'ราคา ↑', 'Цена ↓': 'ราคา ↓', 'Площадь ↓': 'พื้นที่ ↓', '$ за м² ↑': '$ ต่อ ตร.ม. ↑',
     '🏖 У пляжа': '🏖 ใกล้หาด', '♥ Избранное': '♥ รายการโปรด', 'Сбросить': 'ล้างค่า', 'Показать ещё': 'แสดงเพิ่ม',
   } };
   const DEEP_SEL = 'h1,h2,h3,h4,p,li,summary,b,span,a,button,option,output';
@@ -1054,7 +1089,7 @@
         if (hintEl) hintEl.textContent = 'Отметьте согласие на обработку персональных данных.';
         return;
       }
-      const text = 'Заявка с сайта Art Estate\nИмя: ' + nameEl.value.trim() +
+      const text = 'Заявка с сайта Estate Art\nИмя: ' + nameEl.value.trim() +
         '\nКонтакт: ' + phoneEl.value.trim() +
         (msgEl && msgEl.value.trim() ? '\nЗапрос: ' + msgEl.value.trim() : '');
       if (hintEl) hintEl.textContent = 'Открываем WhatsApp с вашей заявкой…';

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Art Estate — локальная админ-панель (оператор).
+Estate Art — локальная админ-панель (оператор).
 ================================================
 
 Запускается НА ВАШЕМ КОМПЬЮТЕРЕ (GitHub Pages — статика и не может это исполнять):
@@ -69,7 +69,7 @@ def load_config():
         pw = os.environ.get("ADMIN_PASS") or secrets.token_urlsafe(9)
         save_config(user, pw)
         print("\n" + "=" * 56)
-        print("  Создан аккаунт администратора Art Estate:")
+        print("  Создан аккаунт администратора Estate Art:")
         print(f"     логин:  {user}")
         print(f"     пароль: {pw}")
         print("  Смените: python3 admin/server.py --set-user X --set-pass Y")
@@ -303,7 +303,7 @@ def main():
         print(f"✓ Аккаунт обновлён: логин «{user}».")
         return
     load_config()  # создаст аккаунт при первом запуске и напечатает пароль
-    print(f"Art Estate Admin → http://{HOST}:{PORT}/admin/   (Ctrl+C для остановки)")
+    print(f"Estate Art Admin → http://{HOST}:{PORT}/admin/   (Ctrl+C для остановки)")
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
 
 

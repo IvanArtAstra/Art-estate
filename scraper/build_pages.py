@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-build_pages.py — генерация статических SEO-страниц объектов Art Estate
+build_pages.py — генерация статических SEO-страниц объектов Estate Art
 =====================================================================
 
 Читает data/catalog.json и для каждого объекта создаёт человекочитаемую
@@ -74,21 +74,21 @@ PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>__TITLE__ — купить на Пхукете | Art Estate</title>
+<title>__TITLE__ — купить на Пхукете | Estate Art</title>
 <meta name="description" content="__METADESC__" />
 <meta name="theme-color" content="#0f3f3a" />
 <link rel="canonical" href="__CANON__" />
 <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg" />
 <meta property="og:type" content="product" />
 <meta property="og:locale" content="ru_RU" />
-<meta property="og:site_name" content="Art Estate" />
-<meta property="og:title" content="__TITLE__ — Art Estate" />
+<meta property="og:site_name" content="Estate Art" />
+<meta property="og:title" content="__TITLE__ — Estate Art" />
 <meta property="og:description" content="__METADESC__" />
 <meta property="og:url" content="__CANON__" />
 <meta property="og:image" content="__OGIMG__" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="__OGIMG__" />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="../../css/styles.css" />
 <style>
@@ -133,7 +133,7 @@ PAGE = """<!DOCTYPE html>
 </head>
 <body>
 <header class="pp-header">
-  <a href="../../" class="logo" style="color:var(--teal)">ART <span style="color:var(--gold)">ESTATE</span></a>
+  <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
   <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
 </header>
 
@@ -210,8 +210,21 @@ PAGE = """<!DOCTYPE html>
 </div>
 
 <footer class="footer" style="margin-top:3rem">
+  <div class="footer__channels">
+    <span class="footer__label">Наши каналы</span>
+    <div class="channels">
+      <a class="chan" href="https://t.me/IISoSArt" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg></span>
+        <span class="chan__txt"><b>Наша студия</b><span>Сайты, AI, видео · @IISoSArt</span></span>
+      </a>
+      <a class="chan" href="https://t.me/IvanArtxJarvis" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg></span>
+        <span class="chan__txt"><b>Про AI и технологии</b><span>Разборы и практика · @IvanArtxJarvis</span></span>
+      </a>
+    </div>
+  </div>
   <div class="footer__bottom" style="border:0">
-    <span>© __YEAR__ Art Estate · Недвижимость на Пхукете · <a href="../../privacy/" style="color:rgba(255,253,248,.7)">Политика конфиденциальности</a></span>
+    <span>© __YEAR__ Estate Art · Недвижимость на Пхукете · <a href="../../privacy/" style="color:rgba(255,253,248,.7)">Политика конфиденциальности</a></span>
     <a href="tel:+79124869508">+7 912 486-95-08</a>
   </div>
 </footer>
@@ -259,18 +272,18 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Недвижимость в районе __NAME__, Пхукет — купить | Art Estate</title>
+<title>Недвижимость в районе __NAME__, Пхукет — купить | Estate Art</title>
 <meta name="description" content="__METADESC__" />
 <meta name="theme-color" content="#0f3f3a" />
 <link rel="canonical" href="__CANON__" />
 <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="ru_RU" />
-<meta property="og:title" content="Недвижимость в районе __NAME__ — Art Estate" />
+<meta property="og:title" content="Недвижимость в районе __NAME__ — Estate Art" />
 <meta property="og:description" content="__METADESC__" />
 <meta property="og:url" content="__CANON__" />
 <meta property="og:image" content="__OGIMG__" />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="../../css/styles.css" />
 <style>
@@ -288,7 +301,7 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 </head>
 <body>
 <header class="pp-header">
-  <a href="../../" class="logo" style="color:var(--teal)">ART <span style="color:var(--gold)">ESTATE</span></a>
+  <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
   <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
 </header>
 <div class="pp-wrap">
@@ -303,8 +316,21 @@ DISTRICT_PAGE = """<!DOCTYPE html>
   <a class="pp-back" href="../../#districts">← Все районы</a>
 </div>
 <footer class="footer" style="margin-top:3rem">
+  <div class="footer__channels">
+    <span class="footer__label">Наши каналы</span>
+    <div class="channels">
+      <a class="chan" href="https://t.me/IISoSArt" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg></span>
+        <span class="chan__txt"><b>Наша студия</b><span>Сайты, AI, видео · @IISoSArt</span></span>
+      </a>
+      <a class="chan" href="https://t.me/IvanArtxJarvis" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg></span>
+        <span class="chan__txt"><b>Про AI и технологии</b><span>Разборы и практика · @IvanArtxJarvis</span></span>
+      </a>
+    </div>
+  </div>
   <div class="footer__bottom" style="border:0">
-    <span>© __YEAR__ Art Estate · Недвижимость на Пхукете · <a href="../../privacy/">Политика конфиденциальности</a></span>
+    <span>© __YEAR__ Estate Art · Недвижимость на Пхукете · <a href="../../privacy/">Политика конфиденциальности</a></span>
     <a href="tel:+79124869508">+7 912 486-95-08</a>
   </div>
 </footer>
@@ -389,7 +415,7 @@ def build():
         desc_block = f'<div class="pp-section"><h2>Описание</h2><p class="pp-desc">{esc(desc_text)}</p></div>'
         meta_desc = esc((desc_text[:155] + "…") if len(desc_text) > 158 else desc_text)
 
-        wa = "https://wa.me/79124869508?text=" + _urlenc("Здравствуйте! Интересует объект «" + (it.get("title") or "") + "» с сайта Art Estate.")
+        wa = "https://wa.me/79124869508?text=" + _urlenc("Здравствуйте! Интересует объект «" + (it.get("title") or "") + "» с сайта Estate Art.")
 
         lat, lng = it.get("lat"), it.get("lng")
         if lat and lng:
@@ -484,17 +510,22 @@ def build():
             if o.get("area"):
                 meta.append(f"{esc(o['area'])} м²")
             tag = f'<span class="card__tag">{esc(o["type"])}</span>' if o.get("type") else ""
+            per = o.get("pricePerM2") or (round(usd_v / o["area"]) if usd_v and o.get("area") else None)
+            old_price = f'<s>{money_usd(o["oldPriceUSD"])}</s> ' if o.get("oldPriceUSD") else ""
+            disc = f'<div class="card__badges"><span class="badge badge--disc">−{o["discountPct"]}%</span></div>' if o.get("discountPct") else ""
             cards.append(
-                f'<article class="card"><div class="card__media"><img src="../../{esc(o.get("image") or "assets/hero-phuket.jpg")}" alt="{esc(o.get("title"))}" loading="lazy" onerror="this.onerror=null;this.src=\'../../assets/hero-phuket.jpg\'"/>{tag}</div>'
-                f'<div class="card__body"><h3>{esc(o.get("title"))}</h3><p class="card__meta">{esc(o.get("location"))} · {" · ".join(meta)}</p>'
-                f'<div class="card__bottom"><span class="card__price">{money_usd(usd_v)}</span><a class="card__link" href="../../{esc(o.get("url"))}">Подробнее →</a></div></div></article>'
+                f'<article class="card"><div class="card__media"><img src="../../{esc(o.get("image") or "assets/hero-phuket.jpg")}" alt="{esc(o.get("title"))}" loading="lazy" onerror="this.onerror=null;this.src=\'../../assets/hero-phuket.jpg\'"/>{tag}{disc}</div>'
+                f'<div class="card__body"><span class="card__price">{old_price}{money_usd(usd_v)}</span>'
+                f'<h3>{esc(o.get("title"))}</h3><p class="card__meta">{esc(o.get("location"))} · {" · ".join(meta)}</p>'
+                f'<div class="card__bottom"><span class="card__ppm">{("≈ " + money_usd(per) + "/м²") if per else ""}</span>'
+                f'<a class="card__link" href="../../{esc(o.get("url"))}">Подробнее <span class="card__arrow">→</span></a></div></div></article>'
             )
             if o.get("lat") and o.get("lng"):
                 points.append([o["lat"], o["lng"], (o.get("title") or "Объект").replace("'", ""), "../../" + (o.get("url") or "")])
 
         cnt = len(objs)
         intro = f"{cnt} {plural(cnt,'объект','объекта','объектов')} в районе {name} — виллы и квартиры. Поможем выбрать, проверить и безопасно оформить сделку, в том числе удалённо."
-        meta_desc = esc(f"Купить недвижимость в районе {name} на Пхукете: {cnt} {plural(cnt,'объект','объекта','объектов')}. Подбор и сопровождение сделки от Art Estate.")
+        meta_desc = esc(f"Купить недвижимость в районе {name} на Пхукете: {cnt} {plural(cnt,'объект','объекта','объектов')}. Подбор и сопровождение сделки от Estate Art.")
         jsonld = json.dumps({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Главная", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": "Каталог", "item": SITE + "/#catalog"},

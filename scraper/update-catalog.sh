@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Обновление каталога Art Estate данными с fazwaz.ru.
+# Обновление каталога Estate Art данными с fazwaz.ru.
 # Запуск вручную:   bash scraper/update-catalog.sh
 # По расписанию:    см. инструкцию ниже и scraper/README.md
 set -euo pipefail
@@ -33,12 +33,12 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] Готово. Не забудьте: git ad
 #
 # Вариант 1 — cron (раз в сутки в 06:00):
 #   crontab -e
-#   0 6 * * * /bin/bash "/Users/ivanartemev/Desktop/проекты/Art Estate/scraper/update-catalog.sh" >> "/tmp/art-estate-catalog.log" 2>&1
+#   0 6 * * * /bin/bash "/Users/ivanartemev/Desktop/проекты/Art Estate/scraper/update-catalog.sh" >> "/tmp/estate-art-catalog.log" 2>&1
 #
 # Вариант 2 — launchd (macOS, надёжнее для ноутбука):
-#   создайте ~/Library/LaunchAgents/ru.artestate.catalog.plist с ProgramArguments,
+#   создайте ~/Library/LaunchAgents/ru.estateart.catalog.plist с ProgramArguments,
 #   указывающими на этот скрипт, и StartCalendarInterval (пример — в scraper/README.md),
-#   затем:  launchctl load ~/Library/LaunchAgents/ru.artestate.catalog.plist
+#   затем:  launchctl load ~/Library/LaunchAgents/ru.estateart.catalog.plist
 #
 # Вариант 3 — Claude Code: команда /schedule (удалённый агент по cron).
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-# Art Estate — сайт недвижимости на Пхукете
+# Estate Art — сайт недвижимости на Пхукете
 
 Премиальный лендинг с кинематографичным скролл-облётом Пхукета (видео скрабится скроллом, Apple-style).
 
@@ -24,11 +24,14 @@ data/
 scraper/
   scrape_fazwaz.py      — парсер объектов с fazwaz.ru
   README.md             — инструкция по парсеру
+tools/
+  make_banners.py       — генератор GIF-баннеров «Переезд» (см. ниже)
 assets/
   flythrough-long.mp4   — длинный облёт: остров → вилла → вход → интерьер (all-intra)
   flythrough-scrub.mp4  — короткий облёт (запасной)
   hero-phuket.jpg       — постер hero / фолбэк
   catalog/              — фотографии объектов (скачивает парсер)
+  banners/              — GIF-баннеры релокации + статичные постеры
   villa.jpg, apartment.jpg, penthouse.jpg — фолбэк-фото каталога
   pool.jpg              — фон блока «Об Алене»
 ```
@@ -147,9 +150,46 @@ PAGES=2 LIMIT=30 bash scraper/update-catalog.sh
 Автоматически (cron, ежедневно в 06:00):
 ```
 crontab -e
-0 6 * * * /bin/bash "<путь>/Art Estate/scraper/update-catalog.sh" >> /tmp/art-estate-catalog.log 2>&1
+0 6 * * * /bin/bash "<путь>/Estate Art/scraper/update-catalog.sh" >> /tmp/estate-art-catalog.log 2>&1
 ```
 Подробности (launchd, /schedule) — в начале `scraper/update-catalog.sh`.
+
+## GIF-баннеры «Переезд во Вьетнам / Таиланд»
+
+Секция `#relocation` на главной. Баннеры собираются скриптом, а не руками:
+
+```bash
+python3 tools/make_banners.py
+```
+
+На каждую страну получается по четыре файла в `assets/banners/`:
+
+| файл | размер | где нужен |
+|---|---|---|
+| `relocation-<страна>.gif` | 1200×630, ~350 КБ | десктоп, Telegram, OG-превью |
+| `relocation-<страна>-p.gif` | 1000×1250, ~110 КБ | телефон (подставляется через `<picture>`) и вертикальные ленты |
+| `…-p.webp` / `….webp` | постеры | `prefers-reduced-motion: reduce` |
+| `…-p.jpg` / `….jpg` | постеры | площадки без webp |
+
+Что менять в `tools/make_banners.py`:
+
+- тексты и города — в `CONFIGS` (`line1`, `line2`, `sub`, `footer`);
+- координаты блоков — в `WIDE` и `PORTRAIT`;
+- рисунок справа/сверху — функции `motif_vietnam` и `motif_thailand`.
+
+Анимация намеренно живёт в одной горизонтальной полосе вокруг кнопки: GIF пишет
+дельта-кадры, поэтому файл весит сотни килобайт, а не мегабайты. Если добавите
+движение в другой части кадра — вес вырастет в разы.
+
+Шрифты берутся системные (Baskerville и Avenir Next), так что скрипт рассчитан
+на macOS. На другой ОС поправьте пути `SERIF` и `SANS` вверху файла.
+
+## Наши каналы
+
+Ссылки стоят в футере всех страниц и в боковом меню:
+
+- 🎨 студия (сайты, AI, видео) — [@IISoSArt](https://t.me/IISoSArt)
+- 🤖 про AI и технологии — [@IvanArtxJarvis](https://t.me/IvanArtxJarvis)
 
 ## Что легко поменять
 
@@ -161,6 +201,12 @@ crontab -e
 - **Каталог** — запустите парсер (см. выше) или вручную правьте `data/catalog.json`.
 - **Длина скролл-анимации** — высота `.hero__scroll-track` в `css/styles.css`
   (по умолчанию `500vh`; больше = дольше летим).
+- **Адрес деплоя** — сейчас во всех canonical/OG-ссылках стоит
+  `https://ivanartastra.github.io/Art-estate/` (путь GitHub Pages, он же имя
+  репозитория). Название бренда сменилось на Estate Art, а адрес нет — если
+  переименуете репозиторий, поправьте `SITE` в `scraper/build_pages.py`,
+  перезапустите `python3 scraper/build_pages.py` и замените адрес в `index.html`,
+  `blog/`, `privacy/`.
 
 ## Контакты агента
 

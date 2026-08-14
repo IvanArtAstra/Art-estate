@@ -11,6 +11,7 @@ Thumbs.db
 /tmp/
 __pycache__/
 *.pyc
+.playwright-mcp/
 
 # Админка: учётные данные (НЕ коммитить)
 admin/admin_config.json

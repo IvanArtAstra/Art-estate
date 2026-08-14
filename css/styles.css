@@ -1,5 +1,5 @@
 /* ============================================================
-   ART ESTATE — Тропический премиум
+   ESTATE ART — Тропический премиум
    ============================================================ */
 
 :root {
@@ -884,4 +884,227 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   .scroll-progress { display: none; }
   * { animation: none !important; }
   html { scroll-behavior: auto; }
+}
+
+/* ============================================================
+   ТИПОГРАФИКА: МЕТРИКИ ФОЛБЭКОВ, ПЕРЕНОСЫ, ВИСЯЧИЕ СТРОКИ
+   ============================================================ */
+
+/* Подгоняем системные фолбэки под метрики веб-шрифтов,
+   чтобы при подмене (font-display: swap) вёрстка не «дёргалась». */
+@font-face {
+  font-family: 'Cormorant Fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Times');
+  size-adjust: 89%;
+  ascent-override: 96%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Manrope Fallback';
+  src: local('Helvetica Neue'), local('Arial'), local('Roboto');
+  size-adjust: 103%;
+  ascent-override: 102%;
+  descent-override: 28%;
+  line-gap-override: 0%;
+}
+
+body { font-family: 'Manrope', 'Manrope Fallback', system-ui, sans-serif; }
+h1, h2, h3, h4 { font-family: 'Cormorant Garamond', 'Cormorant Fallback', Georgia, serif; }
+
+/* Заголовки — балансируем строки, абзацы — без «сирот» в конце */
+h1, h2, h3, h4, .hero__title, .hero__big, .searchband__title, .blog-head h1 { text-wrap: balance; }
+p, li, .section__lead, .card__meta, figcaption { text-wrap: pretty; }
+
+/* Длинные русские слова не должны рвать узкие карточки */
+body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
+.card__body h3, .jcard h3, .step h3, .wp-card h3, .fin-card h3, .dcard__name { hyphens: auto; }
+
+/* Табличные цифры везде, где показываем числа */
+.header__cta, .footer__bottom a, .card__ppm, .spec b, .calc__row output { font-variant-numeric: tabular-nums; }
+
+/* На узких экранах тонкое начертание читается хуже — добавляем веса */
+@media (max-width: 760px) {
+  .section__lead, .hero__sub, .contacts__lead { font-weight: 400; }
+}
+
+/* ---------- ПРОПУСК НАВИГАЦИИ ---------- */
+.skip-link {
+  position: fixed; top: .7rem; left: .7rem; z-index: 500;
+  padding: .75rem 1.2rem; border-radius: var(--radius-sm);
+  background: var(--teal); color: var(--cream);
+  font-size: .85rem; font-weight: 700; letter-spacing: .02em;
+  transform: translateY(-180%); transition: transform .25s var(--ease-out);
+}
+.skip-link:focus-visible { transform: none; }
+
+/* ============================================================
+   ПЕРЕЕЗД: GIF-БАННЕРЫ
+   ============================================================ */
+.relocation__grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.6rem);
+}
+.rbanner {
+  display: block; border-radius: var(--radius); overflow: hidden;
+  background: var(--teal-deep); border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-sm);
+  transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out), border-color .4s var(--ease-out);
+}
+/* Фиксируем пропорции заранее — картинка ленивая, а место под неё уже занято */
+.rbanner img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; }
+.rbanner:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(176,140,61,.4); }
+.relocation__actions {
+  display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; align-items: center;
+  margin-top: clamp(1.6rem, 3vw, 2.4rem);
+}
+/* Второстепенные действия — контурные, чтобы золотая кнопка вела */
+.btn--ghost { background: transparent; color: var(--teal); border: 1px solid rgba(15,63,58,.26); }
+.btn--ghost:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+.btn--ghost svg { flex: none; }
+/* На телефоне подставляем вертикальную версию баннера — горизонтальную
+   пришлось бы ужимать до 30% и текст переставал бы читаться */
+@media (max-width: 880px) {
+  .relocation__grid { grid-template-columns: 1fr; }
+  .rbanner img { aspect-ratio: 1000 / 1250; }
+}
+@media (max-width: 560px) { .relocation__actions .btn { flex: 1 1 100%; } }
+
+/* ============================================================
+   НАШИ КАНАЛЫ
+   ============================================================ */
+.footer__channels {
+  max-width: var(--maxw); margin: 1.6rem auto 2rem;
+  padding-top: 1.6rem; border-top: 1px solid rgba(255,255,255,.08);
+}
+.footer__label {
+  display: block; margin-bottom: .9rem;
+  font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255,253,248,.5);
+}
+.channels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; max-width: 760px; }
+.chan {
+  display: flex; align-items: center; gap: .85rem; min-height: 44px;
+  padding: .8rem 1rem; border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+  transition: border-color .3s var(--ease-out), background .3s var(--ease-out), transform .3s var(--ease-out);
+}
+.chan:hover { border-color: rgba(227,195,120,.45); background: rgba(255,255,255,.07); transform: translateY(-2px); }
+.chan__ico {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px;
+  border-radius: 50%; background: rgba(227,195,120,.12); color: var(--gold-light);
+}
+.chan__txt { display: flex; flex-direction: column; line-height: 1.32; min-width: 0; }
+.chan__txt b { color: var(--cream); font-size: .95rem; font-weight: 600; }
+.chan__txt span { font-size: .8rem; color: rgba(255,253,248,.55); overflow-wrap: anywhere; }
+@media (max-width: 640px) { .channels { grid-template-columns: 1fr; } }
+
+/* Тот же блок в боковом меню — на светлом фоне */
+.drawer__social + .drawer__label {
+  margin-top: .9rem; padding-top: 1rem;
+  border-top: 1px solid rgba(15,63,58,.1);
+}
+.channels--drawer { grid-template-columns: 1fr; max-width: none; }
+.channels--drawer .chan { border-color: rgba(15,63,58,.14); background: var(--cream); }
+.channels--drawer .chan:hover { border-color: rgba(176,140,61,.5); background: #fff; }
+.channels--drawer .chan__ico { background: rgba(176,140,61,.12); color: var(--gold); }
+.channels--drawer .chan__txt b { color: var(--teal); }
+.channels--drawer .chan__txt span { color: var(--ink-soft); }
+
+/* ============================================================
+   МОБИЛЬНАЯ ВЁРСТКА
+   ============================================================ */
+
+/* Высота hero по «малому» вьюпорту: не прыгает при появлении панелей браузера */
+@supports (height: 100svh) { .hero__sticky { height: 100svh; } }
+
+/* Кнопка звонка в шапке — вместо текстового телефона на узких экранах */
+.header__call {
+  display: none; width: 44px; height: 44px; border-radius: 50%;
+  place-items: center; flex: none;
+  border: 1px solid rgba(255,255,255,.45); color: #fff;
+  transition: background .3s var(--ease-out), border-color .3s var(--ease-out), color .3s var(--ease-out);
+}
+.header__call:hover { background: var(--gold); border-color: var(--gold); }
+.header.scrolled .header__call { color: var(--teal); border-color: rgba(15,63,58,.28); }
+.header.scrolled .header__call:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+@media (max-width: 1120px) { .nav { gap: 1.3rem; } }
+@media (max-width: 940px) {
+  .nav { display: none; }
+  .header__cta { display: none; }
+  .header__call { display: grid; }
+  html { scroll-padding-top: 76px; }
+}
+
+/* iOS зумит страницу при фокусе в текстовом поле с кеглем меньше 16px.
+   Селекты вызывают колесо выбора, а не зум, — их кегль можно не трогать. */
+@media (max-width: 760px) {
+  .filter--search input { font-size: 16px; }
+  select.filter {
+    text-overflow: ellipsis; padding-right: 2rem;
+    background-position: right .8rem center;
+  }
+}
+
+/* Панель фильтров — предсказуемой сеткой вместо «рваного» флекса */
+@media (max-width: 760px) {
+  .catalog__toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .catalog__toolbar > .filter { width: 100%; }
+  .filter--search, .price-range, .filter--reset { grid-column: 1 / -1; }
+  /* справа снизу висят плавающие WhatsApp/Telegram — уводим «Сравнить» влево */
+  .card__compare { left: 1rem; right: auto; }
+}
+
+/* Тач-цели не меньше 44px */
+@media (pointer: coarse) {
+  .card__fav { width: 44px; height: 44px; }
+  /* справа снизу висят плавающие WhatsApp/Telegram — уводим «Сравнить» влево */
+  .card__compare { padding: .6rem .9rem; left: 1rem; right: auto; }
+  .modal__close, .drawer__close { width: 44px; height: 44px; }
+  .drawer__nav a { padding: 1rem 0; }
+  .curr-switch button { padding: .75rem .4rem; }
+  .burger { padding: 10px 6px; }
+  .footer__nav a { padding: .3rem 0; }
+}
+
+/* Безопасные зоны iPhone + разводим плавающие кнопки и панель сравнения */
+.floating { right: calc(1.4rem + env(safe-area-inset-right)); bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
+.to-top { left: calc(1.4rem + env(safe-area-inset-left)); bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
+.compare-bar { bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
+.floating, .to-top { transition: bottom .35s var(--ease-out), opacity .4s var(--ease-out), transform .4s var(--ease-out), background .25s var(--ease-out); }
+body.has-compare .floating,
+body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
+
+@media (max-width: 760px) {
+  .compare-bar {
+    left: 1rem; right: 1rem; max-width: none; transform: none;
+    border-radius: var(--radius); animation: barUpMobile .4s var(--ease);
+  }
+  @keyframes barUpMobile { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  .compare-bar.shake { animation: shakeMobile .45s; }
+  @keyframes shakeMobile { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  body.has-compare .floating,
+  body.has-compare .to-top { bottom: calc(7.2rem + env(safe-area-inset-bottom)); }
+}
+
+/* Модалка на телефоне — как нижний лист */
+@media (max-width: 560px) {
+  .modal { padding: 0; align-items: end; }
+  .modal__box {
+    width: 100%; max-height: 92vh; max-height: 92svh;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .whyphuket__grid, .guarantees__inner { grid-template-columns: 1fr; }
+  .about__badge { right: 0; bottom: -16px; padding: .9rem 1.2rem; max-width: 168px; }
+  .footer__top { flex-direction: column; align-items: flex-start; }
+  .footer__bottom { flex-direction: column; gap: .5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbanner:hover, .chan:hover { transform: none; }
+  .skip-link { transition: none; }
 }

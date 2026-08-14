@@ -6,5 +6,6 @@
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="15" fill="url(#g)"/>
-  <text x="32" y="44" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-weight="700" fill="#e3c378" letter-spacing="-1">AE</text>
+  <rect x="5.5" y="5.5" width="53" height="53" rx="10.5" fill="none" stroke="#b08c3d" stroke-opacity=".45" stroke-width="1"/>
+  <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="31" font-weight="700" fill="#e3c378" letter-spacing="0.5">EA</text>
 </svg>

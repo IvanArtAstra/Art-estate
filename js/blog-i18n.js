@@ -1,4 +1,4 @@
-/* Локализация блога Art Estate (RU/EN/TH). Язык синхронизирован с главной (ae_lang). */
+/* Локализация блога Estate Art (RU/EN/TH). Язык синхронизирован с главной (ae_lang). */
 (function () {
   'use strict';
   var DICT = {

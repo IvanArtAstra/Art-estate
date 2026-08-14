@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-scrape_fazwaz.py — обновление каталога Art Estate данными с fazwaz.ru
+scrape_fazwaz.py — обновление каталога Estate Art данными с fazwaz.ru
 ====================================================================
 
 Берёт ПУБЛИЧНЫЕ страницы листингов (server-rendered HTML), вытаскивает
@@ -262,7 +262,7 @@ def main():
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
 
-    ap = argparse.ArgumentParser(description="Парсер каталога fazwaz.ru для Art Estate")
+    ap = argparse.ArgumentParser(description="Парсер каталога fazwaz.ru для Estate Art")
     ap.add_argument("--category", default=DEFAULT_CATEGORY,
                     help="путь категории на fazwaz.ru (по умолчанию: вся Пхукет-недвижимость)")
     ap.add_argument("--pages", type=int, default=1, help="сколько страниц листинга обойти")

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Art Estate — Недвижимость на Пхукете премиум-класса</title>
-  <meta name="description" content="Art Estate — подбор и сопровождение покупки вилл и квартир на Пхукете. Персональный агент Алена Артемьева. Прозрачные сделки, юридическая защита, объекты у океана." />
+  <title>Estate Art — Недвижимость на Пхукете премиум-класса</title>
+  <meta name="description" content="Estate Art — подбор и сопровождение покупки вилл и квартир на Пхукете. Персональный агент Алена Артемьева. Прозрачные сделки, юридическая защита, объекты у океана." />
   <meta name="theme-color" content="#0f3f3a" />
   <link rel="canonical" href="https://ivanartastra.github.io/Art-estate/" />
   <link rel="preload" as="image" href="assets/hero-phuket.webp" type="image/webp" />
@@ -16,8 +16,8 @@
   <!-- OpenGraph (превью ссылки в WhatsApp/Telegram/соцсетях) -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ru_RU" />
-  <meta property="og:site_name" content="Art Estate" />
-  <meta property="og:title" content="Art Estate — недвижимость на Пхукете премиум-класса" />
+  <meta property="og:site_name" content="Estate Art" />
+  <meta property="og:title" content="Estate Art — недвижимость на Пхукете премиум-класса" />
   <meta property="og:description" content="Виллы и квартиры на Пхукете с персональным сопровождением сделки. Кинематографичный подбор, калькуляторы, проверенные объекты у океана." />
   <meta property="og:url" content="https://ivanartastra.github.io/Art-estate/" />
   <meta property="og:image" content="https://ivanartastra.github.io/Art-estate/assets/hero-phuket.jpg" />
@@ -27,13 +27,13 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Art Estate — недвижимость на Пхукете" />
+  <meta name="twitter:title" content="Estate Art — недвижимость на Пхукете" />
   <meta name="twitter:description" content="Виллы и квартиры на Пхукете с персональным сопровождением сделки от Алены Артемьевой." />
   <meta name="twitter:image" content="https://ivanartastra.github.io/Art-estate/assets/hero-phuket.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -41,30 +41,38 @@
 </head>
 <body>
 
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+
   <!-- Прогресс прокрутки -->
   <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- ============ ПРЕЛОАДЕР ============ -->
   <div class="preloader" id="preloader">
     <div class="preloader__inner">
-      <div class="preloader__logo">ART <span>ESTATE</span></div>
+      <div class="preloader__logo">ESTATE <span>ART</span></div>
       <div class="preloader__bar"><span id="preloaderBar"></span></div>
     </div>
   </div>
 
   <!-- ============ ШАПКА ============ -->
   <header class="header" id="header">
-    <a href="#hero" class="logo">ART <span>ESTATE</span></a>
+    <a href="#hero" class="logo">ESTATE <span>ART</span></a>
     <nav class="nav" id="nav">
       <a href="#catalog" data-i18n="nav_objects">Объекты</a>
+      <a href="#relocation" data-i18n="nav_relocation">Переезд</a>
       <a href="#about" data-i18n="nav_about">Об Алене</a>
       <a href="#steps" data-i18n="nav_steps">Этапы</a>
       <a href="#reviews" data-i18n="nav_reviews">Отзывы</a>
       <a href="#contacts" data-i18n="nav_contacts">Контакты</a>
     </nav>
     <a href="tel:+79124869508" class="header__cta">+7 912 486-95-08</a>
-    <button class="burger" id="burger" data-drawer-open aria-label="Открыть меню"><span></span><span></span><span></span></button>
+    <a href="tel:+79124869508" class="header__call" aria-label="Позвонить +7 912 486-95-08">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </a>
+    <button class="burger" id="burger" data-drawer-open aria-label="Открыть меню" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
   </header>
+
+  <main id="main">
 
   <!-- ============ HERO: СКРОЛЛ-ОБЛЁТ ============ -->
   <section class="hero" id="hero">
@@ -98,7 +106,7 @@
         </div>
 
         <div class="hero__scroll-hint" id="scrollHint">
-          <span>Листайте вниз</span>
+          <span data-i18n="hero_hint">Листайте вниз</span>
           <i></i>
         </div>
       </div>
@@ -205,7 +213,7 @@
       </div>
       <button id="fBeach" class="filter filter--toggle" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:.35rem"><path d="M22 12a10.06 10.06 0 0 0-20 0Z"/><path d="M12 12v8a2 2 0 0 0 4 0"/><path d="M12 2v1"/></svg>У пляжа</button>
       <select id="fSort" class="filter" aria-label="Сортировка">
-        <option value="default">Сортировка: по умолчанию</option>
+        <option value="default">Сортировка</option>
         <option value="price-asc">Цена ↑</option>
         <option value="price-desc">Цена ↓</option>
         <option value="area-desc">Площадь ↓</option>
@@ -291,6 +299,46 @@
         <p>Рассчитайте платёж по кредиту и доходность от аренды за пару секунд.</p>
         <button class="btn btn--gold btn--sm" id="openCalcBtn" type="button">Открыть калькулятор</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ ПЕРЕЕЗД: ВЬЕТНАМ И ТАИЛАНД ============ -->
+  <section class="section relocation" id="relocation">
+    <div class="section__head reveal">
+      <p class="eyebrow" data-i18n="reloc_eyebrow">Релокация</p>
+      <h2 class="section__title" data-i18n="reloc_title">Бесплатная консультация по переезду</h2>
+      <p class="section__lead">Разберём вашу ситуацию целиком: виза и статус, жильё, банковский счёт, школа детям, налоги. Без общих слов — по вашим вводным.</p>
+    </div>
+
+    <div class="relocation__grid">
+      <a class="rbanner reveal" href="#contacts" aria-label="Бесплатная консультация по переезду во Вьетнам">
+        <picture>
+          <source media="(prefers-reduced-motion: reduce) and (max-width: 880px)" type="image/webp" srcset="assets/banners/relocation-vietnam-p.webp" width="1000" height="1250" />
+          <source media="(prefers-reduced-motion: reduce)" type="image/webp" srcset="assets/banners/relocation-vietnam.webp" width="1200" height="630" />
+          <source media="(max-width: 880px)" type="image/gif" srcset="assets/banners/relocation-vietnam-p.gif" width="1000" height="1250" />
+          <img src="assets/banners/relocation-vietnam.gif" width="1200" height="630" loading="lazy" decoding="async"
+               alt="Бесплатная консультация по переезду во Вьетнам: виза, жильё, банк, школа, налоги" />
+        </picture>
+      </a>
+      <a class="rbanner reveal" href="#contacts" aria-label="Бесплатная консультация по переезду в Таиланд">
+        <picture>
+          <source media="(prefers-reduced-motion: reduce) and (max-width: 880px)" type="image/webp" srcset="assets/banners/relocation-thailand-p.webp" width="1000" height="1250" />
+          <source media="(prefers-reduced-motion: reduce)" type="image/webp" srcset="assets/banners/relocation-thailand.webp" width="1200" height="630" />
+          <source media="(max-width: 880px)" type="image/gif" srcset="assets/banners/relocation-thailand-p.gif" width="1000" height="1250" />
+          <img src="assets/banners/relocation-thailand.gif" width="1200" height="630" loading="lazy" decoding="async"
+               alt="Бесплатная консультация по переезду в Таиланд: виза, жильё, банк, школа, налоги" />
+        </picture>
+      </a>
+    </div>
+
+    <div class="relocation__actions reveal">
+      <a class="btn btn--ghost" href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%83%D1%8E%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B5%D0%B7%D0%B4%D1%83%20%D0%B2%D0%BE%20%D0%92%D1%8C%D0%B5%D1%82%D0%BD%D0%B0%D0%BC." target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607z"/></svg>
+        <span data-i18n="reloc_wa_vn">Вьетнам · WhatsApp</span></a>
+      <a class="btn btn--ghost" href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%83%D1%8E%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B5%D0%B7%D0%B4%D1%83%20%D0%B2%20%D0%A2%D0%B0%D0%B8%D0%BB%D0%B0%D0%BD%D0%B4." target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607z"/></svg>
+        <span data-i18n="reloc_wa_th">Таиланд · WhatsApp</span></a>
+      <a class="btn btn--gold" href="#contacts" data-i18n="reloc_cta">Оставить заявку на сайте</a>
     </div>
   </section>
 
@@ -457,7 +505,7 @@
         <div class="contacts__avatar">АА</div>
         <div>
           <b>Артемьева Алена Николаевна</b>
-          <span data-i18n="contacts_role">Персональный агент Art Estate</span>
+          <span data-i18n="contacts_role">Персональный агент Estate Art</span>
         </div>
       </div>
 
@@ -478,20 +526,48 @@
     </div>
   </section>
 
+  </main>
+
   <!-- ============ ФУТЕР ============ -->
   <footer class="footer">
     <div class="footer__top">
-      <a href="#hero" class="logo logo--footer">ART <span>ESTATE</span></a>
+      <a href="#hero" class="logo logo--footer">ESTATE <span>ART</span></a>
       <nav class="footer__nav">
-        <a href="#catalog">Объекты</a>
-        <a href="#about">Об Алене</a>
-        <a href="#steps">Этапы</a>
-        <a href="#reviews">Отзывы</a>
-        <a href="#contacts">Контакты</a>
+        <a href="#catalog" data-i18n="nav_objects">Объекты</a>
+        <a href="#relocation" data-i18n="nav_relocation">Переезд</a>
+        <a href="#about" data-i18n="nav_about">Об Алене</a>
+        <a href="#steps" data-i18n="nav_steps">Этапы</a>
+        <a href="#reviews" data-i18n="nav_reviews">Отзывы</a>
+        <a href="#contacts" data-i18n="nav_contacts">Контакты</a>
       </nav>
     </div>
+
+    <div class="footer__channels">
+      <span class="footer__label" data-i18n="channels_label">Наши каналы</span>
+      <div class="channels">
+        <a class="chan" href="https://t.me/IISoSArt" target="_blank" rel="noopener">
+          <span class="chan__ico">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+          </span>
+          <span class="chan__txt">
+            <b data-i18n="chan_studio">Наша студия</b>
+            <span data-i18n="chan_studio_sub">Сайты, AI, видео · @IISoSArt</span>
+          </span>
+        </a>
+        <a class="chan" href="https://t.me/IvanArtxJarvis" target="_blank" rel="noopener">
+          <span class="chan__ico">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg>
+          </span>
+          <span class="chan__txt">
+            <b data-i18n="chan_ai">Про AI и технологии</b>
+            <span data-i18n="chan_ai_sub">Разборы и практика · @IvanArtxJarvis</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
     <div class="footer__bottom">
-      <span>© 2026 Art Estate · Недвижимость на Пхукете · <a href="privacy/">Политика конфиденциальности</a></span>
+      <span>© 2026 Estate Art · Недвижимость на Пхукете · <a href="privacy/">Политика конфиденциальности</a></span>
       <a href="tel:+79124869508">+7 912 486-95-08</a>
     </div>
   </footer>
@@ -516,7 +592,7 @@
     <div class="drawer__overlay" data-drawer-close></div>
     <aside class="drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
       <div class="drawer__top">
-        <span class="logo logo--drawer">ART <span>ESTATE</span></span>
+        <span class="logo logo--drawer">ESTATE <span>ART</span></span>
         <button class="drawer__close" data-drawer-close aria-label="Закрыть">×</button>
       </div>
 
@@ -545,6 +621,7 @@
         <a href="#catalog" data-drawer-close data-i18n="nav_objects">Объекты</a>
         <a href="#map" data-drawer-close data-i18n="nav_map">Карта</a>
         <a href="#finance" data-drawer-close data-i18n="nav_finance">Финансирование</a>
+        <a href="#relocation" data-drawer-close data-i18n="nav_relocation">Переезд</a>
         <a href="blog/" data-i18n="nav_journal">Журнал</a>
         <a href="#about" data-drawer-close data-i18n="nav_about">Об Алене</a>
         <a href="#steps" data-drawer-close data-i18n="nav_steps">Этапы</a>
@@ -558,6 +635,28 @@
         <div class="drawer__social">
           <a href="https://wa.me/79124869508" target="_blank" rel="noopener" class="btn btn--wa">WhatsApp</a>
           <a href="https://t.me/+79124869508" target="_blank" rel="noopener" class="btn btn--tg">Telegram</a>
+        </div>
+
+        <span class="drawer__label" data-i18n="channels_label">Наши каналы</span>
+        <div class="channels channels--drawer">
+          <a class="chan" href="https://t.me/IISoSArt" target="_blank" rel="noopener">
+            <span class="chan__ico">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+            </span>
+            <span class="chan__txt">
+              <b data-i18n="chan_studio">Наша студия</b>
+              <span data-i18n="chan_studio_sub">Сайты, AI, видео · @IISoSArt</span>
+            </span>
+          </a>
+          <a class="chan" href="https://t.me/IvanArtxJarvis" target="_blank" rel="noopener">
+            <span class="chan__ico">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg>
+            </span>
+            <span class="chan__txt">
+              <b data-i18n="chan_ai">Про AI и технологии</b>
+              <span data-i18n="chan_ai_sub">Разборы и практика · @IvanArtxJarvis</span>
+            </span>
+          </a>
         </div>
       </div>
     </aside>
