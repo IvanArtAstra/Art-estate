@@ -29,6 +29,7 @@
   --ease-out:    cubic-bezier(.22,1,.36,1);
   --ease-soft:   cubic-bezier(.4,0,.2,1);
   --maxw:        1240px;
+  --sp-band:     clamp(3rem, 6vw, 5rem);  /* единый вертикальный шаг тёмных полос */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -216,7 +217,7 @@ h1, h2, h3, h4 {
 .trust {
   background: var(--teal); color: var(--cream);
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 2rem; padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+  gap: 2rem; padding: var(--sp-band) clamp(1.5rem, 5vw, 4rem);
   position: relative; z-index: 5;
 }
 .trust__item { text-align: center; }
@@ -558,10 +559,6 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   background-size: cover; background-position: center;
   box-shadow: var(--shadow); display: grid; place-items: end center; padding-bottom: 1.4rem;
 }
-.about__photo-note {
-  color: rgba(255,255,255,.85); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
-  background: rgba(8,40,37,.45); padding: .5rem 1rem; border-radius: 100px; backdrop-filter: blur(6px);
-}
 .about__badge {
   position: absolute; bottom: -22px; right: -10px; background: var(--gold); color: #fff;
   padding: 1.1rem 1.5rem; border-radius: 16px; box-shadow: var(--shadow);
@@ -605,7 +602,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   border: 1px solid var(--hairline); box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column; gap: 1.2rem;
 }
-.review__stars { color: var(--gold); letter-spacing: .15em; font-size: 1.1rem; }
+.review__stars { color: var(--gold); display: flex; gap: .2rem; }
 .review p { font-size: 1.08rem; color: var(--ink); font-style: italic; flex: 1; }
 .review footer b { display: block; color: var(--teal); font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; }
 .review footer span { font-size: .85rem; color: var(--ink-soft); }
@@ -801,8 +798,8 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 [data-parallax] { will-change: transform, background-position; }
 
 /* Чистые стыки секций — тонкая золотая линия сверху тёмных блоков */
-.trust, .steps, .footer { position: relative; }
-.trust::before, .steps::before, .footer::before {
+.trust, .steps, .guarantees, .footer { position: relative; }
+.trust::before, .steps::before, .guarantees::before, .footer::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(176,140,61,.55), transparent);
   pointer-events: none;
@@ -835,7 +832,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 
 /* ---------- ГАРАНТИИ ---------- */
 .guarantees { background: var(--teal); color: var(--cream); position: relative; }
-.guarantees__inner { max-width: var(--maxw); margin: 0 auto; padding: clamp(2.5rem,5vw,3.6rem) clamp(1.4rem,5vw,2.5rem); display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6rem; }
+.guarantees__inner { max-width: var(--maxw); margin: 0 auto; padding: var(--sp-band) clamp(1.4rem,5vw,2.5rem); display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6rem; }
 .guarantee { display: flex; flex-direction: column; gap: .3rem; }
 .guarantee__num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold-light); }
 .guarantee b { color: var(--cream); font-size: 1.1rem; }
@@ -848,8 +845,12 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .faq__item summary { cursor: pointer; list-style: none; padding: 1.15rem 1.5rem; font-weight: 700; color: var(--teal); font-size: 1.06rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; transition: background .25s; }
 .faq__item summary:hover { background: rgba(15,63,58,.04); }
 .faq__item summary::-webkit-details-marker { display: none; }
-.faq__item summary::after { content: '+'; font-size: 1.6rem; color: var(--gold-ink); transition: transform .3s var(--ease-out); flex: none; line-height: 1; }
-.faq__item[open] summary::after { transform: rotate(45deg); }
+.faq__item summary::after {
+  content: ''; flex: none; width: 18px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2385692e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat center / contain;
+  transition: transform .3s var(--ease-out);
+}
+.faq__item[open] summary::after { transform: rotate(180deg); }
 .faq__item p { padding: 0 1.5rem 1.3rem; color: var(--ink-soft); line-height: 1.7; }
 
 /* ---------- ЖУРНАЛ (на главной) ---------- */
@@ -1267,4 +1268,13 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   .fin-card:hover, .wp-card:hover, .jcard:hover, .step:hover,
   .review:hover, .rbanner:hover, .chan:hover, .spec:hover { transform: none; box-shadow: var(--shadow-sm); }
   .btn:hover { transform: none; }
+}
+
+/* ---------- СКЕЛЕТОНЫ КАТАЛОГА ---------- */
+/* Без них секция висела пустой между панелью фильтров и футером всё время,
+   пока грузится catalog.json. Мерцание намеренно не добавляем — оно спорит
+   со спокойной пластикой остального интерфейса. */
+.card--skeleton {
+  aspect-ratio: 4 / 3.4; background: var(--sand-deep);
+  border: 1px solid var(--hairline); border-radius: var(--radius);
 }

@@ -1172,6 +1172,8 @@
     if (upd && data && data.updated) upd.textContent = 'Каталог обновлён ' + data.updated + ' · источник: ' + (data.source || '—');
   }
   if (grid) {
+    // Скелетоны на время загрузки: иначе главная секция сайта стоит пустой
+    grid.innerHTML = '<article class="card card--skeleton"></article>'.repeat(PAGE_SIZE);
     const src = grid.getAttribute('data-src') || 'data/catalog.json';
     fetch(src, { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : Promise.reject())
