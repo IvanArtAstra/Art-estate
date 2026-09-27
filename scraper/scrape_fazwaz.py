@@ -40,16 +40,34 @@ import requests
 
 BASE = "https://www.fazwaz.ru"
 DEFAULT_CATEGORY = "/недвижимость-продажа/таиланд/пхукет"
+
+# Регионы, которые умеет собирать парсер. Ключ — значение для --regions.
+# country/city попадают в каждый объект каталога: по ним работают фильтры
+# и переключатель стран на сайте.
+REGIONS = {
+    "phuket": dict(
+        category="/недвижимость-продажа/таиланд/пхукет",
+        country="th", countryName="Таиланд", city="Пхукет",
+    ),
+    "danang": dict(
+        category="/недвижимость-продажа/вьетнам/дананг",
+        country="vn", countryName="Вьетнам", city="Дананг",
+    ),
+    "nhatrang": dict(
+        category="/недвижимость-продажа/вьетнам/khanh-hoa/nha-trang",
+        country="vn", countryName="Вьетнам", city="Нячанг",
+    ),
+}
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
 # Цена на fazwaz.ru отдаётся в KZT. Курсы для конвертации в USD — ПРАВЬТЕ при
 # необходимости (значения приблизительные). Ключ — код валюты из данных.
 RATES_TO_USD = {"KZT": 1 / 485.0, "THB": 1 / 36.5, "RUB": 1 / 92.0,
-                "USD": 1.0, "EUR": 1.08}
+                "VND": 1 / 26000.0, "USD": 1.0, "EUR": 1.08}
 
 CARD_RE = re.compile(r"bridgeSearchMouseOver',\s*\d+,\s*'(\{.*?\})'\)", re.S)
-CUR_SYMBOLS = {"฿": "THB", "$": "USD", "€": "EUR", "₽": "RUB"}
+CUR_SYMBOLS = {"฿": "THB", "$": "USD", "€": "EUR", "₽": "RUB", "₫": "VND", "₸": "KZT"}
 
 # Предпочтительные размеры крупного фото на detail-странице (по убыванию вкуса)
 DETAIL_IMG_SIZES = ("810x438", "950x505", "540x292", "750x750", "500x500")
@@ -81,10 +99,14 @@ def parse_price(raw):
     """'KZT112,000,000' / '฿ 12,000,000' -> (amount:int|None, currency:str)"""
     if not raw:
         return None, None
-    m = re.match(r"\s*([A-Za-z]{3}|[฿$€₽])?\s*([\d ,. ]+)", raw)
+    m = re.match(r"\s*([A-Za-z]{3}|[฿$€₽₫₸])?\s*([\d ,. ]+)", raw)
     if not m:
         return None, None
     cur = (m.group(1) or "").strip()
+    if not cur:
+        # вьетнамский формат ставит знак валюты после суммы: «39,400,000,000 ₫»
+        t = re.search(r"([A-Za-z]{3}|[฿$€₽₫₸])\s*$", raw.strip())
+        cur = t.group(1) if t else ""
     cur = CUR_SYMBOLS.get(cur, cur or "KZT")
     digits = re.sub(r"[^\d]", "", m.group(2) or "")
     amount = int(digits) if digits else None
@@ -121,9 +143,37 @@ def img_ext(url):
     return ext if ext in ("jpg", "jpeg", "png", "webp") else "jpg"
 
 
+MARKER_JSON_RE = re.compile(
+    r'<script type="application/json" id="search-marker-payloads">(.*?)</script>', re.S)
+
+
 def extract_cards(html_text):
-    """Вернуть список dict из встроенных JSON-блоков карточек."""
+    """Вернуть список dict-карточек со страницы листинга.
+
+    С 2026 года fazwaz отдаёт все карточки одним JSON-блоком
+    <script type="application/json" id="search-marker-payloads">, где ключ — id
+    юнита. Старый формат (inline-вызовы bridgeSearchMouseOver) оставлен как
+    запасной путь на случай отката вёрстки.
+    """
     out, seen = [], set()
+
+    m = MARKER_JSON_RE.search(html_text)
+    if m:
+        try:
+            payload = json.loads(m.group(1))
+        except json.JSONDecodeError:
+            payload = {}
+        for uid, obj in payload.items():
+            if not isinstance(obj, dict):
+                continue
+            uid = str(uid) or unit_id(obj.get("detailUrl", ""))
+            if not uid or uid in seen:
+                continue
+            seen.add(uid)
+            out.append(obj)
+        if out:
+            return out
+
     for raw in CARD_RE.findall(html_text):
         try:
             obj = json.loads(html.unescape(raw))
@@ -156,6 +206,9 @@ def extract_geo(html_text):
 
 
 DESC_META_RE = re.compile(r'<meta[^>]+name="description"[^>]+content="([^"]+)"')
+PROJECT_LINK_RE = re.compile(r'href="(https://www\.fazwaz\.[a-z]+/(?:проекты|projects)/[^"]+)"')
+LAT_RE = re.compile(r'"latitude"\s*:\s*"?(-?\d+\.\d+)')
+LNG_RE = re.compile(r'"longitude"\s*:\s*"?(-?\d+\.\d+)')
 RENT_RE = re.compile(r"АРЕНДА.*?([\d][\d , ]{2,})\s*฿", re.S)
 
 
@@ -171,6 +224,9 @@ def detail_info(s, detail_url):
         if m:
             info["img"] = m.group(0)
             break
+    mp = PROJECT_LINK_RE.search(h)
+    if mp:
+        info["project_url"] = mp.group(1)
     md = DESC_META_RE.search(h)
     if md:
         full = re.sub(r"\s+", " ", html.unescape(md.group(1))).strip()
@@ -183,7 +239,58 @@ def detail_info(s, detail_url):
     return info
 
 
-def normalize(card, s, img_dir, rel_dir, geo_by_id=None, hires=True, delay=1.0):
+# Координаты. С 2026 года fazwaz не отдаёт lat/lng ни в листинге, ни в карточке
+# объекта — они остались только на странице ЖК, куда ведёт ссылка с detail-страницы.
+# Если ЖК не найден, адрес геокодируется через Nominatim (OSM).
+_GEO_CACHE = {}
+CITY_EN = {"Дананг": "Da Nang", "Нячанг": "Nha Trang", "Пхукет": "Phuket",
+           "Хошимин": "Ho Chi Minh City", "Ханой": "Hanoi"}
+NOMINATIM_UA = "EstateArt-catalog/1.0 (+https://ivanartastra.github.io/Art-estate/)"
+
+
+def project_geo(s, project_url):
+    """(lat, lng) со страницы ЖК на fazwaz."""
+    if not project_url:
+        return None
+    if project_url in _GEO_CACHE:
+        return _GEO_CACHE[project_url]
+    try:
+        h = fetch_text(s, project_url, referer=BASE + "/")
+    except requests.RequestException:
+        _GEO_CACHE[project_url] = None
+        return None
+    la, ln = LAT_RE.search(h), LNG_RE.search(h)
+    res = (float(la.group(1)), float(ln.group(1))) if (la and ln) else None
+    _GEO_CACHE[project_url] = res
+    return res
+
+
+def geocode_osm(address, country_name=None):
+    """Запасной геокодер: Nominatim. Точность — до квартала, этого хватает карте."""
+    if not address:
+        return None
+    parts = [CITY_EN.get(p.strip(), p.strip()) for p in address.split(",") if p.strip()]
+    if country_name:
+        parts.append({"Вьетнам": "Vietnam", "Таиланд": "Thailand"}.get(country_name, country_name))
+    q = ", ".join(dict.fromkeys(parts))
+    if q in _GEO_CACHE:
+        return _GEO_CACHE[q]
+    try:
+        r = requests.get("https://nominatim.openstreetmap.org/search",
+                         params={"format": "json", "limit": 1, "q": q},
+                         headers={"User-Agent": NOMINATIM_UA}, timeout=25)
+        r.raise_for_status()
+        data = r.json()
+        res = (float(data[0]["lat"]), float(data[0]["lon"])) if data else None
+    except (requests.RequestException, ValueError, KeyError, IndexError):
+        res = None
+    _GEO_CACHE[q] = res
+    time.sleep(1.1)  # правила Nominatim: не чаще одного запроса в секунду
+    return res
+
+
+def normalize(card, s, img_dir, rel_dir, geo_by_id=None, hires=True, delay=1.0,
+              region=None):
     uid = unit_id(card.get("detailUrl", ""))
     amount, cur = parse_price(card.get("price"))
     usd = to_usd(amount, cur)
@@ -232,9 +339,17 @@ def normalize(card, s, img_dir, rel_dir, geo_by_id=None, hires=True, delay=1.0):
     area = parse_area(card.get("area"))
     price_per_m2 = round(usd / area) if (usd and area) else None
     geo = (geo_by_id or {}).get(uid)
+    if not geo:
+        geo = project_geo(s, info.get("project_url"))
+    if not geo:
+        geo = geocode_osm(loc, (region or {}).get("countryName"))
 
+    region = region or {}
     return {
         "id": uid,
+        "country": region.get("country"),
+        "countryName": region.get("countryName"),
+        "city": region.get("city"),
         "title": card.get("name"),
         "type": card.get("propertyType"),
         "beds": card.get("bedrooms"),
@@ -258,34 +373,58 @@ def normalize(card, s, img_dir, rel_dir, geo_by_id=None, hires=True, delay=1.0):
     }
 
 
-def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    root = os.path.dirname(here)
+# --- Фильтр качества -------------------------------------------------------
+# В категориях «продажа» у fazwaz по Вьетнаму попадается мусор: объявления об
+# аренде, реклама агентов капсом на вьетнамском и битые цены (когда в поле цены
+# оказывается месячная аренда). На витрине премиального сайта это выглядит плохо,
+# поэтому такие карточки отсеиваются ещё до захода на detail-страницу.
 
-    ap = argparse.ArgumentParser(description="Парсер каталога fazwaz.ru для Estate Art")
-    ap.add_argument("--category", default=DEFAULT_CATEGORY,
-                    help="путь категории на fazwaz.ru (по умолчанию: вся Пхукет-недвижимость)")
-    ap.add_argument("--pages", type=int, default=1, help="сколько страниц листинга обойти")
-    ap.add_argument("--limit", type=int, default=9, help="максимум объектов в каталоге")
-    ap.add_argument("--delay", type=float, default=1.2, help="пауза между запросами, сек")
-    ap.add_argument("--no-hires", action="store_true",
-                    help="не заходить на detail-страницы (быстрее, но фото мельче)")
-    ap.add_argument("--allow-dup-titles", action="store_true",
-                    help="не схлопывать объекты с одинаковым названием ЖК (по умолчанию схлопываются)")
-    ap.add_argument("--out-json", default=os.path.join(root, "data", "catalog.json"))
-    ap.add_argument("--img-dir", default=os.path.join(root, "assets", "catalog"))
-    ap.add_argument("--rel-dir", default="assets/catalog",
-                    help="путь к фото относительно корня сайта (для catalog.json)")
-    args = ap.parse_args()
+BAD_TITLE_RE = re.compile(
+    r"(cho thuê|for rent|rental|/month|/мес|в месяц|thanh toán|liên hệ|giá rẻ|"
+    r"chính chủ|cần bán|bán gấp|hot deal|khuyến mãi)", re.I)
+EMOJI_RE = re.compile("[🌀-🫿☀-➿⬀-⯿️]")
+MIN_SALE_USD = 25_000        # ниже — почти наверняка аренда или ошибка
+MIN_PPM_USD = 400            # $/м², вменяемый низ для Вьетнама и Таиланда
+MAX_PPM_USD = 25_000
+MAX_TITLE_LEN = 58           # длиннее — это рекламный текст, а не название ЖК
 
-    os.makedirs(os.path.dirname(args.out_json), exist_ok=True)
-    os.makedirs(args.img_dir, exist_ok=True)
 
-    s = make_session()
-    cards = []
-    geo_by_id = {}
-    base_url = BASE + args.category
+def card_quality(card):
+    """(ok, причина). Проверка по данным карточки, без лишних запросов."""
+    title = (card.get("name") or "").strip()
+    if not title:
+        return False, "без названия"
+    if EMOJI_RE.search(title):
+        return False, "эмодзи в названии — рекламное объявление"
+    if BAD_TITLE_RE.search(title):
+        return False, "название про аренду или рекламу"
+    if title.startswith("[") or title.isupper():
+        return False, "название оформлено как объявление агента"
+    if len(title) > MAX_TITLE_LEN:
+        return False, f"название длиной {len(title)} — это рекламный текст"
+
+    amount, cur = parse_price(card.get("price"))
+    usd = to_usd(amount, cur)
+    if not usd:
+        return False, "цена не распознана"
+    if usd < MIN_SALE_USD:
+        return False, f"${usd} — это не цена продажи"
+    area = parse_area(card.get("area"))
+    if not area:
+        return False, "нет площади"
+    ppm = usd / area
+    if ppm < MIN_PPM_USD or ppm > MAX_PPM_USD:
+        return False, f"${ppm:,.0f} за м² — вне разумного диапазона"
+    return True, ""
+
+
+def scrape_region(s, key, region, args):
+    """Собрать один регион и вернуть список нормализованных объектов."""
+    base_url = BASE + region["category"]
+    print(f"\n=== {region['city']} ({region['countryName']}) ===")
     print(f"Категория: {base_url}")
+
+    cards, geo_by_id = [], {}
     for page in range(1, args.pages + 1):
         url = base_url if page == 1 else f"{base_url}?page={page}"
         print(f"→ страница {page}: {url}")
@@ -299,11 +438,11 @@ def main():
         print(f"  найдено карточек: {len(page_cards)}")
         cards.extend(page_cards)
         time.sleep(args.delay)
-        if len(cards) >= args.limit:
+        if not page_cards:
             break
 
-    # дедуп по id (+ по названию ЖК, если не отключено), обрезка до лимита
-    uniq, seen_id, seen_title = [], set(), set()
+    # дедуп по id (+ по названию ЖК, если не отключено), фильтр качества, лимит
+    uniq, seen_id, seen_title, rejected = [], set(), set(), []
     for c in cards:
         uid = unit_id(c.get("detailUrl", ""))
         title_key = (c.get("name") or "").strip().lower()
@@ -311,17 +450,92 @@ def main():
             continue
         if not args.allow_dup_titles and title_key and title_key in seen_title:
             continue
+        if not args.no_quality_filter:
+            ok, why = card_quality(c)
+            if not ok:
+                rejected.append((c.get("name") or uid, why))
+                continue
         seen_id.add(uid)
         seen_title.add(title_key)
         uniq.append(c)
+    if rejected:
+        print(f"  отсеяно по качеству: {len(rejected)}")
+        for name, why in rejected[:8]:
+            print(f"    − {str(name)[:44]:46} {why}")
+        if len(rejected) > 8:
+            print(f"    … и ещё {len(rejected) - 8}")
     uniq = uniq[: args.limit]
-    print(f"\nОбъектов к обработке: {len(uniq)} (hires={'нет' if args.no_hires else 'да'})")
+    print(f"Объектов к обработке: {len(uniq)} (hires={'нет' if args.no_hires else 'да'})")
 
     items = []
     for i, c in enumerate(uniq, 1):
         print(f"[{i}/{len(uniq)}] {c.get('name')}")
-        items.append(normalize(c, s, args.img_dir, args.rel_dir, geo_by_id=geo_by_id,
-                               hires=not args.no_hires, delay=args.delay))
+        it = normalize(c, s, args.img_dir, args.rel_dir, geo_by_id=geo_by_id,
+                       hires=not args.no_hires, delay=args.delay, region=region)
+        # Без фото карточка подставила бы фолбэк с другой страны — лучше пропустить
+        if not it.get("image"):
+            print(f"    − пропущен: фото не скачалось")
+            continue
+        items.append(it)
+    return items
+
+
+def main():
+    here = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(here)
+
+    ap = argparse.ArgumentParser(description="Парсер каталога fazwaz.ru для Estate Art")
+    ap.add_argument("--regions", default="phuket",
+                    help="регионы через запятую: " + ", ".join(REGIONS) + " (по умолчанию: phuket)")
+    ap.add_argument("--category", default=None,
+                    help="произвольный путь категории на fazwaz.ru вместо --regions")
+    ap.add_argument("--country", default="", help="код страны для --category, например vn")
+    ap.add_argument("--country-name", default="", help="название страны для --category")
+    ap.add_argument("--city", default="", help="город для --category")
+    ap.add_argument("--merge", action="store_true",
+                    help="дописать в существующий catalog.json, сохранив объекты других городов")
+    ap.add_argument("--pages", type=int, default=1, help="сколько страниц листинга обойти на регион")
+    ap.add_argument("--limit", type=int, default=9, help="максимум объектов на регион")
+    ap.add_argument("--delay", type=float, default=1.2, help="пауза между запросами, сек")
+    ap.add_argument("--no-hires", action="store_true",
+                    help="не заходить на detail-страницы (быстрее, но фото мельче)")
+    ap.add_argument("--no-quality-filter", action="store_true",
+                    help="не отсеивать аренду, рекламные заголовки и битые цены")
+    ap.add_argument("--allow-dup-titles", action="store_true",
+                    help="не схлопывать объекты с одинаковым названием ЖК (по умолчанию схлопываются)")
+    ap.add_argument("--out-json", default=os.path.join(root, "data", "catalog.json"))
+    ap.add_argument("--img-dir", default=os.path.join(root, "assets", "catalog"))
+    ap.add_argument("--rel-dir", default="assets/catalog",
+                    help="путь к фото относительно корня сайта (для catalog.json)")
+    args = ap.parse_args()
+
+    if args.category:
+        targets = {"custom": dict(category=args.category, country=args.country or None,
+                                  countryName=args.country_name or None, city=args.city or None)}
+    else:
+        targets = {}
+        for key in [k.strip() for k in args.regions.split(",") if k.strip()]:
+            if key not in REGIONS:
+                sys.exit(f"Неизвестный регион «{key}». Доступны: {', '.join(REGIONS)}")
+            targets[key] = REGIONS[key]
+
+    os.makedirs(os.path.dirname(args.out_json), exist_ok=True)
+    os.makedirs(args.img_dir, exist_ok=True)
+
+    s = make_session()
+    items = []
+    for key, region in targets.items():
+        items.extend(scrape_region(s, key, region, args))
+
+    if args.merge and os.path.exists(args.out_json):
+        with open(args.out_json, encoding="utf-8") as f:
+            old = json.load(f)
+        touched = {r.get("city") for r in targets.values() if r.get("city")}
+        kept = [it for it in old.get("items", []) if it.get("city") not in touched]
+        fresh_ids = {it["id"] for it in items}
+        kept = [it for it in kept if it.get("id") not in fresh_ids]
+        print(f"\nСлияние: сохранено {len(kept)} объектов других городов, добавлено {len(items)}")
+        items = kept + items
 
     catalog = {
         "updated": dt.date.today().isoformat(),
@@ -332,7 +546,12 @@ def main():
     }
     with open(args.out_json, "w", encoding="utf-8") as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
+    by_city = {}
+    for it in items:
+        by_city[it.get("city") or "—"] = by_city.get(it.get("city") or "—", 0) + 1
     print(f"\n✓ Готово: {args.out_json} ({len(items)} объектов)")
+    for city, n in sorted(by_city.items(), key=lambda kv: -kv[1]):
+        print(f"    {city}: {n}")
     print(f"✓ Изображения: {args.img_dir}")
 
 

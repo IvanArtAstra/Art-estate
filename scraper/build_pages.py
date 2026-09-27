@@ -272,14 +272,14 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Недвижимость в районе __NAME__, Пхукет — купить | Estate Art</title>
+<title>Недвижимость __WHERE__ — купить | Estate Art</title>
 <meta name="description" content="__METADESC__" />
 <meta name="theme-color" content="#0f3f3a" />
 <link rel="canonical" href="__CANON__" />
 <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="ru_RU" />
-<meta property="og:title" content="Недвижимость в районе __NAME__ — Estate Art" />
+<meta property="og:title" content="Недвижимость __WHERE__ — Estate Art" />
 <meta property="og:description" content="__METADESC__" />
 <meta property="og:url" content="__CANON__" />
 <meta property="og:image" content="__OGIMG__" />
@@ -293,7 +293,7 @@ DISTRICT_PAGE = """<!DOCTYPE html>
   .crumbs { font-size: .85rem; color: var(--ink-soft); margin: .4rem 0 1.2rem; }
   .crumbs a { color: var(--ink-soft); } .crumbs a:hover { color: var(--gold); } .crumbs span { color: var(--gold); }
   .d-intro h1 { font-size: clamp(2rem,5vw,3.2rem); color: var(--teal); margin-bottom: .5rem; }
-  .d-intro p { color: var(--ink-soft); font-size: 1.1rem; max-width: 760px; }
+  .d-intro > p:not(.eyebrow) { color: var(--ink-soft); font-size: 1.1rem; max-width: 760px; }
   .d-map { height: 340px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin: 1.8rem 0 2.4rem; z-index: 0; }
   .pp-back { display: inline-flex; gap: .4rem; color: var(--teal); font-weight: 700; margin-top: 2.4rem; }
 </style>
@@ -307,8 +307,8 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 <div class="pp-wrap">
   <nav class="crumbs"><a href="../../">Главная</a> / <a href="../../#catalog">Каталог</a> / <span>__NAME__</span></nav>
   <div class="d-intro">
-    <p class="eyebrow">Район Пхукета</p>
-    <h1>Недвижимость в районе __NAME__</h1>
+    <p class="eyebrow">__EYEBROW__</p>
+    <h1>Недвижимость __WHERE__</h1>
     <p>__INTRO__</p>
   </div>
   <div class="d-map" id="dMap"></div>
@@ -485,12 +485,20 @@ def build():
         print(f"  ✓ {rel}")
 
     # ----- СТРАНИЦЫ РАЙОНОВ -----
-    groups = {}
+    # Во Вьетнаме FazWaz отдаёт в адресе квартал (Hoa Hai, Tan Lap), и группировка
+    # по нему даёт десяток страниц с одним объектом на каждой — тонкий контент,
+    # который поисковики не любят, а пользователю ничего не говорит. Поэтому
+    # Вьетнам группируем по городу, а Таиланд — по району, как было.
+    groups, group_kind = {}, {}
     for it in items:
-        d = (it.get("location") or "").split(",")[0].strip()
-        if not d:
+        if it.get("country") == "vn":
+            key, kind = (it.get("city") or "").strip(), "city"
+        else:
+            key, kind = (it.get("location") or "").split(",")[0].strip(), "district"
+        if not key:
             continue
-        groups.setdefault(d, []).append(it)
+        groups.setdefault(key, []).append(it)
+        group_kind[key] = kind
 
     districts_meta = []
     for name, objs in sorted(groups.items(), key=lambda kv: -len(kv[1])):
@@ -524,8 +532,14 @@ def build():
                 points.append([o["lat"], o["lng"], (o.get("title") or "Объект").replace("'", ""), "../../" + (o.get("url") or "")])
 
         cnt = len(objs)
-        intro = f"{cnt} {plural(cnt,'объект','объекта','объектов')} в районе {name} — виллы и квартиры. Поможем выбрать, проверить и безопасно оформить сделку, в том числе удалённо."
-        meta_desc = esc(f"Купить недвижимость в районе {name} на Пхукете: {cnt} {plural(cnt,'объект','объекта','объектов')}. Подбор и сопровождение сделки от Estate Art.")
+        is_city = group_kind.get(name) == "city"
+        where = f"в {name}е" if is_city else f"в районе {name}"
+        country_name = objs[0].get("countryName") or "Пхукет"
+        place = country_name if is_city else "на Пхукете"
+        intro = (f"{cnt} {plural(cnt,'объект','объекта','объектов')} {where} — виллы и квартиры. "
+                 "Поможем выбрать, проверить и безопасно оформить сделку, в том числе удалённо.")
+        meta_desc = esc(f"Купить недвижимость {where} ({place}): {cnt} "
+                        f"{plural(cnt,'объект','объекта','объектов')}. Подбор и сопровождение сделки от Estate Art.")
         jsonld = json.dumps({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Главная", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": "Каталог", "item": SITE + "/#catalog"},
@@ -534,7 +548,9 @@ def build():
 
         html = DISTRICT_PAGE
         for k, v in {
-            "__NAME__": esc(name), "__METADESC__": meta_desc, "__CANON__": canon,
+            "__NAME__": esc(name), "__WHERE__": esc(where),
+            "__EYEBROW__": esc(country_name if is_city else "Район Пхукета"),
+            "__METADESC__": meta_desc, "__CANON__": canon,
             "__OGIMG__": f"{SITE}/{cover}", "__INTRO__": esc(intro),
             "__CARDS__": "".join(cards), "__POINTS__": json.dumps(points, ensure_ascii=False),
             "__JSONLD__": jsonld, "__YEAR__": str(year),

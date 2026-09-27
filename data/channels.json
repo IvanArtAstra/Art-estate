@@ -1,0 +1,464 @@
+{
+  "verifiedAt": "2026-09-27",
+  "note": "Публичная часть базы партнёров. Сами контакты лежат в data/contacts.json и подгружаются только после регистрации на сайте — это сбор заявок, а не защита: файл доступен по прямой ссылке. Для настоящего ограничения доступа нужен бэкенд.",
+  "companies": [
+    {
+      "id": "cvr-luxury-property-danang",
+      "name": "CVR / Luxury Property Danang",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "en, vi",
+      "note": "Одно из старейших агентств Дананга: аренда и продажа домов, вилл, апартаментов, земли и офисов в Дананге, Хойане и Хюэ. Премиальные объекты ведёт под бренд-сайтом luxurypropertydanang.com — команда, офис и хотлайн те же.",
+      "website": "https://cvr.com.vn/",
+      "sourceUrl": "https://cvr.com.vn/contact/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "da-nang-property",
+      "name": "Da Nang Property",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "en, vi",
+      "note": "Агентство с уклоном в жилую и коммерческую недвижимость плюс дизайн и обустройство помещений; офис на 107 Le Van Luong, Son Tra.",
+      "website": "https://danang-property.com/",
+      "sourceUrl": "https://danang-property.com/contact/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "da-nang-homes-danangmls",
+      "name": "Da Nang Homes / DaNangMLS",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "en, vi",
+      "note": "Американо-вьетнамская семейная команда, аренда и продажа для экспатов; ведёт собственный MLS-каталог danangmls.com и телеграм-канал с объектами.",
+      "website": "https://danang.homes/",
+      "sourceUrl": "https://danang.homes/contact",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram",
+        "zalo"
+      ]
+    },
+    {
+      "id": "house-in-danang-luxury-realty-danang",
+      "name": "House In Danang (Luxury Realty Danang)",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "en, vi, ko",
+      "note": "House In Danang Real Estate Company Limited — аренда и продажа жилья и коммерческих помещений, офис на 63 Ton That Tung, Thanh Khe.",
+      "website": "https://luxuryrealtydanang.com/",
+      "sourceUrl": "https://luxuryrealtydanang.com/about/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "realty-shark-danang",
+      "name": "Realty Shark Danang",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "ru, en, vi",
+      "note": "Агентство работает почти целиком через Telegram: канал с домами и виллами @Danang_House (2,4 тыс. подписчиков), чат @Danang_Apartments, личный контакт агента @Anhapartment; посты дублируются на русском и английском.",
+      "website": "https://www.vneproperty.com/",
+      "sourceUrl": "https://t.me/Danang_House",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram",
+        "zalo"
+      ]
+    },
+    {
+      "id": "mvp-vietnam",
+      "name": "MVP Vietnam",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "sale",
+      "languages": "en, ru, ko, zh, vi",
+      "note": "Бутиковое агентство в Дананге и Хойане с русской версией сайта; на странице контактов только телефоны, e-mail и WhatsApp — ни Telegram, ни Zalo не указаны.",
+      "website": "https://www.mvpvietnam.com/",
+      "sourceUrl": "http://www.mvpvietnam.com/contact/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone"
+      ]
+    },
+    {
+      "id": "dvr-da-nang-villa-realty",
+      "name": "DVR — Da Nang Villa Realty",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "both",
+      "languages": "ja, en, vi",
+      "note": "Японское агентство (с 2017 г.): брокеридж, управление и ремонт курортной недвижимости в Дананге и Хойане; для связи предлагает только LINE и WhatsApp, Zalo и Telegram на сайте нет.",
+      "website": "https://www.danangvillarealty.com/",
+      "sourceUrl": "https://www.danangvillarealty.com/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone"
+      ]
+    },
+    {
+      "id": "da-nang-landlord",
+      "name": "Da Nang Landlord",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "rent",
+      "languages": "en, vi",
+      "note": "Агентство долгосрочной аренды для экспатов (квартиры, дома, виллы, сервисные здания) плюс раздел продажи; в контактах только телефон и e-mail.",
+      "website": "https://dananglandlord.com/",
+      "sourceUrl": "https://dananglandlord.com/contact-us",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone"
+      ]
+    },
+    {
+      "id": "zoom-apartment-nha-trang-apartments",
+      "name": "Zoom Apartment (Nha Trang Apartments)",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "both",
+      "languages": "ru, en, vi",
+      "note": "Агентство в Нячанге: продажа и аренда квартир, домов и вилл, плюс управление недвижимостью; сайт имеет русскую версию (hreflang ru).",
+      "website": "https://nhatrangapartments.com/",
+      "sourceUrl": "https://nhatrangapartments.com/contact",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram",
+        "zalo"
+      ]
+    },
+    {
+      "id": "vietdom",
+      "name": "Vietdom",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "both",
+      "languages": "ru",
+      "note": "Русскоязычное агентство по продаже и аренде квартир и апартаментов в Нячанге, работает по вторичному рынку.",
+      "website": "https://vietdom.com/",
+      "sourceUrl": "https://vietdom.com/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram"
+      ]
+    },
+    {
+      "id": "sunset-group",
+      "name": "Sunset Group",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "both",
+      "languages": "ru",
+      "note": "Русскоязычная компания с офисом в ЖК «Океанус» в Нячанге: продажа и аренда жилья, инвестиционные программы; отдельный канал по продажам — t.me/NhaTrang_Sale_Apartments (указан на sunset-group.ru).",
+      "website": "https://sunset-group.ru/",
+      "sourceUrl": "https://t.me/s/Arenda_Nyachang_Zhilye",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram",
+        "zalo"
+      ]
+    },
+    {
+      "id": "org",
+      "name": "Русский Информационный Центр (РИЦ Нячанг)",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "both",
+      "languages": "ru, en",
+      "note": "Русский центр в Нячанге с двумя офисами: консультации и подбор недвижимости, есть четыре собственных дома с квартирами в аренду.",
+      "website": "https://rusinfocenter.com/",
+      "sourceUrl": "https://rusinfocenter.com/services/property/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "telegram",
+        "zalo"
+      ]
+    },
+    {
+      "id": "nha-trang-for-rent",
+      "name": "Nha Trang For Rent",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "rent",
+      "languages": "en, vi",
+      "note": "Агентство по подбору квартир, домов и вилл в Нячанге; офис по адресу 16 Ton Dan, Nha Trang, Khanh Hoa.",
+      "website": "https://nhatrang4rent.com/",
+      "sourceUrl": "https://nhatrang4rent.com/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "alohouse-nhatrang",
+      "name": "AloHouse NhaTrang",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "sale",
+      "languages": "vi",
+      "note": "Вьетнамское брокерское агентство в Нячанге: купля-продажа, приём объектов на реализацию, оценка недвижимости.",
+      "website": "https://www.alohousenhatrang.com/",
+      "sourceUrl": "https://www.alohousenhatrang.com/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "bat-ong-san-nha-trang-cong-ty-co-phan-tap-oan-four-home",
+      "name": "Bất Động Sản Nha Trang (Công ty Cổ phần Tập đoàn Four Home)",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "both",
+      "languages": "vi",
+      "note": "Юридически оформленное вьетнамское агентство (МСТ 5701761724) с офисом в Нячанге: консультации, брокерские услуги, приём объектов на продажу и аренду.",
+      "website": "https://batdongsannhatrang.info/",
+      "sourceUrl": "https://batdongsannhatrang.info/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "new-home-nha-trang",
+      "name": "New Home Nha Trang",
+      "kind": "agency",
+      "country": "vn",
+      "city": "Нячанг",
+      "focus": "rent",
+      "languages": "vi",
+      "note": "Вьетнамское агентство в Нячанге по аренде и подбору квартир, домов, коммерческих помещений, вилл и складов.",
+      "website": "https://newhomenhatrang.com/",
+      "sourceUrl": "https://newhomenhatrang.com/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "sun-group",
+      "name": "Sun Group",
+      "kind": "developer",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "developer",
+      "languages": "vi, en",
+      "note": "Крупнейший застройщик курортной недвижимости и инфраструктуры Центрального Вьетнама, головной офис исторически в Дананге (Ba Na Hills, InterContinental Danang, Sun World).",
+      "website": "https://sungroup.com.vn",
+      "sourceUrl": "https://sungroup.com.vn/en/lien-he",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone"
+      ]
+    },
+    {
+      "id": "sun-frontier-vietnam-hiyori-garden-tower",
+      "name": "Sun Frontier Vietnam (Hiyori Garden Tower)",
+      "kind": "developer",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "developer",
+      "languages": "vi, en, ja",
+      "note": "Японский застройщик (100% японский капитал), построил и продаёт апартаменты Hiyori Garden Tower на Vo Van Kiet в районе Son Tra, Дананг.",
+      "website": "https://hiyorigardentower.com",
+      "sourceUrl": "https://hiyorigardentower.com/en/lien-he/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone"
+      ]
+    },
+    {
+      "id": "filmore-real-estate-development-corporation",
+      "name": "Filmore Real Estate Development Corporation",
+      "kind": "developer",
+      "country": "vn",
+      "city": "Дананг",
+      "focus": "developer",
+      "languages": "vi, en",
+      "note": "Застройщик премиального комплекса The Filmore Da Nang на улице Bach Dang с видом на реку Хан.",
+      "website": "https://filmore.com.vn",
+      "sourceUrl": "https://filmore.com.vn/thefilmoredanang/en/",
+      "verifiedAt": "2026-09-27",
+      "hasContact": true,
+      "channels": [
+        "phone",
+        "zalo"
+      ]
+    },
+    {
+      "id": "wolfhome-da-nang-homes-apartments",
+      "kind": "agency",
+      "country": "vn",
+      "website": "",
+      "verifiedAt": "2026-09-27",
+      "name": "Wolfhome — Da Nang Homes & Apartments",
+      "city": "Дананг",
+      "focus": "rent",
+      "languages": "en, vi",
+      "note": "Работает только через Telegram-канал (1 515 подписчиков): аренда квартир и домов в Дананге. Сайта нет — домен bds247dn.com не открывается.",
+      "sourceUrl": "https://t.me/s/apartmentatdanang",
+      "hasContact": true,
+      "channels": [
+        "telegram"
+      ]
+    },
+    {
+      "id": "viet-life",
+      "kind": "agency",
+      "country": "vn",
+      "website": "",
+      "verifiedAt": "2026-09-27",
+      "name": "Viet Life Нячанг",
+      "city": "Нячанг",
+      "focus": "rent",
+      "languages": "ru",
+      "note": "Один из крупнейших русскоязычных каналов аренды в Нячанге (около 8 950 подписчиков), подбор квартир и вилл онлайн. Собственного сайта нет.",
+      "sourceUrl": "https://t.me/s/Viet_life_niachang",
+      "hasContact": true,
+      "channels": [
+        "telegram"
+      ]
+    }
+  ],
+  "communities": [
+    {
+      "name": "Дананг чат | Вьетнам",
+      "city": "Дананг",
+      "url": "https://t.me/danang_forum",
+      "members": 12465,
+      "note": "Самый многолюдный русскоязычный чат Дананга — 12 465 участников, 2 881 онлайн; бытовые вопросы, переводчики, гиды, визы.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "ВЬЕТНАМ ЧАТЫ | Нячанг Дананг Фукуок Муйне Хошимин Ханой чат",
+      "city": "Нячанг",
+      "url": "https://t.me/vietnam_ru",
+      "members": 11941,
+      "note": "Крупнейший русскоязычный чат по всему Вьетнаму (Нячанг, Дананг, Фукуок, Муйне, Хошимин, Ханой), 11 941 подписчик; обсуждают жизнь, визы, жильё.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Аренда Квартир Нячанг — Viet Life",
+      "city": "Нячанг",
+      "url": "https://t.me/Viet_life_niachang",
+      "members": 8952,
+      "note": "Канал аренды квартир и вилл во всех районах Нячанга с подбором онлайн до прилёта, 8 952 подписчика.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Вьетнам недвижимость аренда продажа жильё квартиры",
+      "city": "Вьетнам",
+      "url": "https://t.me/vietnam_rent",
+      "members": 6669,
+      "note": "Профильный чат объявлений об аренде и продаже недвижимости по всем городам Вьетнама, 6 669 участников, 1 566 онлайн.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Da Nang rent apartments — Дананг аренда жилья",
+      "city": "Дананг",
+      "url": "https://t.me/danangrentaflat",
+      "members": 6410,
+      "note": "Канал объявлений об аренде квартир, домов и вилл в Дананге без комиссии, 6 410 подписчиков.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Нячанг аренда квартир / Обмен валюты / трансфер",
+      "city": "Нячанг",
+      "url": "https://t.me/Arenda_Nyachang_Zhilye",
+      "members": 5230,
+      "note": "Канал подбора жилья в Нячанге, работает с 2017 года, 5 230 подписчиков; комиссию платит собственник.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "DIASPORA | Русские во Вьетнаме",
+      "city": "Дананг",
+      "url": "https://t.me/forum_vietnam_rus",
+      "members": 4330,
+      "note": "Чат русскоязычной диаспоры по Дананту, Нячангу, Ханою, Хошимину и Муйне, 4 330 участников, 575 онлайн.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Нячанг экспаты",
+      "city": "Нячанг",
+      "url": "https://t.me/nhatrang_expats",
+      "members": 3662,
+      "note": "Чат постоянно живущих и зимующих в Нячанге, 3 662 участника, 838 онлайн.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Дананг экспаты",
+      "city": "Дананг",
+      "url": "https://t.me/danang_expats",
+      "members": 2128,
+      "note": "Чат для тех, кто уже живёт в Дананге (без туристических тем), 2 128 участников, 525 онлайн.",
+      "verifiedAt": "2026-09-27"
+    },
+    {
+      "name": "Генконсульство России в Дананге",
+      "city": "Дананг",
+      "url": "https://t.me/rusconsdanang",
+      "members": 1069,
+      "note": "Официальный канал генконсульства России в Дананге, 1 069 подписчиков; консульские новости, важные для переезжающих.",
+      "verifiedAt": "2026-09-27"
+    }
+  ]
+}

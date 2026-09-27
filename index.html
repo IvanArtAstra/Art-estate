@@ -179,9 +179,11 @@
   <section class="section catalog" id="catalog">
     <div class="section__head reveal">
       <p class="eyebrow" data-i18n="catalog_eyebrow">Каталог</p>
-      <h2 class="section__title" data-i18n="catalog_title">Избранные объекты Пхукета</h2>
-      <p class="section__lead">Проверенные виллы и квартиры в лучших локациях острова — от&nbsp;уютных резиденций до&nbsp;премиальных пентхаусов с видом на&nbsp;Андаманское море.</p>
+      <h2 class="section__title" data-i18n="catalog_title">Избранные объекты Таиланда и Вьетнама</h2>
+      <p class="section__lead">Проверенные виллы и квартиры в Таиланде и&nbsp;Вьетнаме — Пхукет, Дананг и&nbsp;Нячанг. От&nbsp;уютных резиденций до&nbsp;премиальных пентхаусов у&nbsp;моря.</p>
     </div>
+
+    <div class="geo-switch reveal" id="geoSwitch" role="group" aria-label="Страна"></div>
 
     <div class="catalog__toolbar reveal" id="catalogToolbar">
       <div class="filter filter--search">
@@ -189,6 +191,7 @@
         <input type="search" id="fSearch" placeholder="Поиск: название или район…" data-i18n-ph="cat_search_ph" autocomplete="off" />
       </div>
       <select id="fType" class="filter" aria-label="Тип"><option value="">Все типы</option></select>
+      <select id="fCity" class="filter" aria-label="Город"><option value="">Все города</option></select>
       <select id="fDistrict" class="filter" aria-label="Район"><option value="">Все районы</option></select>
       <select id="fBeds" class="filter" aria-label="Спальни">
         <option value="">Спальни: любые</option>
@@ -249,8 +252,8 @@
   <section class="section mapsec" id="map">
     <div class="section__head reveal">
       <p class="eyebrow" data-i18n="map_eyebrow">На карте</p>
-      <h2 class="section__title" data-i18n="map_title">Объекты на карте Пхукета</h2>
-      <p class="section__lead">Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.</p>
+      <h2 class="section__title" data-i18n="map_title">Объекты на карте</h2>
+      <p class="section__lead">Карта следует за фильтрами каталога: выберите страну или город — и&nbsp;она покажет только их. Нажмите на маркер, чтобы увидеть цену.</p>
     </div>
     <div class="mapsec__map reveal" id="mapAll"></div>
   </section>
@@ -340,6 +343,20 @@
         <span data-i18n="reloc_wa_th">Таиланд · WhatsApp</span></a>
       <a class="btn btn--gold" href="#contacts" data-i18n="reloc_cta">Оставить заявку на сайте</a>
     </div>
+  </section>
+
+  <!-- ============ ПАРТНЁРЫ И КАНАЛЫ ВЬЕТНАМА ============ -->
+  <section class="section partners" id="partners">
+    <div class="section__head reveal">
+      <p class="eyebrow" data-i18n="partners_eyebrow">Вьетнам изнутри</p>
+      <h2 class="section__title" data-i18n="partners_title">Агентства, застройщики и каналы</h2>
+      <p class="section__lead">База проверенных контактов по Дананту и&nbsp;Нячангу: агентства, застройщики и&nbsp;живые сообщества. Каждый контакт подтверждён на&nbsp;официальной странице компании.</p>
+    </div>
+
+    <div class="reg-state reveal" id="regState" hidden></div>
+    <div class="partners__tabs reveal" id="partnersTabs" role="tablist"></div>
+    <div class="partners__grid" id="partnersGrid"></div>
+    <p class="partners__legal reveal" id="partnersLegal"></p>
   </section>
 
   <!-- ============ ОБ АЛЕНЕ ============ -->
@@ -622,6 +639,7 @@
         <a href="#map" data-drawer-close data-i18n="nav_map">Карта</a>
         <a href="#finance" data-drawer-close data-i18n="nav_finance">Финансирование</a>
         <a href="#relocation" data-drawer-close data-i18n="nav_relocation">Переезд</a>
+        <a href="#partners" data-drawer-close data-i18n="nav_partners">Партнёры</a>
         <a href="blog/" data-i18n="nav_journal">Журнал</a>
         <a href="#about" data-drawer-close data-i18n="nav_about">Об Алене</a>
         <a href="#steps" data-drawer-close data-i18n="nav_steps">Этапы</a>
@@ -677,6 +695,12 @@
   <div class="modal" id="detailModal" hidden aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal__overlay" data-close></div>
     <div class="modal__box" id="detailBox"></div>
+  </div>
+
+  <!-- ============ МОДАЛКА РЕГИСТРАЦИИ (открывает контакты) ============ -->
+  <div class="modal" id="regModal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <div class="modal__box modal__box--narrow" id="regBox"></div>
   </div>
 
   <!-- ============ МОДАЛКА СРАВНЕНИЯ ============ -->

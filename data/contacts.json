@@ -1,0 +1,130 @@
+{
+  "verifiedAt": "2026-09-27",
+  "note": "Контакты партнёров. Подгружается по клику после регистрации.",
+  "contacts": {
+    "cvr-luxury-property-danang": {
+      "phone": "+84 934 891 746",
+      "zalo": "https://zalo.me/84934891746",
+      "sourceUrl": "https://cvr.com.vn/contact/",
+      "verifiedAt": "2026-09-27"
+    },
+    "da-nang-property": {
+      "phone": "+84 878 83 4343",
+      "zalo": "https://zalo.me/0878834343",
+      "sourceUrl": "https://danang-property.com/contact/",
+      "verifiedAt": "2026-09-27"
+    },
+    "da-nang-homes-danangmls": {
+      "phone": "+84 973 747 373",
+      "telegram": "https://t.me/danangmls",
+      "zalo": "+84 973 747 373",
+      "sourceUrl": "https://danang.homes/contact",
+      "verifiedAt": "2026-09-27"
+    },
+    "house-in-danang-luxury-realty-danang": {
+      "phone": "+84 916 775 445",
+      "zalo": "https://zalo.me/0916775445",
+      "sourceUrl": "https://luxuryrealtydanang.com/about/",
+      "verifiedAt": "2026-09-27"
+    },
+    "realty-shark-danang": {
+      "phone": "+84 328 47 6666",
+      "telegram": "https://t.me/Danang_House",
+      "zalo": "+84 328 47 6666",
+      "sourceUrl": "https://t.me/Danang_House",
+      "verifiedAt": "2026-09-27"
+    },
+    "mvp-vietnam": {
+      "phone": "+84 846 702 884",
+      "sourceUrl": "http://www.mvpvietnam.com/contact/",
+      "verifiedAt": "2026-09-27"
+    },
+    "dvr-da-nang-villa-realty": {
+      "phone": "+84 79 509 3575",
+      "sourceUrl": "https://www.danangvillarealty.com/",
+      "verifiedAt": "2026-09-27"
+    },
+    "da-nang-landlord": {
+      "phone": "+84 919 289 420",
+      "sourceUrl": "https://dananglandlord.com/contact-us",
+      "verifiedAt": "2026-09-27"
+    },
+    "zoom-apartment-nha-trang-apartments": {
+      "phone": "+84966552550",
+      "telegram": "t.me/Rozyaptnhatrang",
+      "zalo": "zalo.me/0963913137",
+      "sourceUrl": "https://nhatrangapartments.com/contact",
+      "verifiedAt": "2026-09-27"
+    },
+    "vietdom": {
+      "phone": "+84386131202",
+      "telegram": "t.me/NTarenda",
+      "sourceUrl": "https://vietdom.com/",
+      "verifiedAt": "2026-09-27"
+    },
+    "sunset-group": {
+      "phone": "+84813101501",
+      "telegram": "t.me/NhaTrang_arenda_Pavel_Mihail",
+      "zalo": "+84813101501",
+      "sourceUrl": "https://t.me/s/Arenda_Nyachang_Zhilye",
+      "verifiedAt": "2026-09-27"
+    },
+    "org": {
+      "phone": "+84901907700",
+      "telegram": "https://t.me/+84901907700",
+      "zalo": "+84905084707",
+      "sourceUrl": "https://rusinfocenter.com/services/property/",
+      "verifiedAt": "2026-09-27"
+    },
+    "nha-trang-for-rent": {
+      "phone": "0972319311",
+      "zalo": "zalo.me/0972319311",
+      "sourceUrl": "https://nhatrang4rent.com/",
+      "verifiedAt": "2026-09-27"
+    },
+    "alohouse-nhatrang": {
+      "phone": "0914207689",
+      "zalo": "zalo.me/0914207689",
+      "sourceUrl": "https://www.alohousenhatrang.com/",
+      "verifiedAt": "2026-09-27"
+    },
+    "bat-ong-san-nha-trang-cong-ty-co-phan-tap-oan-four-home": {
+      "phone": "0977963989",
+      "zalo": "zalo.me/0977963989",
+      "sourceUrl": "https://batdongsannhatrang.info/",
+      "verifiedAt": "2026-09-27"
+    },
+    "new-home-nha-trang": {
+      "phone": "0357031778",
+      "zalo": "035.703.1778",
+      "sourceUrl": "https://newhomenhatrang.com/",
+      "verifiedAt": "2026-09-27"
+    },
+    "sun-group": {
+      "phone": "+84 236 3890 874",
+      "sourceUrl": "https://sungroup.com.vn/en/lien-he",
+      "verifiedAt": "2026-09-27"
+    },
+    "sun-frontier-vietnam-hiyori-garden-tower": {
+      "phone": "+84 905 585 353",
+      "sourceUrl": "https://hiyorigardentower.com/en/lien-he/",
+      "verifiedAt": "2026-09-27"
+    },
+    "filmore-real-estate-development-corporation": {
+      "phone": "+84 901 517 105",
+      "zalo": "https://zalo.me/4468425211123669016",
+      "sourceUrl": "https://filmore.com.vn/thefilmoredanang/en/",
+      "verifiedAt": "2026-09-27"
+    },
+    "wolfhome-da-nang-homes-apartments": {
+      "telegram": "https://t.me/apartmentatdanang",
+      "sourceUrl": "https://t.me/s/apartmentatdanang",
+      "verifiedAt": "2026-09-27"
+    },
+    "viet-life": {
+      "telegram": "https://t.me/Viet_life_niachang",
+      "sourceUrl": "https://t.me/s/Viet_life_niachang",
+      "verifiedAt": "2026-09-27"
+    }
+  }
+}

@@ -191,6 +191,7 @@
   const grid = document.getElementById('catalogGrid');
   const fSearch = document.getElementById('fSearch');
   const fType = document.getElementById('fType');
+  const fCity = document.getElementById('fCity');
   const fDistrict = document.getElementById('fDistrict');
   const fBeds = document.getElementById('fBeds');
   const fArea = document.getElementById('fArea');
@@ -214,6 +215,27 @@
   let favOnly = false;
   let beachOnly = false;
   let priceCeil = 0; // верхняя граница слайдера цены
+  let country = ''; // '' | 'th' | 'vn' — выбранная страна
+  try { const c = localStorage.getItem('ae_country'); if (c === 'th' || c === 'vn') country = c; } catch (e) {}
+
+  const COUNTRIES = [
+    { code: '', name: 'Все страны', nameEn: 'All countries', nameTh: 'ทุกประเทศ' },
+    { code: 'th', name: 'Таиланд', nameEn: 'Thailand', nameTh: 'ไทย' },
+    { code: 'vn', name: 'Вьетнам', nameEn: 'Vietnam', nameTh: 'เวียดนาม' },
+  ];
+  const CITY_I18N = {
+    'Пхукет': { en: 'Phuket', th: 'ภูเก็ต' },
+    'Дананг': { en: 'Da Nang', th: 'ดานัง' },
+    'Нячанг': { en: 'Nha Trang', th: 'ญาจาง' },
+  };
+  function cityName(c) {
+    const e = CITY_I18N[c];
+    return (e && lang !== 'ru' && e[lang]) ? e[lang] : c;
+  }
+  function countryName(c) {
+    const e = COUNTRIES.find(x => x.code === c) || COUNTRIES[0];
+    return lang === 'en' ? e.nameEn : lang === 'th' ? e.nameTh : e.name;
+  }
 
   // Избранное — в localStorage
   const FAV_KEY = 'ae_favorites';
@@ -243,14 +265,21 @@
   function itemById(id) { return allItems.find(it => String(it.id) === String(id)); }
   function rentOf(it) { return it.rentMonthUSD || (it.priceUSD ? Math.round(it.priceUSD * 0.06 / 12) : 0); }
 
+  function flagHTML(it, cls) {
+    return it.country ? `<i class="flag flag--${esc(it.country)}${cls ? ' ' + cls : ''}" aria-hidden="true"></i>` : '';
+  }
   function metaLine(it) {
     const p = [];
-    if (it.location) p.push(esc(it.location));
+    if (it.location) {
+      // В адресе город записан по-русски — подменяем на язык интерфейса
+      const loc = it.city ? it.location.replace(it.city, cityName(it.city)) : it.location;
+      p.push(esc(loc));
+    }
     if (typeof it.beds === 'number' && it.beds > 0) p.push(it.beds + ' ' + (lang === 'ru' ? plural(it.beds, 'спальня', 'спальни', 'спален') : t(it.beds === 1 ? 'd_bed' : 'd_beds', 'спальни')));
     else if (it.beds) p.push(/студия/i.test(it.beds) ? t('d_studio', 'Студия') : esc(it.beds));
     if (it.baths) p.push(it.baths + ' ' + t('d_bath', 'с/у'));
     if (it.area) p.push(esc(it.area) + ' м²');
-    return p.join(' · ');
+    return flagHTML(it, 'flag--sm') + ' ' + p.join(' · ');
   }
   function cardHTML(it) {
     const img = it.image || 'assets/hero-phuket.jpg';
@@ -259,16 +288,20 @@
     const per = ppm(it);
     const onCmp = compare.has(String(it.id)) ? ' is-active' : '';
     const onFav = favorites.has(String(it.id)) ? ' is-active' : '';
-    const yld = grossYield(it);
     const badges = [];
-    if (yld) badges.push(`<span class="badge badge--yield">${yld.toFixed(0)}% ${t('d_yieldbadge', 'доходность')}</span>`);
+    // Доходность показываем только там, где аренда взята из объявления.
+    // Раньше бейдж рисовался и по оценке rentOf(), из-за чего у всех объектов
+    // без данных выходили одинаковые «6%» — плашка ничего не сообщала.
+    if (it.rentMonthUSD) {
+      const yld = grossYield(it);
+      if (yld) badges.push(`<span class="badge badge--yield">${yld.toFixed(0)}% ${t('d_yieldbadge', 'доходность')}</span>`);
+    }
     if (it.discountPct) badges.push(`<span class="badge badge--disc">−${it.discountPct}%</span>`);
     const oldPrice = it.oldPriceUSD ? `<s>${money(it.oldPriceUSD)}</s>` : '';
     return `<article class="card reveal" data-id="${esc(it.id)}">
       <div class="card__media">
         <img src="${esc(img)}" alt="${esc(it.title || 'Объект на Пхукете')}" loading="lazy" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>
-        ${tag}
-        ${badges.length ? `<div class="card__badges">${badges.join('')}</div>` : ''}
+        <div class="card__badges">${tag}${badges.join('')}</div>
         <button class="card__fav${onFav}" data-action="fav" data-id="${esc(it.id)}" type="button" aria-label="В избранное" aria-pressed="${onFav ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21s-7.5-4.6-10-9.2C.3 8.4 1.8 4.9 5.2 4.9c2 0 3.3 1.1 4.1 2.3.8-1.2 2.1-2.3 4.1-2.3 3.4 0 4.9 3.5 3.2 6.9C19.5 16.4 12 21 12 21z"/></svg>
         </button>
@@ -293,6 +326,7 @@
     return {
       q: (fSearch && fSearch.value || '').trim().toLowerCase(),
       type: fType && fType.value || '',
+      city: fCity && fCity.value || '',
       district: fDistrict && fDistrict.value || '',
       beds: fBeds && fBeds.value || '',
       area: fArea && fArea.value ? +fArea.value : 0,
@@ -304,8 +338,10 @@
   function matches(it, f) {
     if (favOnly && !favorites.has(String(it.id))) return false;
     if (beachOnly && !it.beach) return false;
-    if (f.q) { const hay = ((it.title || '') + ' ' + (it.location || '') + ' ' + (it.type || '')).toLowerCase(); if (!hay.includes(f.q)) return false; }
+    if (f.q) { const hay = ((it.title || '') + ' ' + (it.location || '') + ' ' + (it.type || '') + ' ' + (it.city || '') + ' ' + (it.countryName || '')).toLowerCase(); if (!hay.includes(f.q)) return false; }
+    if (country && it.country !== country) return false;
     if (f.type && it.type !== f.type) return false;
+    if (f.city && it.city !== f.city) return false;
     if (f.district && district(it) !== f.district) return false;
     if (f.beds) { const b = typeof it.beds === 'number' ? it.beds : 0; if (f.beds === '4') { if (b < 4) return false; } else if (String(b) !== f.beds) return false; }
     if (f.area && (!it.area || it.area < f.area)) return false;
@@ -334,6 +370,60 @@
     if (catalogEmpty) catalogEmpty.hidden = list.length > 0;
     if (catalogMore) catalogMore.hidden = list.length <= shown;
   }
+
+  /* ---------- ПЕРЕКЛЮЧАТЕЛЬ СТРАН ---------- */
+  const geoSwitch = document.getElementById('geoSwitch');
+
+  function countryCount(code) {
+    return allItems.filter(it => !code || it.country === code).length;
+  }
+  function renderGeoSwitch() {
+    if (!geoSwitch) return;
+    geoSwitch.innerHTML = COUNTRIES
+      .filter(c => !c.code || allItems.some(it => it.country === c.code))
+      .map(c => `<button type="button" data-country="${c.code}"${c.code === country ? ' class="is-active"' : ''} aria-pressed="${c.code === country}">
+        ${c.code ? `<i class="flag flag--${c.code}" aria-hidden="true"></i>` : ''}${esc(countryName(c.code))}
+        <span class="geo-switch__count">${countryCount(c.code)}</span>
+      </button>`).join('');
+  }
+  function fillCities() {
+    if (!fCity) return;
+    const cur = fCity.value;
+    const cities = Array.from(new Set(allItems
+      .filter(it => !country || it.country === country)
+      .map(it => it.city).filter(Boolean))).sort();
+    fCity.innerHTML = `<option value="">${esc(t('d_allcities', 'Все города'))}</option>` +
+      cities.map(c => `<option value="${esc(c)}"${c === cur ? ' selected' : ''}>${esc(cityName(c))}</option>`).join('');
+    if (cur && !cities.includes(cur)) fCity.value = '';
+  }
+  function fillDistricts() {
+    if (!fDistrict) return;
+    const cur = fDistrict.value;
+    const city = fCity && fCity.value;
+    const ds = Array.from(new Set(allItems
+      .filter(it => (!country || it.country === country) && (!city || it.city === city))
+      .map(district).filter(Boolean))).sort();
+    fDistrict.innerHTML = `<option value="">${esc(t('d_alldistricts', 'Все районы'))}</option>` +
+      ds.map(d => `<option value="${esc(d)}"${d === cur ? ' selected' : ''}>${esc(d)}</option>`).join('');
+    if (cur && !ds.includes(cur)) fDistrict.value = '';
+  }
+  function setCountry(code) {
+    country = code;
+    try { localStorage.setItem('ae_country', code); } catch (e) {}
+    renderGeoSwitch();
+    fillCities();
+    fillDistricts();
+    initSliders();
+    render(true);
+    renderDistricts();
+    renderSearchChips();
+    refreshAllMap();
+  }
+  geoSwitch && geoSwitch.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-country]');
+    if (b) setCountry(b.dataset.country);
+  });
+  fCity && fCity.addEventListener('change', () => { fillDistricts(); render(true); refreshAllMap(); });
 
   /* ---------- СРАВНЕНИЕ ---------- */
   const compareBar = document.getElementById('compareBar');
@@ -568,14 +658,15 @@
     if (priceLabel) priceLabel.textContent = (lo <= 0 && hi >= priceCeil) ? t('d_priceany', 'Цена: любая') : t('d_price', 'Цена') + ': ' + money(lo) + ' – ' + money(hi);
   }
   function initSliders() {
-    const maxP = allItems.reduce((m, it) => Math.max(m, it.priceUSD || 0), 0);
+    const scope = allItems.filter(it => !country || it.country === country);
+    const maxP = scope.reduce((m, it) => Math.max(m, it.priceUSD || 0), 0);
     priceCeil = Math.ceil(maxP / 50000) * 50000 || 1000000;
     if (pMin && pMax) {
       [pMin, pMax].forEach(s => { s.min = 0; s.max = priceCeil; s.step = 10000; });
       pMin.value = 0; pMax.value = priceCeil; clampSliders();
     }
   }
-  [fSearch, fType, fDistrict, fBeds, fArea, fSort].forEach(el => el && el.addEventListener('input', () => render(true)));
+  [fSearch, fType, fDistrict, fBeds, fArea, fSort].forEach(el => el && el.addEventListener('input', () => { render(true); refreshAllMap(); }));
   pMin && pMin.addEventListener('input', () => { clampSliders('min'); render(true); });
   pMax && pMax.addEventListener('input', () => { clampSliders('max'); render(true); });
   fBeach && fBeach.addEventListener('click', () => {
@@ -591,13 +682,14 @@
     render(true);
   });
   fReset && fReset.addEventListener('click', () => {
-    [fSearch, fType, fDistrict, fBeds, fArea].forEach(el => el && (el.value = ''));
+    [fSearch, fType, fCity, fDistrict, fBeds, fArea].forEach(el => el && (el.value = ''));
+    fillDistricts();
     if (fSort) fSort.value = 'default';
     if (pMin) pMin.value = 0; if (pMax) pMax.value = priceCeil; clampSliders();
     favOnly = false; beachOnly = false;
     if (fFav) { fFav.classList.remove('is-active'); fFav.setAttribute('aria-pressed', 'false'); }
     if (fBeach) { fBeach.classList.remove('is-active'); fBeach.setAttribute('aria-pressed', 'false'); }
-    render(true);
+    render(true); refreshAllMap();
   });
   catalogMore && catalogMore.addEventListener('click', () => { shown += PAGE_SIZE; render(); });
   compareOpen && compareOpen.addEventListener('click', openCompare);
@@ -699,7 +791,9 @@
     en: {
       nav_districts: 'Districts', nav_objects: 'Listings', nav_map: 'Map', nav_finance: 'Financing',
       nav_journal: 'Journal', nav_about: 'About Alena', nav_steps: 'Process', nav_reviews: 'Reviews', nav_contacts: 'Contacts',
-      nav_relocation: 'Relocation',
+      nav_relocation: 'Relocation', nav_partners: 'Partners',
+      partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
+      d_allcities: 'All cities', d_alldistricts: 'All districts',
       cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
       reloc_eyebrow: 'Relocation', reloc_title: 'Free relocation consultation',
       reloc_cta: 'Send a request on the site',
@@ -712,9 +806,9 @@
       sb_eyebrow: 'Find your property', sb_title: 'Find your home in Phuket', sb_btn: 'Search', sb_ph: 'District, type or property name…',
       trust_families: 'happy families', trust_years: 'years on the island', trust_legal: '% legal protection', trust_objects: 'verified listings',
       districts_eyebrow: 'Locations', districts_title: 'Districts of Phuket',
-      catalog_eyebrow: 'Catalog', catalog_title: 'Featured Phuket listings',
+      catalog_eyebrow: 'Catalog', catalog_title: 'Featured listings in Thailand and Vietnam',
       urgent_eyebrow: 'Best value', urgent_title: 'Urgent sale',
-      map_eyebrow: 'On the map', map_title: 'Listings on the Phuket map',
+      map_eyebrow: 'On the map', map_title: 'Listings on the map',
       finance_eyebrow: 'Financing', finance_title: 'Flexible ways to buy',
       whyphuket_eyebrow: 'Dream location', whyphuket_title: 'Why Phuket',
       whyus_eyebrow: 'Why us', whyus_title: 'Buying in Phuket — easy and safe',
@@ -739,7 +833,9 @@
     th: {
       nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
       nav_journal: 'บทความ', nav_about: 'เกี่ยวกับอาเลน่า', nav_steps: 'ขั้นตอน', nav_reviews: 'รีวิว', nav_contacts: 'ติดต่อ',
-      nav_relocation: 'ย้ายถิ่นฐาน',
+      nav_relocation: 'ย้ายถิ่นฐาน', nav_partners: 'พันธมิตร',
+      partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',
+      d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
       cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
       reloc_eyebrow: 'ย้ายถิ่นฐาน', reloc_title: 'ปรึกษาการย้ายถิ่นฐานฟรี',
       reloc_cta: 'ส่งคำขอผ่านเว็บไซต์',
@@ -752,9 +848,9 @@
       sb_eyebrow: 'ค้นหาอสังหาฯ', sb_title: 'ค้นหาบ้านของคุณในภูเก็ต', sb_btn: 'ค้นหา', sb_ph: 'ทำเล ประเภท หรือชื่อโครงการ…',
       trust_families: 'ครอบครัวที่พึงพอใจ', trust_years: 'ปีบนเกาะ', trust_legal: '% คุ้มครองทางกฎหมาย', trust_objects: 'รายการที่ตรวจสอบแล้ว',
       districts_eyebrow: 'ทำเล', districts_title: 'ทำเลในภูเก็ต',
-      catalog_eyebrow: 'แคตตาล็อก', catalog_title: 'รายการแนะนำในภูเก็ต',
+      catalog_eyebrow: 'แคตตาล็อก', catalog_title: 'รายการแนะนำในไทยและเวียดนาม',
       urgent_eyebrow: 'คุ้มค่า', urgent_title: 'ขายด่วน',
-      map_eyebrow: 'บนแผนที่', map_title: 'รายการบนแผนที่ภูเก็ต',
+      map_eyebrow: 'บนแผนที่', map_title: 'รายการบนแผนที่',
       finance_eyebrow: 'การเงิน', finance_title: 'วิธีการซื้อที่ยืดหยุ่น',
       whyphuket_eyebrow: 'ทำเลในฝัน', whyphuket_title: 'ทำไมต้องภูเก็ต',
       whyus_eyebrow: 'ทำไมต้องเรา', whyus_title: 'ซื้อในภูเก็ต — ง่ายและปลอดภัย',
@@ -859,6 +955,9 @@
     'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'Tap a marker to see the price and open the listing.',
     'Короткие гайды, которые помогут разобраться до первого звонка.': 'Short guides to help you get oriented before the first call.',
     'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'Didn’t find the right option? We’ll find a property for your budget and goals.',
+    'Проверенные виллы и квартиры в Таиланде и Вьетнаме — Пхукет, Дананг и Нячанг. От уютных резиденций до премиальных пентхаусов у моря.': 'Vetted villas and apartments in Thailand and Vietnam — Phuket, Da Nang and Nha Trang. From cozy residences to premium seaside penthouses.',
+    'Карта следует за фильтрами каталога: выберите страну или город — и она покажет только их. Нажмите на маркер, чтобы увидеть цену.': 'The map follows the catalog filters: pick a country or city and it shows only those. Tap a marker to see the price.',
+    'База проверенных контактов по Дананту и Нячангу: агентства, застройщики и живые сообщества. Каждый контакт подтверждён на официальной странице компании.': 'A vetted contact base for Da Nang and Nha Trang: agencies, developers and active communities. Every contact was confirmed on the company’s own page.',
     'Разберём вашу ситуацию целиком: виза и статус, жильё, банковский счёт, школа детям, налоги. Без общих слов — по вашим вводным.': 'We go through your whole situation: visa and status, housing, a bank account, schools for the kids, taxes. No generic advice — only your case.',
     'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'Nothing found for your query. Try relaxing the filters or message us — we’ll find it manually.',
     'Все типы': 'All types', 'Все районы': 'All districts', 'Спальни: любые': 'Bedrooms: any',
@@ -946,6 +1045,9 @@
     'Нажмите на маркер, чтобы увидеть цену и открыть карточку объекта.': 'แตะหมุดเพื่อดูราคาและเปิดรายละเอียดทรัพย์',
     'Короткие гайды, которые помогут разобраться до первого звонка.': 'คู่มือสั้น ๆ ช่วยให้เข้าใจก่อนโทรครั้งแรก',
     'Не нашли подходящий вариант? Подберём объект под ваш бюджет и задачи.': 'ยังไม่เจอที่ใช่? เราจะหาทรัพย์ให้ตรงงบและความต้องการของคุณ',
+    'Проверенные виллы и квартиры в Таиланде и Вьетнаме — Пхукет, Дананг и Нячанг. От уютных резиденций до премиальных пентхаусов у моря.': 'วิลล่าและคอนโดที่ผ่านการตรวจสอบในไทยและเวียดนาม — ภูเก็ต ดานัง และญาจาง ตั้งแต่เรสซิเดนซ์อบอุ่นถึงเพนต์เฮาส์หรูริมทะเล',
+    'Карта следует за фильтрами каталога: выберите страну или город — и она покажет только их. Нажмите на маркер, чтобы увидеть цену.': 'แผนที่ทำงานตามตัวกรองแคตตาล็อก: เลือกประเทศหรือเมือง แล้วแผนที่จะแสดงเฉพาะที่เลือก แตะหมุดเพื่อดูราคา',
+    'База проверенных контактов по Дананту и Нячангу: агентства, застройщики и живые сообщества. Каждый контакт подтверждён на официальной странице компании.': 'ฐานข้อมูลผู้ติดต่อที่ตรวจสอบแล้วสำหรับดานังและญาจาง: เอเจนซี ผู้พัฒนา และชุมชนที่ใช้งานจริง ทุกรายการยืนยันจากหน้าเว็บทางการของบริษัท',
     'Разберём вашу ситуацию целиком: виза и статус, жильё, банковский счёт, школа детям, налоги. Без общих слов — по вашим вводным.': 'เราดูสถานการณ์ของคุณทั้งหมด: วีซ่าและสถานะ ที่พัก บัญชีธนาคาร โรงเรียนของลูก และภาษี — ตามเคสของคุณจริง ๆ',
     'По вашему запросу ничего не найдено. Попробуйте смягчить фильтры или напишите нам — подберём вручную.': 'ไม่พบผลลัพธ์ ลองผ่อนตัวกรองหรือทักมาหาเรา — เราจะช่วยหาด้วยตนเอง',
     'Все типы': 'ทุกประเภท', 'Все районы': 'ทุกทำเล', 'Спальни: любые': 'ห้องนอน: ทั้งหมด',
@@ -991,7 +1093,11 @@
     });
     if (langSwitch) langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
     deepTranslate(l);
-    if (allItems.length) { render(); renderUrgent(); if (typeof clampSliders === 'function') clampSliders(); }
+    if (allItems.length) {
+      renderGeoSwitch(); fillCities(); fillDistricts();
+      render(); renderUrgent();
+      if (typeof clampSliders === 'function') clampSliders();
+    }
   }
   langSwitch && langSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (b) applyLang(b.dataset.lang); });
   applyLang(lang);
@@ -1015,7 +1121,10 @@
   function refreshAllMap() {
     if (typeof L === 'undefined') return;
     const el = document.getElementById('mapAll'); if (!el) return;
-    const pts = allItems.filter(it => it.lat && it.lng);
+    // Карта показывает ровно то же, что каталог: иначе при выборе Вьетнама
+    // она продолжала бы показывать Пхукет и сбивала бы с толку.
+    const f = getFilters();
+    const pts = allItems.filter(it => it.lat && it.lng && matches(it, f));
     if (!pts.length) return;
     if (!allMap) {
       allMap = L.map(el, { scrollWheelZoom: false });
@@ -1048,10 +1157,9 @@
       const types = Array.from(new Set(allItems.map(it => it.type).filter(Boolean))).sort();
       fType.insertAdjacentHTML('beforeend', types.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
     }
-    if (fDistrict) {
-      const ds = Array.from(new Set(allItems.map(district).filter(Boolean))).sort();
-      fDistrict.insertAdjacentHTML('beforeend', ds.map(d => `<option value="${esc(d)}">${esc(d)}</option>`).join(''));
-    }
+    renderGeoSwitch();
+    fillCities();
+    fillDistricts();
     // активная валюта в переключателе
     if (currSwitch) currSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.curr === currency));
     initSliders();
@@ -1097,6 +1205,215 @@
     });
     [nameEl, phoneEl].forEach(el => el && el.addEventListener('input', () => el.classList.remove('err')));
     consentEl && consentEl.addEventListener('change', () => { const c = consentEl.closest('.lead__consent'); if (c) c.classList.remove('err'); });
+  }
+
+  /* ======================================================================
+     ПАРТНЁРЫ И КАНАЛЫ ВЬЕТНАМА + ОТКРЫТИЕ КОНТАКТОВ ПО РЕГИСТРАЦИИ
+
+     Важно про «закрытость»: это сбор заявок, а не защита. Контакты вынесены
+     в отдельный data/contacts.json, который подгружается только после
+     регистрации, — их нет в разметке страницы и их не индексируют поисковики.
+     Но файл лежит в открытом доступе по прямой ссылке. Чтобы контакты были
+     закрыты по-настоящему, их надо отдавать с сервера по токену.
+     ====================================================================== */
+  const partnersGrid = document.getElementById('partnersGrid');
+  const partnersTabs = document.getElementById('partnersTabs');
+  const partnersLegal = document.getElementById('partnersLegal');
+  const regState = document.getElementById('regState');
+
+  const REG_KEY = 'ae_reg';
+  let channels = null;
+  let contacts = null;
+  let partnerTab = 'Дананг';
+
+  function regInfo() {
+    try { return JSON.parse(localStorage.getItem(REG_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function isRegistered() { return !!(regInfo() && regInfo().name); }
+
+  const ICON_LOCK = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const ICON_TG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>';
+
+  const KIND_LABEL = { agency: 'Агентство', developer: 'Застройщик' };
+  const FOCUS_LABEL = { sale: 'продажа', rent: 'аренда', both: 'продажа и аренда', developer: 'свои проекты' };
+
+  function telHref(v) { return 'tel:' + String(v).replace(/[^\d+]/g, ''); }
+  function tgHref(v) {
+    const h = String(v).trim();
+    if (/^https?:/.test(h)) return h;
+    return 'https://t.me/' + h.replace(/^@/, '').replace(/^t\.me\//, '');
+  }
+  function zaloHref(v) {
+    const h = String(v).trim();
+    if (/^https?:/.test(h)) return h;
+    const digits = h.replace(/[^\d]/g, '');
+    return digits ? 'https://zalo.me/' + digits : h;
+  }
+  function shortLabel(v) { return String(v).replace(/^https?:\/\//, '').replace(/^(t\.me|zalo\.me)\//, '@').slice(0, 34); }
+
+  function contactsHTML(id) {
+    const c = contacts && contacts[id];
+    if (!c) return '<ul class="contacts-list"><li><span class="hint">Контакты уточняются</span></li></ul>';
+    const rows = [];
+    if (c.phone) rows.push(`<li><span>Телефон</span><a href="${esc(telHref(c.phone))}">${esc(c.phone)}</a></li>`);
+    if (c.telegram) rows.push(`<li><span>Telegram</span><a href="${esc(tgHref(c.telegram))}" target="_blank" rel="noopener">${esc(shortLabel(c.telegram))}</a></li>`);
+    if (c.zalo) rows.push(`<li><span>Zalo</span><a href="${esc(zaloHref(c.zalo))}" target="_blank" rel="noopener">${esc(shortLabel(c.zalo))}</a></li>`);
+    if (c.verifiedAt) rows.push(`<li><span>Проверено</span><b class="hint">${esc(c.verifiedAt)}</b></li>`);
+    return `<ul class="contacts-list">${rows.join('')}</ul>`;
+  }
+
+  function lockHTML(company) {
+    const what = (company.channels || []).map(k => ({ phone: 'телефон', telegram: 'Telegram', zalo: 'Zalo' })[k]).filter(Boolean);
+    return `<div class="lock">
+      <span class="lock__head">${ICON_LOCK} Контакты закрыты</span>
+      <p class="lock__note">${what.length ? esc(what.join(', ')) : 'Контакты'} — откроются бесплатно после короткой регистрации.</p>
+      <button class="btn btn--gold" type="button" data-open-reg>Открыть контакты</button>
+    </div>`;
+  }
+
+  function companyCard(c) {
+    const kind = KIND_LABEL[c.kind] || c.kind;
+    const focus = FOCUS_LABEL[c.focus] || '';
+    return `<article class="pcard">
+      <div class="pcard__top">
+        <h3>${esc(c.name)}</h3>
+        <span class="pcard__kind">${esc(kind)}</span>
+      </div>
+      <p class="pcard__meta">
+        <i class="flag flag--${esc(c.country || 'vn')} flag--sm" aria-hidden="true"></i>
+        ${esc(c.city)}${focus ? ' · ' + esc(focus) : ''}${c.languages ? ' · ' + esc(c.languages) : ''}
+      </p>
+      <p class="pcard__note">${esc(c.note || '')}</p>
+      ${c.website ? `<a class="pcard__site" href="${esc(c.website)}" target="_blank" rel="noopener nofollow">${esc(shortLabel(c.website))}</a>` : ''}
+      ${isRegistered() ? contactsHTML(c.id) : lockHTML(c)}
+    </article>`;
+  }
+
+  function communityCard(c) {
+    const n = c.members ? c.members.toLocaleString('ru-RU') + ' участников' : 'Telegram';
+    return `<article class="pcard pcard--community">
+      <div class="pcard__top">
+        <h3>${esc(c.name)}</h3>
+        <span class="pcard__kind">Сообщество</span>
+      </div>
+      <p class="pcard__meta">${esc(c.city)} · ${esc(n)}</p>
+      <p class="pcard__note">${esc((c.note || '').slice(0, 170))}</p>
+      <a class="pcard__link" href="${esc(c.url)}" target="_blank" rel="noopener">${ICON_TG} Открыть канал →</a>
+    </article>`;
+  }
+
+  function partnerTabs() {
+    if (!channels) return [];
+    const cities = Array.from(new Set(channels.companies.map(c => c.city)));
+    return cities.map(city => ({ key: city, label: city, n: channels.companies.filter(c => c.city === city).length }))
+      .concat([{ key: '__comm', label: 'Сообщества', n: channels.communities.length }]);
+  }
+
+  function renderPartners() {
+    if (!partnersGrid || !channels) return;
+    partnersTabs.innerHTML = partnerTabs().map(t2 =>
+      `<button type="button" role="tab" data-tab="${esc(t2.key)}"${t2.key === partnerTab ? ' class="is-active"' : ''} aria-selected="${t2.key === partnerTab}">${esc(t2.label)} <span class="tab__count">${t2.n}</span></button>`).join('');
+
+    partnersGrid.innerHTML = partnerTab === '__comm'
+      ? channels.communities.map(communityCard).join('')
+      : channels.companies.filter(c => c.city === partnerTab).map(companyCard).join('');
+
+    if (partnersLegal) {
+      partnersLegal.textContent = partnerTab === '__comm'
+        ? 'Сообщества — открытые Telegram-каналы, ссылки без ограничений. Мы их не ведём и за содержание не отвечаем.'
+        : 'Контакты собраны из открытых источников и подтверждены на официальных страницах компаний ' +
+          (channels.verifiedAt || '') + '. Мессенджер-контакты устаревают — если номер не отвечает, напишите нам.';
+    }
+    renderRegState();
+    observeReveal(Array.from(partnersGrid.querySelectorAll('.reveal')));
+  }
+
+  function renderRegState() {
+    if (!regState) return;
+    const r = regInfo();
+    regState.hidden = !r;
+    if (r) {
+      regState.innerHTML = `Контакты открыты для <b>${esc(r.name)}</b> · <button type="button" data-reg-reset>сбросить</button>`;
+    }
+  }
+
+  function openRegModal() {
+    setModal('regBox', `
+      <button class="modal__close" data-close aria-label="Закрыть">×</button>
+      <h3 class="modal__title">Открыть контакты</h3>
+      <p class="detail__desc">Бесплатно и без подтверждения почты. Оставьте имя и способ связи — контакты агентств и застройщиков откроются сразу и останутся открытыми на этом устройстве.</p>
+      <form class="reg-form" id="regForm" novalidate>
+        <label class="reg-form__row"><span>Как вас зовут</span>
+          <input type="text" id="regName" autocomplete="name" required /></label>
+        <label class="reg-form__row"><span>Телефон или @telegram</span>
+          <input type="text" id="regContact" autocomplete="tel" required /></label>
+        <label class="lead__consent">
+          <input type="checkbox" id="regConsent" />
+          <span>Согласен на обработку персональных данных и принимаю <a href="privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+        </label>
+        <button class="btn btn--gold btn--lg" type="submit" style="width:100%">Открыть контакты</button>
+        <p class="lead__hint" id="regHint" aria-live="polite"></p>
+      </form>
+    `);
+    openModal('regModal');
+    const form = document.getElementById('regForm');
+    const nameEl = document.getElementById('regName');
+    const contactEl = document.getElementById('regContact');
+    const consentEl = document.getElementById('regConsent');
+    const hintEl = document.getElementById('regHint');
+    setTimeout(() => nameEl && nameEl.focus(), 150);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let ok = true;
+      [nameEl, contactEl].forEach(el => { const bad = !el.value.trim(); el.classList.toggle('err', bad); if (bad) ok = false; });
+      if (!ok) { hintEl.textContent = 'Заполните имя и контакт.'; hintEl.className = 'lead__hint lead__hint--err'; return; }
+      if (!consentEl.checked) {
+        consentEl.closest('.lead__consent').classList.add('err');
+        hintEl.textContent = 'Отметьте согласие на обработку персональных данных.';
+        hintEl.className = 'lead__hint lead__hint--err';
+        return;
+      }
+      try {
+        localStorage.setItem(REG_KEY, JSON.stringify({
+          name: nameEl.value.trim(), contact: contactEl.value.trim(), at: new Date().toISOString().slice(0, 10),
+        }));
+      } catch (err) {}
+      loadContacts().then(() => { closeModal(); renderPartners(); });
+    });
+  }
+
+  function loadContacts() {
+    if (contacts) return Promise.resolve(contacts);
+    return fetch('data/contacts.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { contacts = d.contacts || {}; return contacts; })
+      .catch(() => { contacts = {}; return contacts; });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-open-reg]')) { openRegModal(); return; }
+    const tab = e.target.closest('#partnersTabs [data-tab]');
+    if (tab) { partnerTab = tab.dataset.tab; renderPartners(); return; }
+    if (e.target.closest('[data-reg-reset]')) {
+      try { localStorage.removeItem(REG_KEY); } catch (err) {}
+      renderPartners();
+    }
+  });
+
+  if (partnersGrid) {
+    fetch('data/channels.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => {
+        channels = d;
+        const cities = Array.from(new Set(d.companies.map(c => c.city)));
+        if (cities.length) partnerTab = cities[0];
+        return isRegistered() ? loadContacts() : null;
+      })
+      .then(renderPartners)
+      .catch(() => {
+        if (partnersGrid) partnersGrid.innerHTML =
+          '<p class="catalog__empty">База партнёров временно недоступна. Напишите нам — пришлём контакты вручную.</p>';
+      });
   }
 
   /* ---------- СЧЁТЧИКИ ЦИФР ---------- */
