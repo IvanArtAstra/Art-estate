@@ -1,0 +1,2690 @@
+{
+  "updated": "2026-09-28",
+  "note": "Реестр объектов: что когда появилось, по какой цене и живо ли сейчас. Обновляется командами sync и check из tools/objects_matrix.py.",
+  "objects": [
+    {
+      "id": "5346015",
+      "title": "Nai Harn Beach Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 112.7,
+      "priceUSD": 230928,
+      "priceOriginal": "KZT112,000,000",
+      "pageUrl": "object/nai-harn-beach-condominium-u5346015/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-nai-harn-beach-condominium-в-раваи-пхукет-u5346015",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "gone",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 230928,
+          "raw": "KZT112,000,000"
+        }
+      ]
+    },
+    {
+      "id": "5350611",
+      "title": "Supalai City Resort Phuket",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Ratsada",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 62.86,
+      "priceUSD": 61538,
+      "priceOriginal": "1,600,000,000 ₫",
+      "pageUrl": "object/supalai-city-resort-phuket-u5350611/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-supalai-city-resort-phuket-в-ratsada-пхукет-u5350611",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 63711,
+          "raw": "KZT30,900,000"
+        },
+        {
+          "date": "2026-09-28",
+          "usd": 61538,
+          "raw": "1,600,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6416545",
+      "title": "Baan Thai Surin Hill",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 5,
+      "area": 773.0,
+      "priceUSD": 2039175,
+      "priceOriginal": "KZT989,000,000",
+      "pageUrl": "object/baan-thai-surin-hill-u6416545/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-baan-thai-surin-hill-в-чернг-талай-пхукет-u6416545",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 2039175,
+          "raw": "KZT989,000,000"
+        }
+      ]
+    },
+    {
+      "id": "6145848",
+      "title": "Diamond Condominium Bang Tao",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Пентхаус",
+      "beds": 2,
+      "area": 133.05,
+      "priceUSD": 538462,
+      "priceOriginal": "14,000,000,000 ₫",
+      "pageUrl": "object/diamond-condominium-bang-tao-u6145848/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-пентхаус-в-diamond-condominium-bang-tao-в-чернг-талай-пхукет-u6145848",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 556701,
+          "raw": "KZT270,000,000"
+        },
+        {
+          "date": "2026-09-28",
+          "usd": 538462,
+          "raw": "14,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1393422",
+      "title": "The View Luxury Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Карон",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 154.0,
+      "priceUSD": 358846,
+      "priceOriginal": "9,330,000,000 ₫",
+      "pageUrl": "object/the-view-luxury-condominium-u1393422/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-the-view-luxury-condominium-в-карон-пхукет-u1393422",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 428866,
+          "raw": "KZT208,000,000"
+        },
+        {
+          "date": "2026-09-28",
+          "usd": 358846,
+          "raw": "9,330,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5592671",
+      "title": "Dlux Condominium ",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чалонг",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 30.0,
+      "priceUSD": 74021,
+      "priceOriginal": "KZT35,900,000",
+      "pageUrl": "object/dlux-condominium-u5592671/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-dlux-condominium-в-чалонг-пхукет-u5592671",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 74021,
+          "raw": "KZT35,900,000"
+        }
+      ]
+    },
+    {
+      "id": "6414679",
+      "title": "Absolute Twin Sands I",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Патонг",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 50.0,
+      "priceUSD": 163711,
+      "priceOriginal": "KZT79,400,000",
+      "pageUrl": "object/absolute-twin-sands-i-u6414679/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-absolute-twin-sands-i-в-патонг-пхукет-u6414679",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 163711,
+          "raw": "KZT79,400,000"
+        }
+      ]
+    },
+    {
+      "id": "6381441",
+      "title": "The Modeva",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 29.0,
+      "priceUSD": 143505,
+      "priceOriginal": "KZT69,600,000",
+      "pageUrl": "object/the-modeva-u6381441/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-modeva-в-чернг-талай-пхукет-u6381441",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 143505,
+          "raw": "KZT69,600,000"
+        }
+      ]
+    },
+    {
+      "id": "6257851",
+      "title": "Aristo 1",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 28.3,
+      "priceUSD": 81856,
+      "priceOriginal": "KZT39,700,000",
+      "pageUrl": "object/aristo-1-u6257851/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-aristo-1-в-чернг-талай-пхукет-u6257851",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 81856,
+          "raw": "KZT39,700,000"
+        }
+      ]
+    },
+    {
+      "id": "6416032",
+      "title": "Nai Home Srisunthon 3",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Si Sunthon",
+      "type": "Дом",
+      "beds": 3,
+      "area": 143.0,
+      "priceUSD": 184948,
+      "priceOriginal": "KZT89,700,000",
+      "pageUrl": "object/nai-home-srisunthon-3-u6416032/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-дом-в-nai-home-srisunthon-3-в-si-sunthon-пхукет-u6416032",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 184948,
+          "raw": "KZT89,700,000"
+        }
+      ]
+    },
+    {
+      "id": "5946968",
+      "title": "The Title Halo 1",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Sakhu",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 45.31,
+      "priceUSD": 128462,
+      "priceOriginal": "3,340,000,000 ₫",
+      "pageUrl": "object/the-title-halo-1-u5946968/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-title-halo-1-в-sakhu-пхукет-u5946968",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 138969,
+          "raw": "KZT67,400,000"
+        },
+        {
+          "date": "2026-09-28",
+          "usd": 128462,
+          "raw": "3,340,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6400743",
+      "title": "NOON Village Tower II",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чалонг",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 51.0,
+      "priceUSD": 134433,
+      "priceOriginal": "KZT65,200,000",
+      "pageUrl": "object/noon-village-tower-ii-u6400743/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-noon-village-tower-ii-в-чалонг-пхукет-u6400743",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 134433,
+          "raw": "KZT65,200,000"
+        }
+      ]
+    },
+    {
+      "id": "6415070",
+      "title": "Serene Raya Villas Bang Tao",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 306.0,
+      "priceUSD": 1080412,
+      "priceOriginal": "KZT524,000,000",
+      "pageUrl": "object/serene-raya-villas-bang-tao-u6415070/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-serene-raya-villas-bang-tao-в-чернг-талай-пхукет-u6415070",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1080412,
+          "raw": "KZT524,000,000"
+        }
+      ]
+    },
+    {
+      "id": "6419432",
+      "title": "Calypso Condo",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 40.0,
+      "priceUSD": 125155,
+      "priceOriginal": "KZT60,700,000",
+      "pageUrl": "object/calypso-condo-u6419432/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-calypso-condo-в-раваи-пхукет-u6419432",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 125155,
+          "raw": "KZT60,700,000"
+        }
+      ]
+    },
+    {
+      "id": "6403216",
+      "title": "Utopia Karon",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Карон",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 35.65,
+      "priceUSD": 179175,
+      "priceOriginal": "KZT86,900,000",
+      "pageUrl": "object/utopia-karon-u6403216/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-utopia-karon-в-карон-пхукет-u6403216",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 179175,
+          "raw": "KZT86,900,000"
+        }
+      ]
+    },
+    {
+      "id": "6419068",
+      "title": "ReLife The Windy",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 80.0,
+      "priceUSD": 216495,
+      "priceOriginal": "KZT105,000,000",
+      "pageUrl": "object/relife-the-windy-u6419068/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-relife-the-windy-в-раваи-пхукет-u6419068",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 216495,
+          "raw": "KZT105,000,000"
+        }
+      ]
+    },
+    {
+      "id": "6401761",
+      "title": "Laguna Beachside",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 131.0,
+      "priceUSD": 781443,
+      "priceOriginal": "KZT379,000,000",
+      "pageUrl": "object/laguna-beachside-u6401761/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-laguna-beachside-в-чернг-талай-пхукет-u6401761",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 781443,
+          "raw": "KZT379,000,000"
+        }
+      ]
+    },
+    {
+      "id": "6247449",
+      "title": "Fifth Element",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 370.0,
+      "priceUSD": 988462,
+      "priceOriginal": "25,700,000,000 ₫",
+      "pageUrl": "object/fifth-element-u6247449/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-fifth-element-в-чернг-талай-пхукет-u6247449",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "currency-changed",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1018557,
+          "raw": "KZT494,000,000"
+        },
+        {
+          "date": "2026-09-28",
+          "usd": 988462,
+          "raw": "25,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6799887",
+      "title": "The Ocean Villas Da Nang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 275.0,
+      "priceUSD": 1515385,
+      "priceOriginal": "39,400,000,000 ₫",
+      "pageUrl": "object/the-ocean-villas-da-nang-u6799887/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-the-ocean-villas-da-nang-в-hoa-hai-дананг-u6799887",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1515385,
+          "raw": "39,400,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6803052",
+      "title": "Nobu Danang Residences",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 57.1,
+      "priceUSD": 393426,
+      "priceOriginal": "10,229,081,000 ₫",
+      "pageUrl": "object/nobu-danang-residences-u6803052/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-nobu-danang-residences-в-phuoc-my-дананг-u6803052",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 393426,
+          "raw": "10,229,081,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2059962",
+      "title": "Hiyori Garden Tower Danang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Dong",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 71.0,
+      "priceUSD": 192308,
+      "priceOriginal": "5,000,000,000 ₫",
+      "pageUrl": "object/hiyori-garden-tower-danang-u2059962/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-hiyori-garden-tower-danang-в-an-hai-dong-дананг-u2059962",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 192308,
+          "raw": "5,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6613464",
+      "title": "Fusion Resort & Villas Da Nang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Вилла",
+      "beds": 4,
+      "area": 504.0,
+      "priceUSD": 2115385,
+      "priceOriginal": "55,000,000,000 ₫",
+      "pageUrl": "object/fusion-resort-villas-da-nang-u6613464/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-4-спальни-вилла-в-fusion-resort-villas-da-nang-в-hoa-hai-дананг-u6613464",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 2115385,
+          "raw": "55,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1222590",
+      "title": "The Filmore Da Nang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Binh Thuan",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 68.0,
+      "priceUSD": 342308,
+      "priceOriginal": "8,900,000,000 ₫",
+      "pageUrl": "object/the-filmore-da-nang-u1222590/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-the-filmore-da-nang-в-binh-thuan-дананг-u1222590",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 342308,
+          "raw": "8,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5952288",
+      "title": "Hyatt Regency Danang Resort ",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 115.0,
+      "priceUSD": 769231,
+      "priceOriginal": "20,000,000,000 ₫",
+      "pageUrl": "object/hyatt-regency-danang-resort-u5952288/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-hyatt-regency-danang-resort-в-hoa-hai-дананг-u5952288",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 769231,
+          "raw": "20,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1362752",
+      "title": "A La Carte Da Nang Beach",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 77.0,
+      "priceUSD": 615385,
+      "priceOriginal": "16,000,000,000 ₫",
+      "pageUrl": "object/a-la-carte-da-nang-beach-u1362752/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-a-la-carte-da-nang-beach-в-phuoc-my-дананг-u1362752",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 615385,
+          "raw": "16,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6613364",
+      "title": "The Ocean Suites",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 132.0,
+      "priceUSD": 289615,
+      "priceOriginal": "7,530,000,000 ₫",
+      "pageUrl": "object/the-ocean-suites-u6613364/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-the-ocean-suites-в-hoa-hai-дананг-u6613364",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 289615,
+          "raw": "7,530,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5724927",
+      "title": "Wyndham Soleil Da Nang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 90.0,
+      "priceUSD": 346154,
+      "priceOriginal": "9,000,000,000 ₫",
+      "pageUrl": "object/wyndham-soleil-da-nang-u5724927/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-wyndham-soleil-da-nang-в-phuoc-my-дананг-u5724927",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 346154,
+          "raw": "9,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5814661",
+      "title": "Kim Long Season Mỹ Khê",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 45.0,
+      "priceUSD": 288462,
+      "priceOriginal": "7,500,000,000 ₫",
+      "pageUrl": "object/kim-long-season-m-kh-u5814661/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-kim-long-season-mỹ-khe-в-phuoc-my-дананг-u5814661",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 288462,
+          "raw": "7,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5364284",
+      "title": "Center Point Đà Nẵng",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Thach Thang",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 68.0,
+      "priceUSD": 200000,
+      "priceOriginal": "5,200,000,000 ₫",
+      "pageUrl": "object/center-point-n-ng-u5364284/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-center-point-da-nẵng-в-thach-thang-дананг-u5364284",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 200000,
+          "raw": "5,200,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5594890",
+      "title": "M Landmark Residence",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hai Chau I",
+      "type": "Пентхаус",
+      "beds": 1,
+      "area": 55.0,
+      "priceUSD": 342308,
+      "priceOriginal": "8,900,000,000 ₫",
+      "pageUrl": "object/m-landmark-residence-u5594890/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-пентхаус-в-m-landmark-residence-в-hai-chau-i-дананг-u5594890",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 342308,
+          "raw": "8,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "666412",
+      "title": "Maple Hotel and Apartment",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Tan Lap",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 47.0,
+      "priceUSD": 59615,
+      "priceOriginal": "1,550,000,000 ₫",
+      "pageUrl": "object/maple-hotel-and-apartment-u666412/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-maple-hotel-and-apartment-в-tan-lap-khanh-hoa-u666412",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 59615,
+          "raw": "1,550,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6814730",
+      "title": "Meliá Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 44.0,
+      "priceUSD": 100577,
+      "priceOriginal": "2,615,000,000 ₫",
+      "pageUrl": "object/meli-nha-trang-u6814730/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-melia-nha-trang-в-vinh-phuoc-khanh-hoa-u6814730",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 100577,
+          "raw": "2,615,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2143208",
+      "title": "Gold Coast Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Loc Tho",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 50.0,
+      "priceUSD": 126923,
+      "priceOriginal": "3,300,000,000 ₫",
+      "pageUrl": "object/gold-coast-nha-trang-u2143208/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-gold-coast-nha-trang-в-loc-tho-khanh-hoa-u2143208",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 126923,
+          "raw": "3,300,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2055451",
+      "title": "Sale Policy of Meliá Nha Trang - a masterpiece of Nature",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Hoa",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 45.0,
+      "priceUSD": 134615,
+      "priceOriginal": "3,500,000,000 ₫",
+      "pageUrl": "object/sale-policy-of-meli-nha-trang-a-masterpiece-of-nature-u2055451/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-vinh-hoa-khanh-hoa-u2055451",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 134615,
+          "raw": "3,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2095144",
+      "title": "Căn Hộ Cao Cấp Với Tiện Ích 5 Sao Mặt Tiền Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 49.0,
+      "priceUSD": 123077,
+      "priceOriginal": "3,200,000,000 ₫",
+      "pageUrl": "object/c-n-h-cao-c-p-v-i-ti-n-ch-5-sao-m-t-ti-n-nha-trang-u2095144/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-vinh-phuoc-khanh-hoa-u2095144",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 123077,
+          "raw": "3,200,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2115521",
+      "title": "5 Star Luxury Apartment - Sea View at Central Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 65.0,
+      "priceUSD": 176923,
+      "priceOriginal": "4,600,000,000 ₫",
+      "pageUrl": "object/5-star-luxury-apartment-sea-view-at-central-nha-trang-u2115521/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-vinh-phuoc-khanh-hoa-u2115521",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 176923,
+          "raw": "4,600,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2131555",
+      "title": "Embracing tranquillity at Gran Meliá Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Hoa",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 44.0,
+      "priceUSD": 123197,
+      "priceOriginal": "3,203,117,000 ₫",
+      "pageUrl": "object/embracing-tranquillity-at-gran-meli-nha-trang-u2131555/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-vinh-hoa-khanh-hoa-u2131555",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 123197,
+          "raw": "3,203,117,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2136505",
+      "title": "Apartment with 3 views - Sea - River - Mountant, Pinkbook",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 70.0,
+      "priceUSD": 211538,
+      "priceOriginal": "5,500,000,000 ₫",
+      "pageUrl": "object/apartment-with-3-views-sea-river-mountant-pinkbook-u2136505/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-vinh-phuoc-khanh-hoa-u2136505",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 211538,
+          "raw": "5,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2136735",
+      "title": "Căn Hộ Cao Cấp View Biển Nha Trang, tại Trần Phú",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Loc Tho",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 35.06,
+      "priceUSD": 94231,
+      "priceOriginal": "2,450,000,000 ₫",
+      "pageUrl": "object/c-n-h-cao-c-p-view-bi-n-nha-trang-t-i-tr-n-ph-u2136735/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-loc-tho-khanh-hoa-u2136735",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 94231,
+          "raw": "2,450,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6800147",
+      "title": "Nobu Danang Residences",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 38.3,
+      "priceUSD": 239294,
+      "priceOriginal": "6,221,652,000 ₫",
+      "pageUrl": "object/nobu-danang-residences-u6800147/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-nobu-danang-residences-в-phuoc-my-дананг-u6800147",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 239294,
+          "raw": "6,221,652,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1362760",
+      "title": "The Sang Residence",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Khue My",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 95.0,
+      "priceUSD": 346154,
+      "priceOriginal": "9,000,000,000 ₫",
+      "pageUrl": "object/the-sang-residence-u1362760/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-the-sang-residence-в-khue-my-дананг-u1362760",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 346154,
+          "raw": "9,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1971532",
+      "title": "Risemount Apartment ",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Thuan Phuoc",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 70.0,
+      "priceUSD": 250000,
+      "priceOriginal": "6,500,000,000 ₫",
+      "pageUrl": "object/risemount-apartment-u1971532/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-risemount-apartment-в-thuan-phuoc-дананг-u1971532",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 250000,
+          "raw": "6,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5575892",
+      "title": "Indochina Riverside",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hai Chau I",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 100.0,
+      "priceUSD": 223077,
+      "priceOriginal": "5,800,000,000 ₫",
+      "pageUrl": "object/indochina-riverside-u5575892/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-indochina-riverside-в-hai-chau-i-дананг-u5575892",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 223077,
+          "raw": "5,800,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5577252",
+      "title": "Sun Cosmo Residence",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Tay",
+      "type": "Квартира",
+      "beds": 3,
+      "area": 92.0,
+      "priceUSD": 315385,
+      "priceOriginal": "8,200,000,000 ₫",
+      "pageUrl": "object/sun-cosmo-residence-u5577252/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-квартира-в-sun-cosmo-residence-в-an-hai-tay-дананг-u5577252",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 315385,
+          "raw": "8,200,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5575870",
+      "title": "Risemount Apartment Đà Nẵng",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Thuan Phuoc",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 84.0,
+      "priceUSD": 326923,
+      "priceOriginal": "8,500,000,000 ₫",
+      "pageUrl": "object/risemount-apartment-n-ng-u5575870/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-risemount-apartment-da-nẵng-в-thuan-phuoc-дананг-u5575870",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 326923,
+          "raw": "8,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1155680",
+      "title": "Felicia Oceanview Apart - Hotel",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "My An",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 38.0,
+      "priceUSD": 196154,
+      "priceOriginal": "5,100,000,000 ₫",
+      "pageUrl": "object/felicia-oceanview-apart-hotel-u1155680/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-felicia-oceanview-apart-hotel-в-my-an-дананг-u1155680",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 196154,
+          "raw": "5,100,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5577402",
+      "title": "6 Bedroom Villa For Sale In Premier Village Da Nang Resort",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Khue My",
+      "type": "Вилла",
+      "beds": 6,
+      "area": 510.0,
+      "priceUSD": 5000000,
+      "priceOriginal": "130,000,000,000 ₫",
+      "pageUrl": "object/6-bedroom-villa-for-sale-in-premier-village-da-nang-resort-u5577402/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-6-спальни-вилла-в-khue-my-дананг-u5577402",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 5000000,
+          "raw": "130,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2076714",
+      "title": "The Filmore Danang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Binh Thuan",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 481.0,
+      "priceUSD": 267077,
+      "priceOriginal": "6,944,000,000 ₫",
+      "pageUrl": "object/the-filmore-danang-u2076714/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-the-filmore-danang-в-binh-thuan-дананг-u2076714",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 267077,
+          "raw": "6,944,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5918785",
+      "title": "Mường Thanh Sơn Trà",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "My An",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 350.0,
+      "priceUSD": 1923077,
+      "priceOriginal": "50,000,000,000 ₫",
+      "pageUrl": "object/m-ng-thanh-s-n-tr-u5918785/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-muờng-thanh-son-tra-в-my-an-дананг-u5918785",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1923077,
+          "raw": "50,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1183312",
+      "title": "Altara Suites",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 60.0,
+      "priceUSD": 192308,
+      "priceOriginal": "5,000,000,000 ₫",
+      "pageUrl": "object/altara-suites-u1183312/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-altara-suites-в-phuoc-my-дананг-u1183312",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 192308,
+          "raw": "5,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6609629",
+      "title": "FPT Plaza 2",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 70.0,
+      "priceUSD": 123077,
+      "priceOriginal": "3,200,000,000 ₫",
+      "pageUrl": "object/fpt-plaza-2-u6609629/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-fpt-plaza-2-в-hoa-hai-дананг-u6609629",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 123077,
+          "raw": "3,200,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5721564",
+      "title": "Khu Do Thi Nam Cau Tuyen Son",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Cuong Nam",
+      "type": "Квартира",
+      "beds": 3,
+      "area": 100.0,
+      "priceUSD": 380769,
+      "priceOriginal": "9,900,000,000 ₫",
+      "pageUrl": "object/khu-do-thi-nam-cau-tuyen-son-u5721564/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-квартира-в-khu-do-thi-nam-cau-tuyen-son-в-hoa-cuong-nam-дананг-u5721564",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 380769,
+          "raw": "9,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1118198",
+      "title": "The 6Nature",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Квартира",
+      "beds": 3,
+      "area": 109.0,
+      "priceUSD": 422692,
+      "priceOriginal": "10,990,000,000 ₫",
+      "pageUrl": "object/the-6nature-u1118198/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-квартира-в-the-6nature-в-phuoc-my-дананг-u1118198",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 422692,
+          "raw": "10,990,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1996463",
+      "title": "Newtown Diamond",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Квартира",
+      "beds": "Студия",
+      "area": 35.0,
+      "priceUSD": 161538,
+      "priceOriginal": "4,200,000,000 ₫",
+      "pageUrl": "object/newtown-diamond-u1996463/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-квартира-в-newtown-diamond-в-hoa-hai-дананг-u1996463",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 161538,
+          "raw": "4,200,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2150306",
+      "title": "Căn Hộ Đẳng Cấp 5 Sao Tại Trần Phú - Sở Hữu Sổ Hòng",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Xuong Huan",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 45.0,
+      "priceUSD": 134615,
+      "priceOriginal": "3,500,000,000 ₫",
+      "pageUrl": "object/c-n-h-ng-c-p-5-sao-t-i-tr-n-ph-s-h-u-s-h-ng-u2150306/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-xuong-huan-khanh-hoa-u2150306",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 134615,
+          "raw": "3,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2121655",
+      "title": "Căn Hộ Cao Cấp 5 Sao Mặt Tiền Trần Phú - Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 63.0,
+      "priceUSD": 196154,
+      "priceOriginal": "5,100,000,000 ₫",
+      "pageUrl": "object/c-n-h-cao-c-p-5-sao-m-t-ti-n-tr-n-ph-nha-trang-u2121655/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-vinh-phuoc-khanh-hoa-u2121655",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 196154,
+          "raw": "5,100,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2076568",
+      "title": "Căn Hộ Đẳng Cấp 5 Sao Sở Hữu Sổ Đỏ Tại Mặt Tiền Trần Phú",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Vinh Phuoc",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 90.0,
+      "priceUSD": 288462,
+      "priceOriginal": "7,500,000,000 ₫",
+      "pageUrl": "object/c-n-h-ng-c-p-5-sao-s-h-u-s-t-i-m-t-ti-n-tr-n-ph-u2076568/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-vinh-phuoc-khanh-hoa-u2076568",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 288462,
+          "raw": "7,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2099070",
+      "title": "Căn Hộ Luxury View Biền Tại Tràn Phú, Nha Trang",
+      "country": "vn",
+      "city": "Нячанг",
+      "district": "Loc Tho",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 54.0,
+      "priceUSD": 146000,
+      "priceOriginal": "3,796,000,000 ₫",
+      "pageUrl": "object/c-n-h-luxury-view-bi-n-t-i-tr-n-ph-nha-trang-u2099070/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-loc-tho-khanh-hoa-u2099070",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 146000,
+          "raw": "3,796,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6716584",
+      "title": "Angsana Villas",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 5,
+      "area": 260.0,
+      "priceUSD": 1015385,
+      "priceOriginal": "26,400,000,000 ₫",
+      "pageUrl": "object/angsana-villas-u6716584/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-angsana-villas-в-чернг-талай-пхукет-u6716584",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1015385,
+          "raw": "26,400,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6114745",
+      "title": "Baan Thai Surin Hill",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 10,
+      "area": 780.0,
+      "priceUSD": 1615385,
+      "priceOriginal": "42,000,000,000 ₫",
+      "pageUrl": "object/baan-thai-surin-hill-u6114745/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-10-спальни-вилла-в-baan-thai-surin-hill-в-чернг-талай-пхукет-u6114745",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1615385,
+          "raw": "42,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5727159",
+      "title": "The Emerald Terrace",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Патонг",
+      "type": "Квартира",
+      "beds": "Студия",
+      "area": 38.4,
+      "priceUSD": 77692,
+      "priceOriginal": "2,020,000,000 ₫",
+      "pageUrl": "object/the-emerald-terrace-u5727159/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-квартира-в-the-emerald-terrace-в-патонг-пхукет-u5727159",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 77692,
+          "raw": "2,020,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6524196",
+      "title": "The Title Legendary-Bang Tao",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 50.75,
+      "priceUSD": 203462,
+      "priceOriginal": "5,290,000,000 ₫",
+      "pageUrl": "object/the-title-legendary-bang-tao-u6524196/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-title-legendary-bang-tao-в-чернг-талай-пхукет-u6524196",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 203462,
+          "raw": "5,290,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5343557",
+      "title": "Laguna Beachside",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 99.0,
+      "priceUSD": 596154,
+      "priceOriginal": "15,500,000,000 ₫",
+      "pageUrl": "object/laguna-beachside-u5343557/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-laguna-beachside-в-чернг-талай-пхукет-u5343557",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 596154,
+          "raw": "15,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5928175",
+      "title": "Baan Maneekram-Jomthong Thani",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Wichit",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 360.0,
+      "priceUSD": 325769,
+      "priceOriginal": "8,470,000,000 ₫",
+      "pageUrl": "object/baan-maneekram-jomthong-thani-u5928175/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-baan-maneekram-jomthong-thani-в-wichit-пхукет-u5928175",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 325769,
+          "raw": "8,470,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5332546",
+      "title": "Layan Green Park Phase 1",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 30.3,
+      "priceUSD": 161154,
+      "priceOriginal": "4,190,000,000 ₫",
+      "pageUrl": "object/layan-green-park-phase-1-u5332546/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-layan-green-park-phase-1-в-чернг-талай-пхукет-u5332546",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 161154,
+          "raw": "4,190,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6802291",
+      "title": "Nai Harn Beach Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 36.0,
+      "priceUSD": 94231,
+      "priceOriginal": "2,450,000,000 ₫",
+      "pageUrl": "object/nai-harn-beach-condominium-u6802291/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-nai-harn-beach-condominium-в-раваи-пхукет-u6802291",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 94231,
+          "raw": "2,450,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6800328",
+      "title": "Bayshore Oceanview Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Патонг",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 40.0,
+      "priceUSD": 53846,
+      "priceOriginal": "1,400,000,000 ₫",
+      "pageUrl": "object/bayshore-oceanview-condominium-u6800328/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-bayshore-oceanview-condominium-в-патонг-пхукет-u6800328",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 53846,
+          "raw": "1,400,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5379258",
+      "title": "Space Cherngtalay Condominium ",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 28.55,
+      "priceUSD": 104615,
+      "priceOriginal": "2,720,000,000 ₫",
+      "pageUrl": "object/space-cherngtalay-condominium-u5379258/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-space-cherngtalay-condominium-в-чернг-талай-пхукет-u5379258",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 104615,
+          "raw": "2,720,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6799632",
+      "title": "Escent Phuket",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Wichit",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 51.25,
+      "priceUSD": 151538,
+      "priceOriginal": "3,940,000,000 ₫",
+      "pageUrl": "object/escent-phuket-u6799632/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-escent-phuket-в-wichit-пхукет-u6799632",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 151538,
+          "raw": "3,940,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6644776",
+      "title": "Tanode Villas 2",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 4,
+      "area": 559.0,
+      "priceUSD": 1646154,
+      "priceOriginal": "42,800,000,000 ₫",
+      "pageUrl": "object/tanode-villas-2-u6644776/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-4-спальни-вилла-в-tanode-villas-2-в-чернг-талай-пхукет-u6644776",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 1646154,
+          "raw": "42,800,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6762986",
+      "title": "Laguna Links",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 4,
+      "area": 400.0,
+      "priceUSD": 880769,
+      "priceOriginal": "22,900,000,000 ₫",
+      "pageUrl": "object/laguna-links-u6762986/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-4-спальни-вилла-в-laguna-links-в-чернг-талай-пхукет-u6762986",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 880769,
+          "raw": "22,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6572824",
+      "title": "Arise Vibe",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Si Sunthon",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 26.29,
+      "priceUSD": 83846,
+      "priceOriginal": "2,180,000,000 ₫",
+      "pageUrl": "object/arise-vibe-u6572824/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-arise-vibe-в-si-sunthon-пхукет-u6572824",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 83846,
+          "raw": "2,180,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6817337",
+      "title": "The Base Downtown",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Wichit",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 58.25,
+      "priceUSD": 137308,
+      "priceOriginal": "3,570,000,000 ₫",
+      "pageUrl": "object/the-base-downtown-u6817337/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-the-base-downtown-в-wichit-пхукет-u6817337",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 137308,
+          "raw": "3,570,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6800881",
+      "title": "The Beachfront",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 44.0,
+      "priceUSD": 131154,
+      "priceOriginal": "3,410,000,000 ₫",
+      "pageUrl": "object/the-beachfront-u6800881/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-beachfront-в-раваи-пхукет-u6800881",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 131154,
+          "raw": "3,410,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6646675",
+      "title": "The Baycliff Residence",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Патонг",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 162.0,
+      "priceUSD": 476923,
+      "priceOriginal": "12,400,000,000 ₫",
+      "pageUrl": "object/the-baycliff-residence-u6646675/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-the-baycliff-residence-в-патонг-пхукет-u6646675",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 476923,
+          "raw": "12,400,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1952778",
+      "title": "5 Bedroom customizable Sea View villa for Sale",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чалонг",
+      "type": "Вилла",
+      "beds": 5,
+      "area": 470.0,
+      "priceUSD": 2242308,
+      "priceOriginal": "58,300,000,000 ₫",
+      "pageUrl": "object/5-bedroom-customizable-sea-view-villa-for-sale-u1952778/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-чалонг-пхукет-u1952778",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 2242308,
+          "raw": "58,300,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6812179",
+      "title": "Phanasons City Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Wichit",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 30.77,
+      "priceUSD": 56538,
+      "priceOriginal": "1,470,000,000 ₫",
+      "pageUrl": "object/phanasons-city-condominium-u6812179/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-phanasons-city-condominium-в-wichit-пхукет-u6812179",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 56538,
+          "raw": "1,470,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6755544",
+      "title": "The Standard Residences",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 78.9,
+      "priceUSD": 434615,
+      "priceOriginal": "11,300,000,000 ₫",
+      "pageUrl": "object/the-standard-residences-u6755544/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-standard-residences-в-чернг-талай-пхукет-u6755544",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 434615,
+          "raw": "11,300,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6763005",
+      "title": "Laguna Fairway",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 522.0,
+      "priceUSD": 807692,
+      "priceOriginal": "21,000,000,000 ₫",
+      "pageUrl": "object/laguna-fairway-u6763005/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-laguna-fairway-в-чернг-талай-пхукет-u6763005",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 807692,
+          "raw": "21,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6812117",
+      "title": "Cassia Phuket",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Квартира",
+      "beds": 1,
+      "area": 42.0,
+      "priceUSD": 170385,
+      "priceOriginal": "4,430,000,000 ₫",
+      "pageUrl": "object/cassia-phuket-u6812117/",
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-квартира-в-cassia-phuket-в-чернг-талай-пхукет-u6812117",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 170385,
+          "raw": "4,430,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5657090",
+      "title": "THE LEGEND DA NANG APARTMENT FOR SALE - 3 BEDROOM 117 m²",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Tay",
+      "type": "Дом",
+      "beds": 3,
+      "area": 117.0,
+      "priceUSD": 634615,
+      "priceOriginal": "16,500,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-дом-в-an-hai-tay-дананг-u5657090",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 634615,
+          "raw": "16,500,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1970770",
+      "title": "Golf View Luxury Apartment",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Hai",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 94.0,
+      "priceUSD": 419231,
+      "priceOriginal": "10,900,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-golf-view-luxury-apartment-в-hoa-hai-дананг-u1970770",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 419231,
+          "raw": "10,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5349084",
+      "title": "Sun Symphony Residence Danang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Nai Hien Dong",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 175.4,
+      "priceUSD": 588462,
+      "priceOriginal": "15,300,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-sun-symphony-residence-danang-в-nai-hien-dong-дананг-u5349084",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 588462,
+          "raw": "15,300,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5596588",
+      "title": "Vinpearl Condotel Đà Nẵng",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Bac",
+      "type": "Пентхаус",
+      "beds": 2,
+      "area": 70.0,
+      "priceUSD": 230769,
+      "priceOriginal": "6,000,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-пентхаус-в-vinpearl-condotel-da-nẵng-в-an-hai-bac-дананг-u5596588",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 230769,
+          "raw": "6,000,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2059845",
+      "title": "Blooming Tower Danang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Thuan Phuoc",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 109.0,
+      "priceUSD": 103846,
+      "priceOriginal": "2,700,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-blooming-tower-danang-в-thuan-phuoc-дананг-u2059845",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 103846,
+          "raw": "2,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6595110",
+      "title": "Azura",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Bac",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 100.0,
+      "priceUSD": 279615,
+      "priceOriginal": "7,270,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-azura-в-an-hai-bac-дананг-u6595110",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 279615,
+          "raw": "7,270,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5657007",
+      "title": "THE LEGEND DA NANG APARTMENT FOR SALE - 1 BEDROOM 49m²",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Tay",
+      "type": "Дом",
+      "beds": 1,
+      "area": 49.0,
+      "priceUSD": 226923,
+      "priceOriginal": "5,900,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-дом-в-an-hai-tay-дананг-u5657007",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 226923,
+          "raw": "5,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2044600",
+      "title": "For sale | 2 bedroom apartment in Alphanam Luxury building",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc My",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 101.0,
+      "priceUSD": 300000,
+      "priceOriginal": "7,800,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-phuoc-my-дананг-u2044600",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 300000,
+          "raw": "7,800,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5364271",
+      "title": "Filmore Da Nang",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Phuoc Ninh",
+      "type": "Пентхаус",
+      "beds": 1,
+      "area": 50.0,
+      "priceUSD": 292308,
+      "priceOriginal": "7,600,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-пентхаус-в-filmore-da-nang-в-phuoc-ninh-дананг-u5364271",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 292308,
+          "raw": "7,600,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1373210",
+      "title": "Son Tra Ocean View",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Hoa Cuong Nam",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 51.0,
+      "priceUSD": 69231,
+      "priceOriginal": "1,800,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-son-tra-ocean-view-в-hoa-cuong-nam-дананг-u1373210",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 69231,
+          "raw": "1,800,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "5675112",
+      "title": "Capital Square Da Nang Luxurious Apartments 1 bed for sale",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "An Hai Bac",
+      "type": "Дом",
+      "beds": 1,
+      "area": 48.0,
+      "priceUSD": 188462,
+      "priceOriginal": "4,900,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-дом-в-an-hai-bac-дананг-u5675112",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 188462,
+          "raw": "4,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2141807",
+      "title": "Get Booking 50 million / ARIA Beach Apartment DA NANG",
+      "country": "vn",
+      "city": "Дананг",
+      "district": "Khue My",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 48.0,
+      "priceUSD": 34188,
+      "priceOriginal": "888,888,888 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-khue-my-дананг-u2141807",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 34188,
+          "raw": "888,888,888 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6817402",
+      "title": "Phanason Park Ville 3 (Baan Lipon)",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Si Sunthon",
+      "type": "Дом",
+      "beds": 3,
+      "area": 200.0,
+      "priceUSD": 137308,
+      "priceOriginal": "3,570,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-дом-в-phanason-park-ville-3-baan-lipon-в-si-sunthon-пхукет-u6817402",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 137308,
+          "raw": "3,570,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6781646",
+      "title": "6th Avenue Surin",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 35.0,
+      "priceUSD": 89615,
+      "priceOriginal": "2,330,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-6th-avenue-surin-в-чернг-талай-пхукет-u6781646",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 89615,
+          "raw": "2,330,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6806253",
+      "title": "Brand New Luxury 3-Bedroom Villa for Sale & Rent – Rawai",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Вилла",
+      "beds": 3,
+      "area": 330.0,
+      "priceUSD": 565385,
+      "priceOriginal": "14,700,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-вилла-в-раваи-пхукет-u6806253",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 565385,
+          "raw": "14,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6797951",
+      "title": "Cherng Lay Villas and Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Кондо",
+      "beds": 2,
+      "area": 180.52,
+      "priceUSD": 450000,
+      "priceOriginal": "11,700,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-cherng-lay-villas-and-condominium-в-чернг-талай-пхукет-u6797951",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 450000,
+          "raw": "11,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6806492",
+      "title": "The Title V",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 41.0,
+      "priceUSD": 122308,
+      "priceOriginal": "3,180,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-the-title-v-в-раваи-пхукет-u6806492",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 122308,
+          "raw": "3,180,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Utopia Dream U2",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Квартира",
+      "beds": "Студия",
+      "area": 30.0,
+      "priceUSD": 98846,
+      "priceOriginal": "2,570,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-квартира-в-utopia-dream-u2-в-раваи-пхукет-u6749046",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 98846,
+          "raw": "2,570,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6811883",
+      "title": "Connext",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Talat Nuea",
+      "type": "Кондо",
+      "beds": "Студия",
+      "area": 34.0,
+      "priceUSD": 89615,
+      "priceOriginal": "2,330,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-студия-кондо-в-connext-в-talat-nuea-пхукет-u6811883",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 89615,
+          "raw": "2,330,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6745622",
+      "title": "Saiyuan Buri Condominium",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Кондо",
+      "beds": 1,
+      "area": 45.57,
+      "priceUSD": 89615,
+      "priceOriginal": "2,330,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-кондо-в-saiyuan-buri-condominium-в-раваи-пхукет-u6745622",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 89615,
+          "raw": "2,330,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6802850",
+      "title": "Utopia Loft",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Пентхаус",
+      "beds": 1,
+      "area": 37.0,
+      "priceUSD": 104615,
+      "priceOriginal": "2,720,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-1-спальни-пентхаус-в-utopia-loft-в-раваи-пхукет-u6802850",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 104615,
+          "raw": "2,720,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6802904",
+      "title": "Siri Place Airport Phuket",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Mai Khao",
+      "type": "Дом",
+      "beds": 2,
+      "area": 156.0,
+      "priceUSD": 113462,
+      "priceOriginal": "2,950,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-дом-в-siri-place-airport-phuket-в-mai-khao-пхукет-u6802904",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 113462,
+          "raw": "2,950,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "2016969",
+      "title": "Villa Suksan Soi King Suksan 4",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Раваи",
+      "type": "Вилла",
+      "beds": 2,
+      "area": 220.0,
+      "priceUSD": 296154,
+      "priceOriginal": "7,700,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-вилла-в-villa-suksan-soi-king-suksan-4-в-раваи-пхукет-u2016969",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 296154,
+          "raw": "7,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "1039470",
+      "title": "Pearl Of Naithon",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Sakhu",
+      "type": "Пентхаус",
+      "beds": 3,
+      "area": 258.0,
+      "priceUSD": 719231,
+      "priceOriginal": "18,700,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-пентхаус-в-pearl-of-naithon-в-sakhu-пхукет-u1039470",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 719231,
+          "raw": "18,700,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6777010",
+      "title": "The Trees Residence",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Камала",
+      "type": "Кондо",
+      "beds": 3,
+      "area": 360.0,
+      "priceUSD": 534615,
+      "priceOriginal": "13,900,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-3-спальни-кондо-в-the-trees-residence-в-камала-пхукет-u6777010",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 534615,
+          "raw": "13,900,000,000 ₫"
+        }
+      ]
+    },
+    {
+      "id": "6787691",
+      "title": "Andaman Riviera",
+      "country": "th",
+      "city": "Пхукет",
+      "district": "Чернг Талай",
+      "type": "Квартира",
+      "beds": 2,
+      "area": 68.0,
+      "priceUSD": 415385,
+      "priceOriginal": "10,800,000,000 ₫",
+      "pageUrl": null,
+      "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-квартира-в-andaman-riviera-в-чернг-талай-пхукет-u6787691",
+      "firstSeen": "2026-09-28",
+      "lastChecked": "2026-09-28",
+      "lastSeenInCatalog": "2026-09-28",
+      "status": "live",
+      "priceHistory": [
+        {
+          "date": "2026-09-28",
+          "usd": 415385,
+          "raw": "10,800,000,000 ₫"
+        }
+      ]
+    }
+  ],
+  "lastCheck": {
+    "date": "2026-09-28",
+    "checked": 106,
+    "live": 104,
+    "price-changed": 0,
+    "currency-changed": 1,
+    "gone": 1,
+    "unknown": 0
+  }
+}

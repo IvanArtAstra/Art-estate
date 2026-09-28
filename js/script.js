@@ -1177,6 +1177,7 @@
     renderSearchChips();
     renderUrgent();
     refreshAllMap();
+    if (typeof renderMarquee === 'function') renderMarquee();
     const upd = document.getElementById('catalogUpdated');
     if (upd && data && data.updated) upd.textContent = 'Каталог обновлён ' + data.updated + ' · источник: ' + (data.source || '—');
   }
@@ -1228,14 +1229,15 @@
      закрыты по-настоящему, их надо отдавать с сервера по токену.
      ====================================================================== */
   const partnersGrid = document.getElementById('partnersGrid');
-  const partnersTabs = document.getElementById('partnersTabs');
+  const partnersCommunities = document.getElementById('partnersCommunities');
+  const marquee = document.getElementById('devMarquee');
+  const marqueeNote = document.getElementById('marqueeNote');
   const partnersLegal = document.getElementById('partnersLegal');
   const regState = document.getElementById('regState');
 
   const REG_KEY = 'ae_reg';
   let channels = null;
   let contacts = null;
-  let partnerTab = 'Дананг';
 
   function regInfo() {
     try { return JSON.parse(localStorage.getItem(REG_KEY) || 'null'); } catch (e) { return null; }
@@ -1296,7 +1298,6 @@
         ${esc(c.city)}${focus ? ' · ' + esc(focus) : ''}${c.languages ? ' · ' + esc(c.languages) : ''}
       </p>
       <p class="pcard__note">${esc(c.note || '')}</p>
-      ${c.website ? `<a class="pcard__site" href="${esc(c.website)}" target="_blank" rel="noopener nofollow">${esc(shortLabel(c.website))}</a>` : ''}
       ${isRegistered() ? contactsHTML(c.id) : lockHTML(c)}
     </article>`;
   }
@@ -1314,30 +1315,64 @@
     </article>`;
   }
 
-  function partnerTabs() {
-    if (!channels) return [];
-    const cities = Array.from(new Set(channels.companies.map(c => c.city)));
-    return cities.map(city => ({ key: city, label: city, n: channels.companies.filter(c => c.city === city).length }))
-      .concat([{ key: '__comm', label: 'Сообщества', n: channels.communities.length }]);
-  }
-
   function renderPartners() {
     if (!partnersGrid || !channels) return;
-    partnersTabs.innerHTML = partnerTabs().map(t2 =>
-      `<button type="button" role="tab" data-tab="${esc(t2.key)}"${t2.key === partnerTab ? ' class="is-active"' : ''} aria-selected="${t2.key === partnerTab}">${esc(t2.label)} <span class="tab__count">${t2.n}</span></button>`).join('');
+    const byCity = channels.companies.slice().sort((a, b) =>
+      (a.city || '').localeCompare(b.city || '', 'ru') || (a.name || '').localeCompare(b.name || '', 'ru'));
+    partnersGrid.innerHTML = byCity.map(companyCard).join('');
 
-    partnersGrid.innerHTML = partnerTab === '__comm'
-      ? channels.communities.map(communityCard).join('')
-      : channels.companies.filter(c => c.city === partnerTab).map(companyCard).join('');
-
+    if (partnersCommunities) {
+      partnersCommunities.innerHTML = channels.communities.length
+        ? `<span class="partners__label">Живые сообщества во Вьетнаме</span>
+           <div class="partners__grid">${channels.communities.map(communityCard).join('')}</div>`
+        : '';
+    }
     if (partnersLegal) {
-      partnersLegal.textContent = partnerTab === '__comm'
-        ? 'Сообщества — открытые Telegram-каналы, ссылки без ограничений. Мы их не ведём и за содержание не отвечаем.'
-        : 'Контакты собраны из открытых источников и подтверждены на официальных страницах компаний ' +
-          (channels.verifiedAt || '') + '. Мессенджер-контакты устаревают — если номер не отвечает, напишите нам.';
+      partnersLegal.textContent =
+        'Контакты собраны из открытых источников и подтверждены на официальных страницах компаний ' +
+        (channels.verifiedAt || '') + '. Сообщества — открытые Telegram-каналы: мы их не ведём и за содержание ' +
+        'не отвечаем. Мессенджер-контакты устаревают — если номер не отвечает, напишите нам.';
     }
     renderRegState();
     observeReveal(Array.from(partnersGrid.querySelectorAll('.reveal')));
+  }
+
+  /* ---------- бегущая строка: что реально есть в каталоге ---------- */
+  function renderMarquee() {
+    if (!marquee) return;
+    const track = marquee.querySelector('.marquee__track');
+
+    // Комплексы берём из каталога — это проверяемый факт: их объекты у нас есть.
+    const projects = Array.from(new Set(allItems.map(it => (it.title || '').trim()).filter(Boolean)))
+      .map(name => {
+        const it = allItems.find(x => (x.title || '').trim() === name);
+        return { name, country: it && it.country, dev: false };
+      });
+    // Застройщики — только подтверждённые в базе партнёров
+    const devs = ((channels && channels.companies) || [])
+      .filter(c => c.kind === 'developer')
+      .map(c => ({ name: c.name, country: c.country, dev: true }));
+
+    const all = devs.concat(projects);
+    if (!all.length) { marquee.hidden = true; return; }
+    marquee.hidden = false;
+
+    const item = x => `<span class="marquee__item${x.dev ? ' marquee__item--dev' : ''}">
+        ${x.country ? `<i class="flag flag--${esc(x.country)} flag--sm" aria-hidden="true"></i>` : ''}${esc(x.name)}
+      </span><span class="marquee__dot" aria-hidden="true"></span>`;
+    // Лента дублируется: анимация сдвигает ровно на половину и стыкуется без шва
+    const once = all.map(item).join('');
+    track.innerHTML = once + once;
+    // Чем длиннее лента, тем дольше цикл — скорость остаётся одинаковой на глаз
+    track.style.animationDuration = Math.max(40, all.length * 2.2) + 's';
+
+    if (marqueeNote) {
+      // В русском три формы множественного: 1 комплекс, 2 комплекса, 5 комплексов
+      const d = devs.length ? `${devs.length} ${plural(devs.length, 'застройщик', 'застройщика', 'застройщиков')} и ` : '';
+      const pr = `${projects.length} ${plural(projects.length, 'комплекс', 'комплекса', 'комплексов')}`;
+      marqueeNote.textContent = `${d}${pr}, объекты которых есть в каталоге. ` +
+        'Список собирается из каталога автоматически.';
+    }
   }
 
   function renderRegState() {
@@ -1404,8 +1439,6 @@
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-open-reg]')) { openRegModal(); return; }
-    const tab = e.target.closest('#partnersTabs [data-tab]');
-    if (tab) { partnerTab = tab.dataset.tab; renderPartners(); return; }
     if (e.target.closest('[data-reg-reset]')) {
       try { localStorage.removeItem(REG_KEY); } catch (err) {}
       renderPartners();
@@ -1417,11 +1450,9 @@
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(d => {
         channels = d;
-        const cities = Array.from(new Set(d.companies.map(c => c.city)));
-        if (cities.length) partnerTab = cities[0];
         return isRegistered() ? loadContacts() : null;
       })
-      .then(renderPartners)
+      .then(() => { renderPartners(); renderMarquee(); })
       .catch(() => {
         if (partnersGrid) partnersGrid.innerHTML =
           '<p class="catalog__empty">База партнёров временно недоступна. Напишите нам — пришлём контакты вручную.</p>';

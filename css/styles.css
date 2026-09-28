@@ -1487,3 +1487,45 @@ body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset
 /* Карточки партнёров */
 .pcard__kind { display: inline-flex; align-items: center; gap: .4rem; }
 .pcard__kind .ico { font-size: 1.05em; }
+
+/* ============================================================
+   БЕГУЩАЯ СТРОКА: КОМПЛЕКСЫ И ЗАСТРОЙЩИКИ ИЗ КАТАЛОГА
+   ============================================================ */
+.marquee {
+  overflow: hidden; margin-bottom: 1rem; padding: 1.1rem 0;
+  border-block: 1px solid var(--hairline);
+  /* края растворяются, чтобы строка не обрывалась резко */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.marquee__track {
+  display: flex; align-items: center; gap: 2.6rem; width: max-content;
+  animation: marqueeRun 80s linear infinite;
+}
+/* Лента продублирована в разметке, поэтому сдвиг ровно на половину даёт стык без шва */
+@keyframes marqueeRun { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee:hover .marquee__track,
+.marquee:focus-within .marquee__track { animation-play-state: paused; }
+
+.marquee__item {
+  display: inline-flex; align-items: center; gap: .6rem; white-space: nowrap;
+  font-family: 'Cormorant Garamond', 'Cormorant Fallback', Georgia, serif;
+  font-size: var(--fs-h4); color: var(--teal); letter-spacing: .01em;
+}
+.marquee__item .flag { opacity: .85; }
+.marquee__item--dev { color: var(--gold-ink); font-weight: 600; }
+.marquee__dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); opacity: .55; flex: none; }
+.marquee__note { font-size: var(--fs-2xs); color: var(--ink-soft); margin-bottom: 2rem; }
+
+.partners__communities { margin-top: clamp(1.8rem, 3vw, 2.6rem); }
+.partners__label {
+  display: block; margin-bottom: .9rem;
+  font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.partners__communities .partners__grid { margin-top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; flex-wrap: wrap; width: auto; gap: 1rem 2rem; }
+  .marquee { -webkit-mask-image: none; mask-image: none; }
+}
