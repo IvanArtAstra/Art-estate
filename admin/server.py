@@ -48,7 +48,30 @@ ITER = 200_000
 
 SESSIONS = {}          # token -> created_ts
 SESSION_TTL = 8 * 3600
-JOB = {"running": False, "done": False, "ok": False, "log": [], "started": 0}
+JOB = {"running": False, "done": False, "ok": False, "log": [], "started": 0, "title": ""}
+MATRIX = os.path.join(ROOT, "data", "objects-matrix.json")
+
+
+def python_bin():
+    """Интерпретатор, в котором точно есть requests.
+
+    На машине бывает несколько python3 (homebrew и системный), и пакет
+    установлен не во всех. Раньше здесь стояло просто "python3", и запуск
+    из фонового процесса падал с ModuleNotFoundError.
+    """
+    for cand in (sys.executable, "/usr/bin/python3", "python3"):
+        if not cand:
+            continue
+        try:
+            r = subprocess.run([cand, "-c", "import requests"], capture_output=True, timeout=20)
+            if r.returncode == 0:
+                return cand
+        except Exception:
+            continue
+    return sys.executable or "python3"
+
+
+PY_BIN = python_bin()
 
 
 # ---------------- аккаунт / пароль ----------------
@@ -120,37 +143,83 @@ def compute_stats():
     }
 
 
-# ---------------- запуск парсера (фоновый job) ----------------
+# ---------------- фоновые задачи ----------------
+def job_log(line):
+    JOB["log"].append(line)
+
+
+def job_run(cmd, title):
+    """Запустить скрипт, стримя его вывод в лог задачи."""
+    job_log(f"▶ {title}")
+    try:
+        p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT, text=True, bufsize=1)
+        for ln in p.stdout:
+            ln = ln.rstrip()
+            if ln and "NotOpenSSL" not in ln and "warnings.warn" not in ln:
+                job_log(ln)
+        p.wait()
+        return p.returncode == 0
+    except Exception as e:
+        job_log(f"! ошибка: {e}")
+        return False
+
+
 def run_pipeline(pages, limit, gallery):
-    JOB.update(running=True, done=False, ok=False, log=[], started=time.time())
+    JOB.update(running=True, done=False, ok=False, log=[], started=time.time(),
+               title="Парсинг каталога")
 
-    def log(line):
-        JOB["log"].append(line)
-
-    def run(cmd, title):
-        log(f"▶ {title}")
-        try:
-            p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT, text=True, bufsize=1)
-            for ln in p.stdout:
-                ln = ln.rstrip()
-                if ln and "NotOpenSSL" not in ln and "warnings.warn" not in ln:
-                    log(ln)
-            p.wait()
-            return p.returncode == 0
-        except Exception as e:
-            log(f"! ошибка: {e}")
-            return False
-
-    ok = run(["python3", "scraper/scrape_fazwaz.py", "--pages", str(pages),
-              "--limit", str(limit), "--delay", "0.8"], "Парсинг объектов с fazwaz.ru")
+    ok = job_run([PY_BIN, "scraper/scrape_fazwaz.py", "--pages", str(pages),
+                  "--limit", str(limit), "--delay", "0.8"], "Парсинг объектов с fazwaz.ru")
     if ok and gallery:
-        ok = run(["python3", "scraper/enrich_gallery.py", "--max", "6", "--delay", "0.6"],
-                 "Скачивание галереи фото") or True  # галерея не критична
+        ok = job_run([PY_BIN, "scraper/enrich_gallery.py", "--max", "6", "--delay", "0.6"],
+                     "Скачивание галереи фото") or True  # галерея не критична
     if ok:
-        ok = run(["python3", "scraper/build_pages.py"], "Генерация страниц и sitemap")
-    log("✓ Готово. Нажмите «Опубликовать», чтобы обновить сайт." if ok else "✗ Завершено с ошибкой.")
+        ok = job_run([PY_BIN, "scraper/build_pages.py"], "Генерация страниц и sitemap")
+    job_log("✓ Готово. Нажмите «Опубликовать», чтобы обновить сайт." if ok else "✗ Завершено с ошибкой.")
     JOB.update(running=False, done=True, ok=ok)
+
+
+def run_check(apply_changes, only_stale):
+    """Сверить объекты с источником: живы ли объявления, не сдвинулись ли цены."""
+    JOB.update(running=True, done=False, ok=False, log=[], started=time.time(),
+               title="Проверка актуальности")
+
+    ok = job_run([PY_BIN, "tools/objects_matrix.py", "sync"], "Сверка каталога с матрицей")
+    if ok:
+        cmd = [PY_BIN, "tools/objects_matrix.py", "check", "--delay", "0.8"]
+        if not only_stale:
+            cmd.append("--all")
+        if apply_changes:
+            cmd.append("--apply")
+        ok = job_run(cmd, "Проверка объявлений на источнике")
+    # Если что-то сняли с продажи, страницы и sitemap надо пересобрать
+    if ok and apply_changes:
+        ok = job_run([PY_BIN, "scraper/build_pages.py"], "Генерация страниц и sitemap")
+    job_log("✓ Готово. Нажмите «Опубликовать», чтобы обновить сайт." if ok else "✗ Завершено с ошибкой.")
+    JOB.update(running=False, done=True, ok=ok)
+
+
+def matrix_state():
+    """Короткая сводка по матрице для карточки в админке."""
+    if not os.path.exists(MATRIX):
+        return {"exists": False}
+    try:
+        with open(MATRIX, encoding="utf-8") as f:
+            m = json.load(f)
+    except Exception:
+        return {"exists": False}
+    objs = m.get("objects", [])
+    by = {}
+    for o in objs:
+        by[o.get("status") or "unchecked"] = by.get(o.get("status") or "unchecked", 0) + 1
+    moved = [o for o in objs if len(o.get("priceHistory") or []) > 1]
+    return {
+        "exists": True, "total": len(objs), "byStatus": by,
+        "updated": m.get("updated"), "lastCheck": m.get("lastCheck"),
+        "neverChecked": sum(1 for o in objs if not o.get("lastChecked")),
+        "priceMoved": len(moved),
+    }
 
 
 def git(cmd):
@@ -216,6 +285,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 return self._json(200, read_catalog())
             if path == "/admin/api/run-status":
                 return self._json(200, JOB)
+            if path == "/admin/api/matrix":
+                return self._json(200, matrix_state())
             return self._json(404, {"error": "not found"})
         # статика проекта (превью фото в редакторе) — только существующие файлы внутри ROOT
         return self._serve_static(path)
@@ -246,6 +317,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             threading.Thread(target=run_pipeline, kwargs={
                 "pages": int(b.get("pages", 1)), "limit": int(b.get("limit", 18)),
                 "gallery": bool(b.get("gallery", True))}, daemon=True).start()
+            return self._json(200, {"started": True})
+        if path == "/admin/api/run-check":
+            if JOB["running"]:
+                return self._json(409, {"error": "уже выполняется"})
+            b = self._body()
+            threading.Thread(target=run_check, kwargs={
+                "apply_changes": bool(b.get("apply", True)),
+                "only_stale": bool(b.get("onlyStale", False))}, daemon=True).start()
             return self._json(200, {"started": True})
         if path == "/admin/api/publish":
             b = self._body()

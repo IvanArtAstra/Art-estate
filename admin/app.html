@@ -123,6 +123,22 @@
       <div class="log" id="runLog"></div>
     </div>
 
+    <!-- ПРОВЕРКА АКТУАЛЬНОСТИ -->
+    <div class="card">
+      <h2>Проверка актуальности объектов</h2>
+      <p class="muted">Сходит на источник по каждому объекту: снято ли объявление, не сдвинулась ли цена.
+        Результат пишется в матрицу <code>data/objects-matrix.json</code> — она помнит историю цен и даты проверок.</p>
+      <div class="stats" id="matrixStats" style="margin-top:1rem"></div>
+      <div class="run__opts" style="margin-top:1rem">
+        <label class="chk"><input id="chkApply" type="checkbox" checked> Записать изменения в каталог и убрать снятые</label>
+        <label class="chk"><input id="chkStale" type="checkbox"> Только давно не проверявшиеся</label>
+        <button class="btn btn--teal" id="checkBtn">▶ Проверить актуальность</button>
+      </div>
+      <p class="muted" style="margin-top:.6rem">Полная проверка сотни объектов занимает около четырёх минут —
+        между запросами стоит пауза, чтобы не долбить источник.</p>
+      <div class="log" id="checkLog"></div>
+    </div>
+
     <!-- РЕДАКТОР КАТАЛОГА -->
     <div class="card">
       <h2 style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
@@ -170,7 +186,7 @@ $('#loginForm').addEventListener('submit', async e=>{
 });
 $('#logoutBtn').addEventListener('click', async ()=>{ await api('logout',{method:'POST'}); location.reload(); });
 
-function showApp(){ $('#loginScreen').classList.add('hide'); $('#app').classList.remove('hide'); loadStats(); loadCatalog(); }
+function showApp(){ $('#loginScreen').classList.add('hide'); $('#app').classList.remove('hide'); loadStats(); loadCatalog(); loadMatrix(); }
 
 /* ---- статистика ---- */
 async function loadStats(){
@@ -256,14 +272,42 @@ $('#runBtn').addEventListener('click', async ()=>{
   const r = await api('run-parser',{method:'POST',body:JSON.stringify({
     pages:+$('#rpages').value, limit:+$('#rlimit').value, gallery:$('#rgallery').checked})});
   if(!r.ok){ const j=await r.json().catch(()=>({})); log.textContent=j.error||'Ошибка'; $('#runBtn').disabled=false; return; }
-  poll();
+  poll('#runLog');
 });
-async function poll(){
+async function poll(target){
   const j = await (await api('run-status')).json();
-  const log=$('#runLog'); log.textContent=(j.log||[]).join('\n'); log.scrollTop=log.scrollHeight;
-  if(j.running){ setTimeout(poll,1200); }
-  else { $('#runBtn').disabled=false; if(j.done){ toast(j.ok?'Парсинг завершён':'Завершено с ошибкой'); loadStats(); loadCatalog(); } }
+  const log=$(target||'#runLog'); log.textContent=(j.log||[]).join('\n'); log.scrollTop=log.scrollHeight;
+  if(j.running){ setTimeout(()=>poll(target),1200); return; }
+  // Задача одна на сервере, поэтому разблокируем обе кнопки
+  $('#runBtn').disabled=false; $('#checkBtn').disabled=false;
+  if(j.done){ toast(j.ok?((j.title||'Задача')+' завершена'):'Завершено с ошибкой'); loadStats(); loadCatalog(); loadMatrix(); }
 }
+
+/* ---- проверка актуальности ---- */
+async function loadMatrix(){
+  const box=$('#matrixStats'); if(!box) return;
+  try{
+    const m = await (await api('matrix')).json();
+    if(!m.exists){ box.innerHTML='<div class="stat"><b>—</b><span>матрица ещё не собрана</span></div>'; return; }
+    const st=m.byStatus||{};
+    const cell=(v,l)=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+    box.innerHTML = cell(m.total,'объектов в матрице')
+      + cell(st['live']||0,'на месте')
+      + cell(st['gone']||0,'снято с продажи')
+      + cell(m.priceMoved||0,'цена менялась')
+      + cell(m.neverChecked||0,'ни разу не проверяли')
+      + cell(m.lastCheck?m.lastCheck.date:'—','последняя проверка');
+  }catch(e){ box.textContent='Не удалось прочитать матрицу'; }
+}
+
+$('#checkBtn').addEventListener('click', async ()=>{
+  const log=$('#checkLog'); log.classList.add('show'); log.textContent='Запуск…';
+  $('#checkBtn').disabled=true;
+  const r = await api('run-check',{method:'POST',body:JSON.stringify({
+    apply:$('#chkApply').checked, onlyStale:$('#chkStale').checked})});
+  if(!r.ok){ const j=await r.json().catch(()=>({})); log.textContent=j.error||'Ошибка'; $('#checkBtn').disabled=false; return; }
+  poll('#checkLog');
+});
 
 /* ---- публикация ---- */
 $('#pubBtn').addEventListener('click', async ()=>{
