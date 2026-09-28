@@ -14,21 +14,88 @@
     (root || document).querySelectorAll('.card__media img, .dcard img').forEach(im => { if (im.complete) im.classList.add('is-loaded'); });
   }
 
-  /* ---------- ПРЕЛОАДЕР ---------- */
+  /* ---------- ПРЕЛОАДЕР ----------
+     Прогресс привязан к настоящим вехам загрузки, а не к случайным числам:
+     раньше полоса дорисовывалась на Math.random() и могла добежать до конца
+     задолго до того, как страница была готова, — то есть врала. Между вехами
+     идёт медленное подползание, чтобы полоса не выглядела застывшей, но она
+     никогда не заходит за долю следующей невзятой вехи.
+     -------------------------------------------------------------------- */
   const preloader = document.getElementById('preloader');
   const preloaderBar = document.getElementById('preloaderBar');
-  let prog = 0;
-  const fakeLoad = setInterval(() => {
-    prog = Math.min(100, prog + Math.random() * 18);
-    if (preloaderBar) preloaderBar.style.width = prog + '%';
-    if (prog >= 100) clearInterval(fakeLoad);
-  }, 130);
-  window.addEventListener('load', () => {
-    if (preloaderBar) preloaderBar.style.width = '100%';
-    setTimeout(() => preloader && preloader.classList.add('hidden'), 500);
-  });
-  // подстраховка: убрать прелоадер даже если load не сработал
-  setTimeout(() => preloader && preloader.classList.add('hidden'), 3500);
+  const preloaderPct = document.getElementById('preloaderPct');
+
+  if (preloader) {
+    const STAGES = [
+      { at: 0.25, done: false },   // разметка разобрана
+      { at: 0.55, done: false },   // шрифты готовы
+      { at: 0.80, done: false },   // фон героя загружен
+      { at: 1.00, done: false },   // window load
+    ];
+    let shown = 0;
+    let raf = null;
+    let finished = false;
+
+    const target = () => {
+      let t = 0;
+      for (const st of STAGES) {
+        if (st.done) t = st.at;
+        else break;
+      }
+      return t;
+    };
+    const ceiling = () => {
+      for (const st of STAGES) if (!st.done) return st.at;
+      return 1;
+    };
+
+    function paint() {
+      const t = target();
+      const cap = ceiling();
+      // подтягиваемся к взятой вехе быстро, дальше ползём к потолку медленно
+      shown += (t - shown) * 0.16;
+      if (shown < cap - 0.01) shown += (cap - shown) * 0.012;
+      shown = Math.min(shown, cap);
+      const pct = Math.round(shown * 100);
+      preloaderBar.style.width = pct + '%';
+      if (preloaderPct) preloaderPct.textContent = pct;
+      preloader.setAttribute('aria-valuenow', pct);
+      if (!finished) raf = requestAnimationFrame(paint);
+    }
+    raf = requestAnimationFrame(paint);
+
+    const reach = (i) => { for (let k = 0; k <= i; k++) STAGES[k].done = true; };
+
+    function finish() {
+      if (finished) return;
+      finished = true;
+      cancelAnimationFrame(raf);
+      preloaderBar.style.width = '100%';
+      if (preloaderPct) preloaderPct.textContent = '100';
+      preloader.setAttribute('aria-valuenow', 100);
+      // короткая пауза, чтобы глаз успел увидеть завершённую полосу
+      setTimeout(() => preloader.classList.add('hidden'), 420);
+    }
+
+    reach(0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => reach(1)).catch(() => reach(1));
+    } else {
+      reach(1);
+    }
+
+    // Герой — самая тяжёлая картинка первого экрана, ждём именно её
+    const heroSrc = 'assets/hero-phuket.webp';
+    const heroImg = new Image();
+    heroImg.onload = heroImg.onerror = () => reach(2);
+    heroImg.src = heroSrc;
+
+    if (document.readyState === 'complete') finish();
+    else window.addEventListener('load', () => { reach(3); finish(); });
+
+    // Подстраховка: если какое-то событие не придёт, сайт всё равно откроется
+    setTimeout(() => { reach(3); finish(); }, 6000);
+  }
 
   /* ---------- ШАПКА ПРИ СКРОЛЛЕ ---------- */
   const header = document.getElementById('header');

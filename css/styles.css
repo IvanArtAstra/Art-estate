@@ -103,16 +103,80 @@ h1, h2, h3, h4 {
   position: fixed; inset: 0; z-index: 9999;
   background: var(--teal-deep);
   display: grid; place-items: center;
-  transition: opacity .8s var(--ease), visibility .8s;
+  /* Уход занавесом вверх вместо простого затухания: полотно уезжает,
+     открывая герой снизу вверх. */
+  transition: transform 1s var(--ease-out), visibility 1s;
+  will-change: transform;
 }
-.preloader.hidden { opacity: 0; visibility: hidden; }
+/* Тонкая золотая линия по нижней кромке полотна — она же «край занавеса» */
+.preloader::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(227,195,120,.5), transparent);
+}
+.preloader.hidden { transform: translateY(-100%); visibility: hidden; }
+.preloader.hidden .preloader__inner { opacity: 0; transition: opacity .45s var(--ease-out); }
+
+.preloader__inner { width: min(420px, 82vw); text-align: center; }
+
 .preloader__logo {
-  font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 6vw, 3.4rem);
-  color: var(--cream); letter-spacing: .22em; text-align: center; margin-bottom: 1.6rem;
+  font-family: 'Cormorant Garamond', 'Cormorant Fallback', Georgia, serif;
+  font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1;
+  color: var(--cream); margin-bottom: 1.6rem;
+  display: flex; justify-content: center; gap: .5em;
 }
-.preloader__logo span { color: var(--gold-light); }
-.preloader__bar { width: 220px; height: 2px; background: rgba(255,255,255,.15); border-radius: 2px; overflow: hidden; }
-.preloader__bar span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width .3s linear; }
+.preloader__word { display: inline-flex; }
+/* Буквы проявляются волной слева направо: типографика вместо спиннера */
+.preloader__logo span span {
+  display: inline-block; opacity: 0; transform: translateY(.45em);
+  letter-spacing: .2em;
+  animation: preloaderLetter .8s var(--ease-out) forwards;
+  animation-delay: calc(var(--i) * 60ms);
+}
+.preloader__logo .is-gold { color: var(--gold-light); }
+@keyframes preloaderLetter {
+  to { opacity: 1; transform: none; }
+}
+
+.preloader__rule {
+  position: relative; height: 1px; width: 100%;
+  background: rgba(255,253,248,.14); overflow: hidden;
+}
+.preloader__rule span {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  transition: width .5s var(--ease-out);
+}
+/* Блик, бегущий по линии, пока идёт загрузка */
+.preloader__rule::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 34%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,253,248,.55), transparent);
+  animation: preloaderSheen 1.9s var(--ease-soft) infinite;
+}
+@keyframes preloaderSheen {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(400%); }
+}
+
+.preloader__meta {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  margin-top: .9rem;
+  opacity: 0; animation: preloaderMeta .8s var(--ease-out) .55s forwards;
+}
+@keyframes preloaderMeta { to { opacity: 1; } }
+.preloader__tag {
+  font-size: var(--fs-2xs); letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255,253,248,.45);
+}
+.preloader__pct {
+  font-size: var(--fs-2xs); letter-spacing: .1em; color: var(--gold-light);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .preloader__logo { gap: .35em; margin-bottom: 1.3rem; }
+  .preloader__tag { display: none; }
+  .preloader__meta { justify-content: flex-end; }
+}
 
 /* ---------- ШАПКА ---------- */
 .header {
@@ -1528,4 +1592,16 @@ body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset
 @media (prefers-reduced-motion: reduce) {
   .marquee__track { animation: none; flex-wrap: wrap; width: auto; gap: 1rem 2rem; }
   .marquee { -webkit-mask-image: none; mask-image: none; }
+}
+
+/* ---------- ПРЕЛОАДЕР: БЕЗ ДВИЖЕНИЯ ---------- */
+/* Глобальное `* { animation: none }` выключает и проявление букв, а стартовое
+   состояние у них — opacity: 0. Без этого блока логотип на прелоадере просто
+   не появился бы. Поэтому здесь возвращаем конечное состояние вручную. */
+@media (prefers-reduced-motion: reduce) {
+  .preloader { transition: opacity .4s linear, visibility .4s; }
+  .preloader.hidden { transform: none; opacity: 0; }
+  .preloader__logo span span { opacity: 1; transform: none; letter-spacing: .2em; }
+  .preloader__meta { opacity: 1; }
+  .preloader__rule::after { display: none; }
 }

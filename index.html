@@ -47,10 +47,19 @@
   <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- ============ ПРЕЛОАДЕР ============ -->
-  <div class="preloader" id="preloader">
+  <noscript><style>.preloader{display:none}</style></noscript>
+  <div class="preloader" id="preloader" role="progressbar"
+       aria-label="Загрузка сайта" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
     <div class="preloader__inner">
-      <div class="preloader__logo">ESTATE <span>ART</span></div>
-      <div class="preloader__bar"><span id="preloaderBar"></span></div>
+      <div class="preloader__logo" aria-hidden="true">
+        <span class="preloader__word"><span style="--i:0">E</span><span style="--i:1">S</span><span style="--i:2">T</span><span style="--i:3">A</span><span style="--i:4">T</span><span style="--i:5">E</span></span>
+        <span class="preloader__word"><span class="is-gold" style="--i:6">A</span><span class="is-gold" style="--i:7">R</span><span class="is-gold" style="--i:8">T</span></span>
+      </div>
+      <div class="preloader__rule" aria-hidden="true"><span id="preloaderBar"></span></div>
+      <div class="preloader__meta" aria-hidden="true">
+        <span class="preloader__tag">Недвижимость Таиланда и Вьетнама</span>
+        <span class="preloader__pct"><b id="preloaderPct">0</b>%</span>
+      </div>
     </div>
   </div>
 
