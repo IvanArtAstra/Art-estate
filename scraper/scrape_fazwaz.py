@@ -494,6 +494,8 @@ def main():
     ap.add_argument("--city", default="", help="город для --category")
     ap.add_argument("--merge", action="store_true",
                     help="дописать в существующий catalog.json, сохранив объекты других городов")
+    ap.add_argument("--append", action="store_true",
+                    help="долить новые объекты, не трогая уже собранные (в т.ч. их галереи)")
     ap.add_argument("--pages", type=int, default=1, help="сколько страниц листинга обойти на регион")
     ap.add_argument("--limit", type=int, default=9, help="максимум объектов на регион")
     ap.add_argument("--delay", type=float, default=1.2, help="пауза между запросами, сек")
@@ -527,15 +529,25 @@ def main():
     for key, region in targets.items():
         items.extend(scrape_region(s, key, region, args))
 
-    if args.merge and os.path.exists(args.out_json):
+    if (args.merge or args.append) and os.path.exists(args.out_json):
         with open(args.out_json, encoding="utf-8") as f:
             old = json.load(f)
-        touched = {r.get("city") for r in targets.values() if r.get("city")}
-        kept = [it for it in old.get("items", []) if it.get("city") not in touched]
-        fresh_ids = {it["id"] for it in items}
-        kept = [it for it in kept if it.get("id") not in fresh_ids]
-        print(f"\nСлияние: сохранено {len(kept)} объектов других городов, добавлено {len(items)}")
-        items = kept + items
+        prev = old.get("items", [])
+        if args.append:
+            # Доливаем только незнакомые id: у уже собранных объектов остаются
+            # галереи из enrich_gallery.py, перезаписывать их нельзя
+            known = {it.get("id") for it in prev}
+            fresh = [it for it in items if it["id"] not in known]
+            print(f"\nДолив: было {len(prev)}, новых {len(fresh)}, "
+                  f"уже знакомых пропущено {len(items) - len(fresh)}")
+            items = prev + fresh
+        else:
+            touched = {r.get("city") for r in targets.values() if r.get("city")}
+            kept = [it for it in prev if it.get("city") not in touched]
+            fresh_ids = {it["id"] for it in items}
+            kept = [it for it in kept if it.get("id") not in fresh_ids]
+            print(f"\nСлияние: сохранено {len(kept)} объектов других городов, добавлено {len(items)}")
+            items = kept + items
 
     catalog = {
         "updated": dt.date.today().isoformat(),

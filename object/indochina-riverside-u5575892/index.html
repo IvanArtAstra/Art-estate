@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Indochina Riverside — купить на Пхукете | Estate Art</title>
+<meta name="description" content="Это квартира площадью 100 кв.м. с 2 спальни и 2 ванные. Этот объект недвижимости сейчас доступен на продажу. Является частью Indochina Riverside в Hai Chau..." />
+<meta name="theme-color" content="#0f3f3a" />
+<link rel="canonical" href="https://ivanartastra.github.io/Art-estate/object/indochina-riverside-u5575892/" />
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg" />
+<meta property="og:type" content="product" />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:site_name" content="Estate Art" />
+<meta property="og:title" content="Indochina Riverside — Estate Art" />
+<meta property="og:description" content="Это квартира площадью 100 кв.м. с 2 спальни и 2 ванные. Этот объект недвижимости сейчас доступен на продажу. Является частью Indochina Riverside в Hai Chau..." />
+<meta property="og:url" content="https://ivanartastra.github.io/Art-estate/object/indochina-riverside-u5575892/" />
+<meta property="og:image" content="https://ivanartastra.github.io/Art-estate/assets/catalog/u5575892.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://ivanartastra.github.io/Art-estate/assets/catalog/u5575892.png" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="../../css/styles.css" />
+<style>
+  body { background: var(--sand); }
+  .pp-header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1rem clamp(1.2rem,4vw,3rem); background: rgba(246,241,231,.9); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(20,32,31,.08); }
+  .pp-wrap { max-width: 1080px; margin: 0 auto; padding: clamp(1.4rem,4vw,2.6rem); }
+  .crumbs { font-size: .85rem; color: var(--ink-soft); margin: .4rem 0 1.4rem; }
+  .crumbs a { color: var(--ink-soft); } .crumbs a:hover { color: var(--gold); }
+  .crumbs span { color: var(--gold); }
+  .pp-hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 1.8rem; align-items: stretch; }
+  .pp-media { position: relative; border-radius: var(--radius); overflow: hidden; min-height: 320px; box-shadow: var(--shadow); }
+  .pp-media img { width: 100%; height: 100%; object-fit: cover; }
+  .pp-badges { position: absolute; top: 1rem; left: 1rem; display: flex; flex-direction: column; gap: .4rem; }
+  .pp-info { display: flex; flex-direction: column; }
+  .pp-type { color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; }
+  .pp-title { font-size: clamp(1.8rem,4vw,2.8rem); color: var(--teal); margin: .3rem 0 .5rem; }
+  .pp-loc { color: var(--ink-soft); margin-bottom: 1.2rem; }
+  .pp-price { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 700; color: var(--ink); line-height: 1.05; }
+  .pp-price s { font-size: 1.2rem; color: var(--ink-soft); opacity: .7; margin-right: .6rem; font-family: 'Manrope', sans-serif; }
+  .pp-price-sub { color: var(--ink-soft); font-size: .92rem; margin: .3rem 0 1.4rem; font-variant-numeric: tabular-nums; }
+  .pp-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: auto; }
+  .pp-section { margin-top: 2.6rem; }
+  .pp-section h2 { font-size: clamp(1.5rem,3vw,2rem); color: var(--teal); margin-bottom: 1rem; }
+  .pp-desc { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.7; }
+  .pp-map { height: 360px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); z-index: 0; }
+  .pp-back { display: inline-flex; align-items: center; gap: .4rem; color: var(--teal); font-weight: 700; margin-top: 2.6rem; }
+  .pp-gallery { display: flex; flex-direction: column; gap: .7rem; }
+  .pp-media { cursor: zoom-in; }
+  .pp-thumbs { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .pp-thumb { width: 84px; height: 60px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; padding: 0; cursor: pointer; background: none; transition: border-color .2s; }
+  .pp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pp-thumb.is-active { border-color: var(--gold); }
+  .lb { position: fixed; inset: 0; z-index: 500; background: rgba(6,32,29,.93); display: grid; place-items: center; }
+  .lb[hidden] { display: none; }
+  .lb img { max-width: 92vw; max-height: 84vh; border-radius: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .lb__btn { position: absolute; background: rgba(255,255,255,.14); color: #fff; border: 0; width: 52px; height: 52px; border-radius: 50%; font-size: 1.7rem; cursor: pointer; display: grid; place-items: center; transition: background .2s; }
+  .lb__btn:hover { background: rgba(255,255,255,.28); }
+  .lb__prev { left: 3vw; } .lb__next { right: 3vw; } .lb__close { top: 3vh; right: 3vw; width: 46px; height: 46px; }
+  @media (max-width: 820px) { .pp-hero { grid-template-columns: 1fr; } }
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Indochina Riverside", "image": ["https://ivanartastra.github.io/Art-estate/assets/catalog/u5575892.png"], "description": "Это квартира площадью 100 кв.м. с 2 спальни и 2 ванные. Этот объект недвижимости сейчас доступен на продажу. Является частью Indochina Riverside в Hai Chau...", "category": "Квартира", "offers": {"@type": "Offer", "priceCurrency": "USD", "price": 223077, "availability": "https://schema.org/InStock", "url": "https://ivanartastra.github.io/Art-estate/object/indochina-riverside-u5575892/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Главная", "item": "https://ivanartastra.github.io/Art-estate/"}, {"@type": "ListItem", "position": 2, "name": "Каталог", "item": "https://ivanartastra.github.io/Art-estate/#catalog"}, {"@type": "ListItem", "position": 3, "name": "Indochina Riverside", "item": "https://ivanartastra.github.io/Art-estate/object/indochina-riverside-u5575892/"}]}</script>
+</head>
+<body>
+<header class="pp-header">
+  <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
+  <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
+</header>
+
+<div class="pp-wrap">
+  <nav class="crumbs" aria-label="Хлебные крошки">
+    <a href="../../">Главная</a> / <a href="../../#catalog">Каталог</a> / <span>Indochina Riverside</span>
+  </nav>
+
+  <div class="pp-hero">
+    <div class="pp-gallery">
+      <div class="pp-media">
+        <img id="ppMain" src="../../assets/catalog/u5575892.png" alt="Indochina Riverside — фото" data-i="0" />
+        <div class="pp-badges"><span class="badge badge--yield">6% доходность</span></div>
+      </div>
+      <div class="pp-thumbs"></div>
+    </div>
+    <div class="pp-info">
+      <span class="pp-type">Квартира</span>
+      <h1 class="pp-title">Indochina Riverside</h1>
+      <p class="pp-loc">Hai Chau I, Дананг</p>
+      <div class="pp-price">$223 077</div>
+      <p class="pp-price-sub">≈ 20 523 084 ₽ · 8 142 310 ฿</p>
+      <div class="detail__specs" style="margin-bottom:1.4rem"><div class="spec"><span>Тип</span><b>Квартира</b></div><div class="spec"><span>Спальни</span><b>2 спальни</b></div><div class="spec"><span>Санузлы</span><b>2</b></div><div class="spec"><span>Площадь</span><b>100.0 м²</b></div><div class="spec"><span>Цена за м²</span><b>$2 231</b></div></div>
+      <div class="pp-actions">
+        <a class="btn btn--wa" href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%20%C2%ABIndochina%20Riverside%C2%BB%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%20Estate%20Art." target="_blank" rel="noopener">Узнать об объекте · WhatsApp</a>
+        <a class="btn btn--tg" href="https://t.me/+79124869508" target="_blank" rel="noopener">Telegram</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="pp-section"><h2>Описание</h2><p class="pp-desc">Это квартира площадью 100 кв.м. с 2 спальни и 2 ванные. Этот объект недвижимости сейчас доступен на продажу. Является частью Indochina Riverside в Hai Chau...</p></div>
+
+  <div class="pp-section">
+    <h2>Калькуляторы покупки</h2>
+    <div class="calc-grid">
+      <div class="calc">
+        <h4>Кредитный калькулятор</h4>
+        <label class="calc__row">Стоимость, $<input type="number" id="m_price" value="223077" min="0" step="1000"></label>
+        <label class="calc__row">Первоначальный взнос: <output id="m_down_v">30%</output><input type="range" id="m_down" min="0" max="90" value="30" step="5"></label>
+        <label class="calc__row">Ставка, % годовых<input type="number" id="m_rate" value="6" min="0" max="30" step="0.1"></label>
+        <label class="calc__row">Срок: <output id="m_term_v">20 лет</output><input type="range" id="m_term" min="5" max="30" value="20" step="1"></label>
+        <div class="calc__out">
+          <div><span>Платёж / мес</span><b id="m_payment">—</b></div>
+          <div><span>Сумма кредита</span><b id="m_loan">—</b></div>
+          <div><span>Переплата</span><b id="m_interest">—</b></div>
+        </div>
+        <p class="calc__note">Ориентировочный аннуитетный расчёт. Условия зависят от банка и статуса покупателя.</p>
+      </div>
+      <div class="calc">
+        <h4>Калькулятор доходности</h4>
+        <label class="calc__row">Стоимость, $<input type="number" id="r_price" value="223077" min="0" step="1000"></label>
+        <label class="calc__row">Аренда / мес, $<input type="number" id="r_rent" value="1115" min="0" step="50"></label>
+        <label class="calc__row">Загрузка: <output id="r_occ_v">75%</output><input type="range" id="r_occ" min="30" max="100" value="75" step="5"></label>
+        <div class="calc__out">
+          <div><span>Доход / год</span><b id="r_annual">—</b></div>
+          <div><span>Доходность</span><b id="r_yield">—</b></div>
+          <div><span>Окупаемость</span><b id="r_payback">—</b></div>
+        </div>
+        <p class="calc__note">Аренда оценочная (≈6% годовых). Без учёта налогов и комиссий УК.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pp-section"><h2>Расположение на карте</h2><div class="pp-map" id="ppMap"></div></div>
+
+  <a class="pp-back" href="../../#catalog">← Все объекты каталога</a>
+</div>
+
+<div class="lb" id="lb" hidden>
+  <button class="lb__btn lb__close" id="lbClose" aria-label="Закрыть">×</button>
+  <button class="lb__btn lb__prev" id="lbPrev" aria-label="Предыдущее">‹</button>
+  <img id="lbImg" src="" alt="Фото объекта" />
+  <button class="lb__btn lb__next" id="lbNext" aria-label="Следующее">›</button>
+</div>
+
+<footer class="footer" style="margin-top:3rem">
+  <div class="footer__channels">
+    <span class="footer__label">Наши каналы</span>
+    <div class="channels">
+      <a class="chan" href="https://t.me/IISoSArt" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg></span>
+        <span class="chan__txt"><b>Наша студия</b><span>Сайты, AI, видео · @IISoSArt</span></span>
+      </a>
+      <a class="chan" href="https://t.me/IvanArtxJarvis" target="_blank" rel="noopener">
+        <span class="chan__ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg></span>
+        <span class="chan__txt"><b>Про AI и технологии</b><span>Разборы и практика · @IvanArtxJarvis</span></span>
+      </a>
+    </div>
+  </div>
+  <div class="footer__bottom" style="border:0">
+    <span>© 2026 Estate Art · Недвижимость на Пхукете · <a href="../../privacy/" style="color:rgba(255,253,248,.7)">Политика конфиденциальности</a></span>
+    <a href="tel:+79124869508">+7 912 486-95-08</a>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function nsep(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+  function usd(n){return (n||n===0)?'$'+nsep(n):'—';}
+  function plural(n,a,b,c){n=Math.abs(n)%100;var d=n%10;if(n>10&&n<20)return c;if(d>1&&d<5)return b;if(d===1)return a;return c;}
+  var mp=$('m_price'),md=$('m_down'),mr=$('m_rate'),mt=$('m_term');
+  function recalcM(){var p=+mp.value||0,dp=+md.value,rt=+mr.value,yr=+mt.value;$('m_down_v').textContent=dp+'%';$('m_term_v').textContent=yr+' '+plural(yr,'год','года','лет');var loan=p*(1-dp/100),i=rt/100/12,n=yr*12,pay=i>0?loan*i/(1-Math.pow(1+i,-n)):(n?loan/n:0);$('m_loan').textContent=usd(loan);$('m_payment').textContent=usd(pay);$('m_interest').textContent=usd(pay*n-loan);}
+  [mp,md,mr,mt].forEach(function(e){e&&e.addEventListener('input',recalcM);});
+  var rp=$('r_price'),rr=$('r_rent'),ro=$('r_occ');
+  function recalcR(){var p=+rp.value||0,rent=+rr.value||0,occ=+ro.value/100;$('r_occ_v').textContent=(+ro.value)+'%';var an=rent*12*occ;$('r_annual').textContent=usd(an);$('r_yield').textContent=p?(an/p*100).toFixed(1)+'%':'—';$('r_payback').textContent=an?(p/an).toFixed(1)+' '+plural(Math.round(p/an),'год','года','лет'):'—';}
+  [rp,rr,ro].forEach(function(e){e&&e.addEventListener('input',recalcR);});
+  mp&&mp.addEventListener('input',function(){if(rp){rp.value=mp.value;recalcR();}});
+  rp&&rp.addEventListener('input',function(){if(mp){mp.value=rp.value;recalcM();}});
+  recalcM();recalcR();
+  var ll=[16.070505,108.224698];
+  if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);L.marker(ll).addTo(m).bindPopup("Indochina Riverside").openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+
+  // Галерея + лайтбокс
+  var IMAGES=["../../assets/catalog/u5575892.png"], idx=0;
+  var main=$('ppMain'), lb=$('lb'), lbImg=$('lbImg');
+  function setMain(i){ idx=i; if(main&&IMAGES[i])main.src=IMAGES[i]; document.querySelectorAll('.pp-thumb').forEach(function(t,k){t.classList.toggle('is-active',k===i);}); }
+  function showLb(i){ if(!IMAGES.length)return; idx=(i+IMAGES.length)%IMAGES.length; lbImg.src=IMAGES[idx]; lb.hidden=false; }
+  document.querySelectorAll('.pp-thumb').forEach(function(t){ t.addEventListener('click',function(){ setMain(+t.dataset.i); }); });
+  main&&main.addEventListener('click',function(){ showLb(idx); });
+  $('lbClose')&&$('lbClose').addEventListener('click',function(){ lb.hidden=true; });
+  $('lbPrev')&&$('lbPrev').addEventListener('click',function(){ showLb(idx-1); });
+  $('lbNext')&&$('lbNext').addEventListener('click',function(){ showLb(idx+1); });
+  lb&&lb.addEventListener('click',function(e){ if(e.target===lb)lb.hidden=true; });
+  document.addEventListener('keydown',function(e){ if(lb.hidden)return; if(e.key==='Escape')lb.hidden=true; else if(e.key==='ArrowLeft')showLb(idx-1); else if(e.key==='ArrowRight')showLb(idx+1); });
+})();
+</script>
+</body>
+</html>

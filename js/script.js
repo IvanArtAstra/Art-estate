@@ -268,18 +268,22 @@
   function flagHTML(it, cls) {
     return it.country ? `<i class="flag flag--${esc(it.country)}${cls ? ' ' + cls : ''}" aria-hidden="true"></i>` : '';
   }
+  function ico(name) { return `<i class="ico ico--${name}" aria-hidden="true"></i>`; }
   function metaLine(it) {
     const p = [];
     if (it.location) {
       // В адресе город записан по-русски — подменяем на язык интерфейса
       const loc = it.city ? it.location.replace(it.city, cityName(it.city)) : it.location;
-      p.push(esc(loc));
+      p.push(`<span>${flagHTML(it, 'flag--sm')}${esc(loc)}</span>`);
     }
-    if (typeof it.beds === 'number' && it.beds > 0) p.push(it.beds + ' ' + (lang === 'ru' ? plural(it.beds, 'спальня', 'спальни', 'спален') : t(it.beds === 1 ? 'd_bed' : 'd_beds', 'спальни')));
-    else if (it.beds) p.push(/студия/i.test(it.beds) ? t('d_studio', 'Студия') : esc(it.beds));
-    if (it.baths) p.push(it.baths + ' ' + t('d_bath', 'с/у'));
-    if (it.area) p.push(esc(it.area) + ' м²');
-    return flagHTML(it, 'flag--sm') + ' ' + p.join(' · ');
+    if (typeof it.beds === 'number' && it.beds > 0) {
+      p.push(`<span>${ico('bed')}${it.beds} ${lang === 'ru' ? plural(it.beds, 'спальня', 'спальни', 'спален') : t(it.beds === 1 ? 'd_bed' : 'd_beds', 'спальни')}</span>`);
+    } else if (it.beds) {
+      p.push(`<span>${ico('bed')}${/студия/i.test(it.beds) ? t('d_studio', 'Студия') : esc(it.beds)}</span>`);
+    }
+    if (it.baths) p.push(`<span>${ico('bath')}${it.baths} ${t('d_bath', 'с/у')}</span>`);
+    if (it.area) p.push(`<span>${ico('area')}${esc(it.area)} м²</span>`);
+    return p.join('');
   }
   function cardHTML(it) {
     const img = it.image || 'assets/hero-phuket.jpg';
@@ -315,7 +319,7 @@
         <p class="card__meta">${metaLine(it)}</p>
         ${beach}
         <div class="card__bottom">
-          <span class="card__ppm">${per ? `≈ ${money(per)}/м²` : ''}</span>
+          <span class="card__ppm">${per ? `${ico('tag')}≈ ${money(per)}/м²` : ''}</span>
           ${it.url ? `<a class="card__link" href="${esc(it.url)}">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></button>`}
         </div>
       </div>
@@ -492,7 +496,12 @@
   }
 
   /* ---------- КАРТОЧКА ОБЪЕКТА + КАЛЬКУЛЯТОРЫ ---------- */
-  function specRow(label, val) { return val ? `<div class="spec"><span>${label}</span><b>${val}</b></div>` : ''; }
+  const SPEC_ICON = { 'Тип': 'home', 'Спальни': 'bed', 'Санузлы': 'bath', 'Площадь': 'area' };
+  function specRow(label, val) {
+    if (!val) return '';
+    const name = SPEC_ICON[label];
+    return `<div class="spec"><span>${name ? ico(name) : ''}${label}</span><b>${val}</b></div>`;
+  }
   function calcGridHTML(price, rent, fromListing) {
     return `<div class="calc-grid">
         <div class="calc" id="calcMortgage" data-price="${price}">
@@ -1275,11 +1284,12 @@
 
   function companyCard(c) {
     const kind = KIND_LABEL[c.kind] || c.kind;
+    const kindIco = ico(c.kind === 'developer' ? 'developer' : 'agency');
     const focus = FOCUS_LABEL[c.focus] || '';
     return `<article class="pcard">
       <div class="pcard__top">
         <h3>${esc(c.name)}</h3>
-        <span class="pcard__kind">${esc(kind)}</span>
+        <span class="pcard__kind">${kindIco}${esc(kind)}</span>
       </div>
       <p class="pcard__meta">
         <i class="flag flag--${esc(c.country || 'vn')} flag--sm" aria-hidden="true"></i>
@@ -1296,7 +1306,7 @@
     return `<article class="pcard pcard--community">
       <div class="pcard__top">
         <h3>${esc(c.name)}</h3>
-        <span class="pcard__kind">Сообщество</span>
+        <span class="pcard__kind">${ico('community')}Сообщество</span>
       </div>
       <p class="pcard__meta">${esc(c.city)} · ${esc(n)}</p>
       <p class="pcard__note">${esc((c.note || '').slice(0, 170))}</p>

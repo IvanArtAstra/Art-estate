@@ -1,0 +1,22 @@
+# Деплой моста «чат на сайте ↔ Telegram».
+#   npm i -g wrangler && wrangler login
+#   wrangler kv namespace create CHAT      → вставьте выданный id ниже
+#   wrangler secret put BOT_TOKEN          → токен от @BotFather
+#   wrangler secret put AGENT_CHAT_ID      → ваш chat_id (как узнать — в README)
+#   wrangler secret put WEBHOOK_SECRET     → любая случайная строка
+#   wrangler deploy
+#
+# Секреты в этот файл НЕ вписываются — они хранятся на стороне Cloudflare.
+
+name = "estate-art-chat"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Откуда виджету разрешено обращаться. Через запятую, без пробелов.
+ALLOWED_ORIGINS = "https://ivanartastra.github.io,http://localhost:8123"
+SITE_URL = "https://ivanartastra.github.io/Art-estate/"
+
+[[kv_namespaces]]
+binding = "CHAT"
+id = "ЗАМЕНИТЕ_НА_ID_ИЗ_KV_NAMESPACE_CREATE"

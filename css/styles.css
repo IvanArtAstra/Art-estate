@@ -1314,3 +1314,176 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   aspect-ratio: 4 / 3.4; background: var(--sand-deep);
   border: 1px solid var(--hairline); border-radius: var(--radius);
 }
+
+/* ============================================================
+   ЧАТ НА САЙТЕ (мост в Telegram)
+   ============================================================ */
+.chat { position: fixed; right: calc(1.4rem + env(safe-area-inset-right)); bottom: calc(1.4rem + env(safe-area-inset-bottom)); z-index: 96; }
+
+.chat__fab {
+  position: relative; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer;
+  display: grid; place-items: center; color: var(--cream); background: var(--teal);
+  box-shadow: 0 14px 30px -8px rgba(8,40,37,.5), 0 0 0 1px rgba(227,195,120,.4);
+  transition: transform .3s var(--ease), background .3s var(--ease);
+}
+.chat__fab:hover { transform: translateY(-2px) scale(1.04); background: var(--teal-deep); }
+.chat.is-open .chat__fab { background: var(--gold-fill); }
+.chat__badge {
+  position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 10px; background: #c0392b; color: #fff; font-size: var(--fs-2xs); font-weight: 700;
+  display: grid; place-items: center; box-shadow: 0 0 0 2px var(--sand);
+}
+
+.chat__panel {
+  position: absolute; right: 0; bottom: 70px; width: min(370px, calc(100vw - 2.8rem));
+  display: flex; flex-direction: column; max-height: min(560px, calc(100vh - 8rem));
+  background: var(--sand); border: 1px solid var(--hairline); border-radius: var(--radius);
+  box-shadow: 0 30px 70px -28px rgba(8,40,37,.6); overflow: hidden;
+  animation: chatIn .32s var(--ease-out);
+}
+.chat__panel[hidden] { display: none; }
+@keyframes chatIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.chat__head {
+  display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+  padding: 1rem 1.1rem; background: var(--teal-deep); color: var(--cream);
+}
+.chat__who { display: flex; flex-direction: column; line-height: 1.3; }
+.chat__who b { font-family: 'Cormorant Garamond', 'Cormorant Fallback', Georgia, serif; font-size: var(--fs-h4); letter-spacing: .06em; }
+.chat__who span { font-size: var(--fs-2xs); color: rgba(255,253,248,.62); }
+.chat__close {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.1); color: var(--cream); display: grid; place-items: center;
+  transition: background .25s var(--ease-out);
+}
+.chat__close:hover { background: rgba(255,255,255,.2); }
+
+.chat__log { flex: 1; overflow-y: auto; padding: 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
+.chat__empty { font-size: var(--fs-base); color: var(--ink-soft); line-height: 1.55; }
+
+.chat__msg { max-width: 86%; display: flex; flex-direction: column; gap: .2rem; }
+.chat__msg p {
+  padding: .7rem .95rem; border-radius: var(--radius-sm); font-size: var(--fs-base);
+  line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.chat__msg time { font-size: var(--fs-2xs); color: var(--ink-soft); }
+.chat__msg--user { align-self: flex-end; align-items: flex-end; }
+.chat__msg--user p { background: var(--teal); color: var(--cream); border-bottom-right-radius: 4px; }
+.chat__msg--agent { align-self: flex-start; }
+.chat__msg--agent p { background: var(--cream); color: var(--ink); border: 1px solid var(--hairline); border-bottom-left-radius: 4px; }
+
+.chat__form { border-top: 1px solid var(--hairline); padding: .9rem 1.1rem 1rem; background: var(--cream); }
+.chat__intro { display: flex; flex-direction: column; gap: .6rem; margin-bottom: .8rem; }
+.chat__intro label { display: flex; flex-direction: column; gap: .25rem; }
+.chat__intro label > span { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.chat__intro input[type=text] {
+  font: inherit; font-size: 1rem; color: var(--ink); background: var(--sand);
+  border: 1px solid rgba(15,63,58,.2); border-radius: var(--radius-sm); padding: .6rem .8rem; outline: none;
+}
+.chat__intro input[type=text]:focus-visible { border-color: var(--gold-ink); box-shadow: 0 0 0 2px var(--cream), 0 0 0 4px var(--gold-ink); }
+.chat__consent { flex-direction: row !important; align-items: flex-start; gap: .55rem; font-size: var(--fs-2xs); line-height: 1.45; color: var(--ink-soft); cursor: pointer; }
+.chat__consent input { margin-top: .15rem; width: 16px; height: 16px; accent-color: var(--gold-fill); flex: none; }
+.chat__consent a { color: var(--gold-ink); text-decoration: underline; }
+.chat__consent.err { color: #c0392b; }
+.chat__consent.err input { outline: 2px solid #c0392b; outline-offset: 2px; }
+
+.chat__row { display: flex; align-items: flex-end; gap: .6rem; }
+.chat__input {
+  flex: 1; font: inherit; font-size: 1rem; line-height: 1.45; color: var(--ink);
+  background: var(--sand); border: 1px solid rgba(15,63,58,.2); border-radius: var(--radius-sm);
+  padding: .65rem .85rem; outline: none; resize: none; max-height: 120px;
+}
+.chat__input:focus-visible { border-color: var(--gold-ink); box-shadow: 0 0 0 2px var(--cream), 0 0 0 4px var(--gold-ink); }
+.chat__send {
+  flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); border: 0; cursor: pointer;
+  background: var(--gold-fill); color: #fff; display: grid; place-items: center;
+  transition: background .25s var(--ease-out);
+}
+.chat__send:hover { background: var(--teal); }
+.chat__hint { margin-top: .5rem; font-size: var(--fs-2xs); color: var(--ink-soft); min-height: 1em; }
+.chat__hint--err { color: #c0392b; }
+
+/* Чат занимает место плавающих кнопок — двигаем их выше.
+   Класс на body, а не `.chat ~ .floating`: виджет вставляется скриптом
+   в конец DOM, и сестринский селектор до .floating не дотягивается. */
+body.has-chat .floating { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
+body.has-compare .chat { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
+body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset-bottom)); }
+
+@media (max-width: 560px) {
+  .chat__panel {
+    position: fixed; inset: auto 0 0 0; width: 100%; max-height: 82vh; max-height: 82svh;
+    border-radius: var(--radius) var(--radius) 0 0; border-bottom: 0;
+  }
+  .chat__fab { width: 52px; height: 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat__panel { animation: none; }
+  .chat__fab:hover { transform: none; }
+}
+
+/* ============================================================
+   ИКОНКИ
+   Маска, а не background-image: цвет иконки наследуется от color,
+   поэтому одна и та же иконка работает и на светлом, и на тёмном.
+   ============================================================ */
+.ico {
+  display: inline-block; width: 1em; height: 1em; flex: none; vertical-align: -.13em;
+  background-color: currentColor;
+  -webkit-mask: var(--ico) no-repeat center / contain;
+          mask: var(--ico) no-repeat center / contain;
+}
+
+.ico--bed { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204v16%22%2F%3E%3Cpath%20d%3D%22M2%208h18a2%202%200%200%201%202%202v10%22%2F%3E%3Cpath%20d%3D%22M2%2017h20%22%2F%3E%3Cpath%20d%3D%22M6%208v9%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--bath { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M10%204%208%206%22%2F%3E%3Cpath%20d%3D%22M17%2019v2%22%2F%3E%3Cpath%20d%3D%22M2%2012h20%22%2F%3E%3Cpath%20d%3D%22M7%2019v2%22%2F%3E%3Cpath%20d%3D%22M9%205%207.5%203.5a2.12%202.12%200%200%200-3%203L6%208%22%2F%3E%3Cpath%20d%3D%22M4%2012V5a2%202%200%200%201%202-2h1%22%2F%3E%3Cpath%20d%3D%22M20%2012v3a4%204%200%200%201-4%204H8a4%204%200%200%201-4-4v-3%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--area { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%203H5a2%202%200%200%200-2%202v3%22%2F%3E%3Cpath%20d%3D%22M21%208V5a2%202%200%200%200-2-2h-3%22%2F%3E%3Cpath%20d%3D%22M3%2016v3a2%202%200%200%200%202%202h3%22%2F%3E%3Cpath%20d%3D%22M16%2021h3a2%202%200%200%200%202-2v-3%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--tag { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.586%202.586A2%202%200%200%200%2011.172%202H4a2%202%200%200%200-2%202v7.172a2%202%200%200%200%20.586%201.414l8.704%208.704a2.426%202.426%200%200%200%203.42%200l6.58-6.58a2.426%202.426%200%200%200%200-3.42z%22%2F%3E%3Ccircle%20cx%3D%227.5%22%20cy%3D%227.5%22%20r%3D%22.6%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--home { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m3%209%209-7%209%207v11a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2z%22%2F%3E%3Cpolyline%20points%3D%229%2022%209%2012%2015%2012%2015%2022%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--pin { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2010c0%206-8%2012-8%2012s-8-6-8-12a8%208%200%200%201%2016%200Z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2210%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--map { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m3%206%206-3%206%203%206-3v15l-6%203-6-3-6%203z%22%2F%3E%3Cpath%20d%3D%22M9%203v15%22%2F%3E%3Cpath%20d%3D%22M15%206v15%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--sort { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h12%22%2F%3E%3Cpath%20d%3D%22M3%2012h9%22%2F%3E%3Cpath%20d%3D%22M3%2018h6%22%2F%3E%3Cpath%20d%3D%22m17%208%204-4%204%204%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--phone { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M22%2016.92v3a2%202%200%200%201-2.18%202%2019.79%2019.79%200%200%201-8.63-3.07%2019.5%2019.5%200%200%201-6-6%2019.79%2019.79%200%200%201-3.07-8.67A2%202%200%200%201%204.11%202h3a2%202%200%200%201%202%201.72c.13.96.36%201.9.7%202.81a2%202%200%200%201-.45%202.11L8.09%209.91a16%2016%200%200%200%206%206l1.27-1.27a2%202%200%200%201%202.11-.45c.9.34%201.85.57%202.81.7A2%202%200%200%201%2022%2016.92z%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--eye { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.06%2012.35a1%201%200%200%201%200-.7%2010.75%2010.75%200%200%201%2019.88%200%201%201%200%200%201%200%20.7%2010.75%2010.75%200%200%201-19.88%200%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--shield { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201.17%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z%22%2F%3E%3Cpath%20d%3D%22m9%2012%202%202%204-4%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--contract { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M15%202H6a2%202%200%200%200-2%202v16a2%202%200%200%200%202%202h12a2%202%200%200%200%202-2V7Z%22%2F%3E%3Cpath%20d%3D%22M14%202v4a2%202%200%200%200%202%202h4%22%2F%3E%3Cpath%20d%3D%22m9%2015%202%202%204-4%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--key { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m15.5%207.5%202.3%202.3a1%201%200%200%200%201.4%200l2.1-2.1a1%201%200%200%200%200-1.4L19%204%22%2F%3E%3Cpath%20d%3D%22m21%202-9.6%209.6%22%2F%3E%3Ccircle%20cx%3D%227.5%22%20cy%3D%2215.5%22%20r%3D%225.5%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--search { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m8%2011%202%202%204-4%22%2F%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22m21%2021-4.3-4.3%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--money { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%2220%22%20height%3D%2212%22%20x%3D%222%22%20y%3D%226%22%20rx%3D%222%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222%22%2F%3E%3Cpath%20d%3D%22M6%2012h.01M18%2012h.01%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--support { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22m4.93%204.93%204.24%204.24%22%2F%3E%3Cpath%20d%3D%22m14.83%209.17%204.24-4.24%22%2F%3E%3Cpath%20d%3D%22m14.83%2014.83%204.24%204.24%22%2F%3E%3Cpath%20d%3D%22m9.17%2014.83-4.24%204.24%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--agency { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2022V4a2%202%200%200%201%202-2h8a2%202%200%200%201%202%202v18Z%22%2F%3E%3Cpath%20d%3D%22M6%2012H4a2%202%200%200%200-2%202v6a2%202%200%200%200%202%202h2%22%2F%3E%3Cpath%20d%3D%22M18%209h2a2%202%200%200%201%202%202v9a2%202%200%200%201-2%202h-2%22%2F%3E%3Cpath%20d%3D%22M10%206h4M10%2010h4M10%2014h4%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--developer { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%2216%22%20height%3D%2220%22%20x%3D%224%22%20y%3D%222%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M9%2022v-4h6v4%22%2F%3E%3Cpath%20d%3D%22M8%206h.01M12%206h.01M16%206h.01M8%2010h.01M12%2010h.01M16%2010h.01M8%2014h.01M12%2014h.01M16%2014h.01%22%2F%3E%3C%2Fsvg%3E"); }
+.ico--community { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M16%2021v-2a4%204%200%200%200-4-4H6a4%204%200%200%200-4%204v2%22%2F%3E%3Ccircle%20cx%3D%229%22%20cy%3D%227%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22M22%2021v-2a4%204%200%200%200-3-3.87%22%2F%3E%3Cpath%20d%3D%22M16%203.13a4%204%200%200%201%200%207.75%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* Иконка слева в каждом фильтре-селекте: список полей читается взглядом,
+   а не перечитыванием подписей */
+.toolbar__group select.filter {
+  padding-left: 2.6rem;
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 1.1rem center, left 1rem center;
+  background-size: auto, 15px 15px;
+}
+#fType { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m3%209%209-7%209%207v11a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2z%22%2F%3E%3Cpolyline%20points%3D%229%2022%209%2012%2015%2012%2015%2022%22%2F%3E%3C%2Fsvg%3E"); }
+#fCity { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2010c0%206-8%2012-8%2012s-8-6-8-12a8%208%200%200%201%2016%200Z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2210%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E"); }
+#fDistrict { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m3%206%206-3%206%203%206-3v15l-6%203-6-3-6%203z%22%2F%3E%3Cpath%20d%3D%22M9%203v15%22%2F%3E%3Cpath%20d%3D%22M15%206v15%22%2F%3E%3C%2Fsvg%3E"); }
+#fBeds { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204v16%22%2F%3E%3Cpath%20d%3D%22M2%208h18a2%202%200%200%201%202%202v10%22%2F%3E%3Cpath%20d%3D%22M2%2017h20%22%2F%3E%3Cpath%20d%3D%22M6%208v9%22%2F%3E%3C%2Fsvg%3E"); }
+#fArea { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%203H5a2%202%200%200%200-2%202v3%22%2F%3E%3Cpath%20d%3D%22M21%208V5a2%202%200%200%200-2-2h-3%22%2F%3E%3Cpath%20d%3D%22M3%2016v3a2%202%200%200%200%202%202h3%22%2F%3E%3Cpath%20d%3D%22M16%2021h3a2%202%200%200%200%202-2v-3%22%2F%3E%3C%2Fsvg%3E"); }
+#fSort { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230f3f3a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%252338514d%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h12%22%2F%3E%3Cpath%20d%3D%22M3%2012h9%22%2F%3E%3Cpath%20d%3D%22M3%2018h6%22%2F%3E%3Cpath%20d%3D%22m17%208%204-4%204%204%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* Мета-строка карточки: иконки вместо точек-разделителей */
+.card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: .1rem .7rem; }
+.card__meta .ico { color: var(--ink-soft); opacity: .8; margin-right: .28rem; }
+.card__meta i.flag { margin-right: .15rem; }
+.card__ppm { display: inline-flex; align-items: center; gap: .35rem; }
+
+/* Плитки характеристик в карточке объекта */
+.spec span { display: flex; align-items: center; gap: .35rem; }
+.spec .ico { color: var(--gold-ink); }
+
+/* Этапы и гарантии: иконка рядом с номером */
+.step__num, .guarantee__num { display: flex; align-items: center; gap: .7rem; }
+.step__num .ico, .guarantee__num .ico { font-size: 1.5rem; color: var(--gold-light); opacity: .85; }
+
+/* Карточки партнёров */
+.pcard__kind { display: inline-flex; align-items: center; gap: .4rem; }
+.pcard__kind .ico { font-size: 1.05em; }

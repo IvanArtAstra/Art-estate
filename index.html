@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body data-chat-endpoint="">
 
   <a class="skip-link" href="#main">Перейти к содержимому</a>
 
@@ -403,21 +403,21 @@
       <p class="section__lead">Прозрачный процесс без сюрпризов — вы&nbsp;всегда понимаете, что происходит на&nbsp;каждом шаге.</p>
     </div>
     <div class="steps__grid">
-      <div class="step reveal"><span class="step__num">01</span><h3>Знакомство</h3><p>Обсуждаем задачи, бюджет и&nbsp;цели покупки на&nbsp;звонке. Формирую персональную подборку.</p></div>
-      <div class="step reveal"><span class="step__num">02</span><h3>Просмотры</h3><p>Онлайн-туры или личные показы на&nbsp;острове. Честно показываю плюсы и&nbsp;минусы каждого варианта.</p></div>
-      <div class="step reveal"><span class="step__num">03</span><h3>Проверка</h3><p>Юридическая чистота объекта, репутация застройщика, документы и&nbsp;договор под защитой юриста.</p></div>
-      <div class="step reveal"><span class="step__num">04</span><h3>Сделка</h3><p>Безопасные расчёты, оформление и&nbsp;передача ключей. Сопровождаю до&nbsp;последней подписи.</p></div>
-      <div class="step reveal"><span class="step__num">05</span><h3>После покупки</h3><p>Помогаю с&nbsp;меблировкой, управлением и&nbsp;сдачей в&nbsp;аренду для дохода.</p></div>
+      <div class="step reveal"><span class="step__num"><i class="ico ico--phone" aria-hidden="true"></i>01</span><h3>Знакомство</h3><p>Обсуждаем задачи, бюджет и&nbsp;цели покупки на&nbsp;звонке. Формирую персональную подборку.</p></div>
+      <div class="step reveal"><span class="step__num"><i class="ico ico--eye" aria-hidden="true"></i>02</span><h3>Просмотры</h3><p>Онлайн-туры или личные показы на&nbsp;острове. Честно показываю плюсы и&nbsp;минусы каждого варианта.</p></div>
+      <div class="step reveal"><span class="step__num"><i class="ico ico--shield" aria-hidden="true"></i>03</span><h3>Проверка</h3><p>Юридическая чистота объекта, репутация застройщика, документы и&nbsp;договор под защитой юриста.</p></div>
+      <div class="step reveal"><span class="step__num"><i class="ico ico--contract" aria-hidden="true"></i>04</span><h3>Сделка</h3><p>Безопасные расчёты, оформление и&nbsp;передача ключей. Сопровождаю до&nbsp;последней подписи.</p></div>
+      <div class="step reveal"><span class="step__num"><i class="ico ico--key" aria-hidden="true"></i>05</span><h3>После покупки</h3><p>Помогаю с&nbsp;меблировкой, управлением и&nbsp;сдачей в&nbsp;аренду для дохода.</p></div>
     </div>
   </section>
 
   <!-- ============ ГАРАНТИИ ============ -->
   <section class="guarantees">
     <div class="guarantees__inner">
-      <div class="guarantee reveal"><span class="guarantee__num">01</span><b>Юридическая проверка</b><span>Проверяем объект, застройщика и&nbsp;документы до&nbsp;сделки.</span></div>
-      <div class="guarantee reveal"><span class="guarantee__num">02</span><b>Защита сделки</b><span>Договор и&nbsp;расчёты сопровождает юрист — без&nbsp;скрытых рисков.</span></div>
-      <div class="guarantee reveal"><span class="guarantee__num">03</span><b>Безопасные расчёты</b><span>Прозрачная схема оплаты и&nbsp;перевода средств.</span></div>
-      <div class="guarantee reveal"><span class="guarantee__num">04</span><b>Поддержка после</b><span>Меблировка, управление и&nbsp;сдача в&nbsp;аренду для&nbsp;дохода.</span></div>
+      <div class="guarantee reveal"><span class="guarantee__num"><i class="ico ico--search" aria-hidden="true"></i>01</span><b>Юридическая проверка</b><span>Проверяем объект, застройщика и&nbsp;документы до&nbsp;сделки.</span></div>
+      <div class="guarantee reveal"><span class="guarantee__num"><i class="ico ico--shield" aria-hidden="true"></i>02</span><b>Защита сделки</b><span>Договор и&nbsp;расчёты сопровождает юрист — без&nbsp;скрытых рисков.</span></div>
+      <div class="guarantee reveal"><span class="guarantee__num"><i class="ico ico--money" aria-hidden="true"></i>03</span><b>Безопасные расчёты</b><span>Прозрачная схема оплаты и&nbsp;перевода средств.</span></div>
+      <div class="guarantee reveal"><span class="guarantee__num"><i class="ico ico--support" aria-hidden="true"></i>04</span><b>Поддержка после</b><span>Меблировка, управление и&nbsp;сдача в&nbsp;аренду для&nbsp;дохода.</span></div>
     </div>
   </section>
 
@@ -720,5 +720,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/chat.js" defer></script>
 </body>
 </html>
