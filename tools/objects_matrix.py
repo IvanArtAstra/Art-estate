@@ -265,7 +265,7 @@ def cmd_check(args):
                     status = "unknown"
                 time.sleep(args.delay)
             if status == "gone":
-                gone.append(o["title"])
+                gone.append((oid, o["title"]))
 
         o["status"] = status
         o["lastChecked"] = TODAY
@@ -284,10 +284,11 @@ def cmd_check(args):
         if catalog:
             fresh = {o["id"]: o for o in todo}
             dead = {o["id"] for o in todo if o.get("status") == "gone"}
-            kept, fixed = [], 0
+            kept, fixed, removed = [], 0, 0
             for it in catalog.get("items", []):
                 oid = str(it.get("id"))
                 if oid in dead:
+                    removed += 1
                     continue
                 o = fresh.get(oid)
                 if o and o.get("priceUSD") and it.get("priceUSD") != o["priceUSD"]:
@@ -302,10 +303,13 @@ def cmd_check(args):
                 kept.append(it)
             catalog["items"], catalog["count"] = kept, len(kept)
             save(CATALOG, catalog)
-            print(f"\nВ catalog.json: обновлено цен {fixed}, удалено снятых {len(dead)}, "
-                  f"осталось объектов {len(kept)}")
-            if dead:
-                print("Перегенерируйте страницы: python3 scraper/build_pages.py")
+            if fixed or removed:
+                print(f"\nВ catalog.json: обновлено цен {fixed}, удалено снятых {removed}, "
+                      f"осталось объектов {len(kept)}")
+                if removed:
+                    print("Перегенерируйте страницы: python3 scraper/build_pages.py")
+            else:
+                print(f"\nВ catalog.json менять нечего: {len(kept)} объектов, всё совпадает.")
 
     print(f"\nПроверено {len(todo)}:")
     print(f"  на месте, цена та же:  {stats.get('live', 0)}")
@@ -324,11 +328,24 @@ def cmd_check(args):
             print(f"  {title[:34]:36} {was_raw:>18} → {raw:<18} (${was_usd or 0:,} → ${usd or 0:,})")
         print("  Проверьте курсы в RATES_TO_USD в scraper/scrape_fazwaz.py — они заданы вручную.")
     if gone:
+        # В одном жилом комплексе бывает несколько лотов, и названия у них
+        # одинаковые. Без id непонятно, какой именно снят, — выглядит так,
+        # будто снят живой объект с тем же именем.
+        in_catalog = set()
+        cat = load(CATALOG, None)
+        if cat:
+            in_catalog = {str(i.get("id")) for i in cat.get("items", [])}
         print("\nСняты с продажи:")
-        for title in gone[:15]:
-            print(f"  · {title[:60]}")
-        print("\nЭти объекты остались в каталоге. Уберите их вручную из data/catalog.json\n"
-              "или пересоберите каталог парсером.")
+        for oid, title in gone[:15]:
+            mark = "в каталоге" if oid in in_catalog else "в каталоге уже нет"
+            print(f"  · {title[:46]:48} id={oid:<10} {mark}")
+        still = [oid for oid, _ in gone if oid in in_catalog]
+        if still and not args.apply:
+            print("\nОни остались в каталоге. Перезапустите с --apply, чтобы убрать,\n"
+                  "или удалите вручную из data/catalog.json.")
+        elif still:
+            print("\nОни остались в каталоге: с --apply убираются только те, что "
+                  "проверялись в этом запуске.")
 
 
 # ---------------------------------------------------------------- report
