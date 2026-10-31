@@ -15,6 +15,16 @@
   const tg = window.Telegram && window.Telegram.WebApp;
   if (!tg) return;
 
+  /* Наличия объекта мало: telegram-web-app.js создаёт window.Telegram.WebApp
+     на любой странице, и в обычном браузере он тоже есть — с platform
+     'unknown' и пустым initData. Проверка «объект существует» считала
+     мини-аппом каждого посетителя сайта и прятала у него плавающие кнопки,
+     чат и кнопку «наверх», то есть все постоянные входы в заявку.
+     Настоящий мини-апп всегда даёт либо initData, либо известную платформу. */
+  const inside = !!(tg.initData && tg.initData.length) ||
+                 (tg.platform && tg.platform !== 'unknown');
+  if (!inside) return;
+
   const root = document.documentElement;
   root.classList.add('in-telegram');
 
