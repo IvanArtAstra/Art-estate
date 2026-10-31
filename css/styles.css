@@ -1593,6 +1593,27 @@ body.has-compare.has-chat .floating { --lift: 10rem; }
   .chat__fab:hover { transform: none; }
 }
 
+/* ============================================================
+   ВНУТРИ TELEGRAM (MINI APP)
+   Сайт открывается кнопкой меню бота. Там человек уже в Telegram и уже
+   в переписке с тем же ботом, поэтому кнопки мессенджеров и свой чат
+   превращаются из помощи в шум: на узком экране они занимают угол, а
+   панель чата сжимается в вертикальную полосу по букве в строке.
+   ============================================================ */
+.in-telegram .floating,
+.in-telegram .chat,
+.in-telegram .to-top { display: none; }
+
+/* Высоту окна Telegram задаёт сам, и она не равна 100vh */
+.in-telegram .hero__sticky { height: var(--tg-viewport, 100vh); }
+
+/* Шапка мини-аппа перекрывает верх страницы */
+.in-telegram .header { padding-top: calc(.9rem + env(safe-area-inset-top)); }
+
+/* Звук внутри мессенджера неуместен: человек листает в чате, часто со звуком
+   уведомлений, и щелчки сайта мешаются с ними */
+.in-telegram .sound-toggle { display: none; }
+
 /* ---------- ПЕРЕКЛЮЧАТЕЛЬ ЗВУКА ---------- */
 .sound-toggle {
   display: flex; align-items: center; gap: .7rem; width: 100%;
