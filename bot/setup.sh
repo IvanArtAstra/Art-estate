@@ -35,15 +35,12 @@ fi
 # shellcheck disable=SC1090
 set -a; . "./$ENVFILE"; set +a
 
-missing=""
-[ -n "${BOT_TOKEN:-}" ]     || missing="$missing BOT_TOKEN"
-[ -n "${AGENT_CHAT_ID:-}" ] || missing="$missing AGENT_CHAT_ID"
-if [ -n "$missing" ]; then
-  say "В $ENVFILE не хватает:$missing"
-  [ -n "${BOT_TOKEN:-}" ] && [ -z "${AGENT_CHAT_ID:-}" ] && {
-    echo "Узнать AGENT_CHAT_ID:  bash bot/chat-id.sh"
-    echo "Если бот уже на вебхуке, getUpdates молчит — снимите на минуту:"
-    echo "  bash bot/push-secrets.sh --unhook"; }
+# BOT_TOKEN в файле не обязателен — push-secrets.sh спросит его скрытым вводом
+if [ -z "${AGENT_CHAT_ID:-}" ]; then
+  say "В $ENVFILE пустой AGENT_CHAT_ID — заявкам некуда падать"
+  echo "Узнать:  bash bot/chat-id.sh"
+  echo "Если бот уже на вебхуке, getUpdates молчит — снимите на минуту:"
+  echo "  bash bot/push-secrets.sh --unhook"
   exit 1
 fi
 

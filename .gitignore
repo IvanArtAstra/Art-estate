@@ -30,3 +30,6 @@ bot/.dev.vars
 .dev.vars
 .env
 *.secrets.env
+
+# Локальный кэш wrangler
+bot/.wrangler/

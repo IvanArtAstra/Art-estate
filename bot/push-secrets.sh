@@ -24,14 +24,33 @@ wrangler whoami 2>&1 | grep -qi 'not authenticated' && die "Нет входа в
 # shellcheck disable=SC1090
 set -a; . "./$ENVFILE"; set +a
 
+
+# Токен бота можно не класть в файл вовсе: спросим здесь, скрытым вводом.
+# Так он не оседает ни на диске, ни в истории команд — живёт только в этом
+# процессе и в секретах Cloudflare.
+ask_token() {
+  if [ -n "${BOT_TOKEN:-}" ]; then return 0; fi
+  if [ ! -t 0 ]; then
+    die "BOT_TOKEN пуст, а ввести его негде: запустите скрипт в терминале"
+  fi
+  printf 'Токен бота @EstateArtHomesBot (ввод не отображается): '
+  read -rs BOT_TOKEN
+  printf '\n'
+  [ -n "$BOT_TOKEN" ] || die "Пустой токен"
+  case "$BOT_TOKEN" in
+    *:*) : ;;
+    *) die "Это не похоже на токен Telegram — в нём есть двоеточие, вида 123456789:AA..." ;;
+  esac
+}
+
 if [ "${1:-}" = "--unhook" ]; then
-  [ -n "${BOT_TOKEN:-}" ] || die "в $ENVFILE пустой BOT_TOKEN"
+  ask_token
   curl -sS "https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook" && echo
   echo "Вебхук снят — теперь работает bash bot/chat-id.sh. Вернуть: bash bot/push-secrets.sh"
   exit 0
 fi
 
-[ -n "${BOT_TOKEN:-}" ] || die "в $ENVFILE пустой BOT_TOKEN — без него бот не заработает"
+ask_token
 [ -n "${AGENT_CHAT_ID:-}" ] || die "в $ENVFILE пустой AGENT_CHAT_ID — заявкам некуда падать (bash bot/chat-id.sh)"
 if [ -z "${WEBHOOK_SECRET:-}" ]; then
   WEBHOOK_SECRET="$(openssl rand -hex 16)"
@@ -85,11 +104,16 @@ WORKER_URL="$WORKER_URL" python3 - <<'PY'
 import io, os, re, sys
 url = os.environ["WORKER_URL"]
 s = io.open("index.html", encoding="utf-8").read()
-s2 = re.sub(r'data-chat-endpoint="[^"]*"', 'data-chat-endpoint="%s"' % url, s, count=1)
-if s2 == s:
+# Проверяем наличие атрибута, а не факт изменения: при повторном запуске
+# адрес уже тот же, замена даёт тот же текст — и это не ошибка
+if not re.search(r'data-chat-endpoint="[^"]*"', s):
     sys.exit("не нашёл data-chat-endpoint в index.html")
-io.open("index.html", "w", encoding="utf-8").write(s2)
-print("  ✓ data-chat-endpoint = " + url)
+s2 = re.sub(r'data-chat-endpoint="[^"]*"', 'data-chat-endpoint="%s"' % url, s, count=1)
+if s2 != s:
+    io.open("index.html", "w", encoding="utf-8").write(s2)
+    print("  ✓ data-chat-endpoint = " + url)
+else:
+    print("  ✓ data-chat-endpoint уже верный: " + url)
 PY
 
 # ---------- проверка ----------

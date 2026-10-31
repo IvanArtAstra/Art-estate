@@ -19,4 +19,4 @@ SITE_URL = "https://estateart.homes/"
 
 [[kv_namespaces]]
 binding = "CHAT"
-id = "ЗАМЕНИТЕ_НА_ID_ИЗ_KV_NAMESPACE_CREATE"
+id = "f50b5d6be4764a169857081df5f1ac59"

@@ -10,7 +10,14 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ -f bot/.secrets.env ] || { echo "Нет bot/.secrets.env — скопируйте bot/.secrets.env.example" >&2; exit 1; }
 # shellcheck disable=SC1091
 set -a; . ./bot/.secrets.env; set +a
-[ -n "${BOT_TOKEN:-}" ] || { echo "В bot/.secrets.env пустой BOT_TOKEN" >&2; exit 1; }
+if [ -z "${BOT_TOKEN:-}" ]; then
+  # Не требуем класть токен в файл: спросим здесь, скрытым вводом
+  [ -t 0 ] || { echo "BOT_TOKEN пуст, а ввести его негде" >&2; exit 1; }
+  printf 'Токен бота (ввод не отображается): '
+  read -rs BOT_TOKEN
+  printf '\n'
+  [ -n "$BOT_TOKEN" ] || { echo "Пустой токен" >&2; exit 1; }
+fi
 
 echo "Спрашиваю Telegram, кто писал боту…"
 resp="$(curl -sS "https://api.telegram.org/bot${BOT_TOKEN}/getUpdates")"
