@@ -14,8 +14,8 @@ compatibility_date = "2026-09-01"
 
 [vars]
 # Откуда виджету разрешено обращаться. Через запятую, без пробелов.
-ALLOWED_ORIGINS = "https://ivanartastra.github.io,http://localhost:8123"
-SITE_URL = "https://ivanartastra.github.io/Art-estate/"
+ALLOWED_ORIGINS = "https://estateart.homes,https://www.estateart.homes,https://ivanartastra.github.io,http://localhost:8123"
+SITE_URL = "https://estateart.homes/"
 
 [[kv_namespaces]]
 binding = "CHAT"

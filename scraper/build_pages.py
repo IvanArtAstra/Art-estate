@@ -18,7 +18,7 @@ import os
 import re
 import datetime as dt
 
-SITE = "https://ivanartastra.github.io/Art-estate"
+SITE = "https://estateart.homes"
 RATES = {"RUB": 92, "THB": 36.5}  # курс USD→валюта (синхронно с js/script.js)
 
 # Статические контент-страницы для sitemap (privacy исключаем — noindex)

@@ -199,7 +199,7 @@ async function handleTelegram(request, env) {
       await tg(env, 'sendMessage', {
         chat_id: message.chat.id,
         text: 'Это служебный бот Estate Art. Напишите нам через чат на сайте: ' +
-              (env.SITE_URL || 'https://ivanartastra.github.io/Art-estate/'),
+              (env.SITE_URL || 'https://estateart.homes/'),
       });
     }
     return new Response('ok');

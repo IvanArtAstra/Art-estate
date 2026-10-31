@@ -410,7 +410,7 @@ python3 tools/objects_matrix.py report   # показать состояние, 
 - **Длина скролл-анимации** — высота `.hero__scroll-track` в `css/styles.css`
   (по умолчанию `500vh`; больше = дольше летим).
 - **Адрес деплоя** — сейчас во всех canonical/OG-ссылках стоит
-  `https://ivanartastra.github.io/Art-estate/` (путь GitHub Pages, он же имя
+  `https://estateart.homes/` (путь GitHub Pages, он же имя
   репозитория). Название бренда сменилось на Estate Art, а адрес нет — если
   переименуете репозиторий, поправьте `SITE` в `scraper/build_pages.py`,
   перезапустите `python3 scraper/build_pages.py` и замените адрес в `index.html`,

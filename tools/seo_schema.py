@@ -21,7 +21,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(ROOT, "index.html")
 CATALOG = os.path.join(ROOT, "data", "catalog.json")
-SITE = "https://ivanartastra.github.io/Art-estate"
+SITE = "https://estateart.homes"
 
 BEGIN = "  <!-- schema:begin — генерируется tools/seo_schema.py, руками не править -->"
 END = "  <!-- schema:end -->"

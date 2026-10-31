@@ -37,13 +37,13 @@ schema.org Product.
 
 ## Страницы
 
-- [Главная](https://ivanartastra.github.io/Art-estate/): каталог, карта объектов, калькуляторы, форма заявки
-- [Журнал](https://ivanartastra.github.io/Art-estate/blog/): гайды о покупке недвижимости
-- [Как купить иностранцу](https://ivanartastra.github.io/Art-estate/blog/kak-kupit-nedvizhimost-na-phukete/)
-- [Freehold и leasehold](https://ivanartastra.github.io/Art-estate/blog/freehold-vs-leasehold/)
-- [Районы Пхукета](https://ivanartastra.github.io/Art-estate/blog/rayony-phuketa/)
-- [Политика конфиденциальности](https://ivanartastra.github.io/Art-estate/privacy/)
-- [Карта сайта](https://ivanartastra.github.io/Art-estate/sitemap.xml)
+- [Главная](https://estateart.homes/): каталог, карта объектов, калькуляторы, форма заявки
+- [Журнал](https://estateart.homes/blog/): гайды о покупке недвижимости
+- [Как купить иностранцу](https://estateart.homes/blog/kak-kupit-nedvizhimost-na-phukete/)
+- [Freehold и leasehold](https://estateart.homes/blog/freehold-vs-leasehold/)
+- [Районы Пхукета](https://estateart.homes/blog/rayony-phuketa/)
+- [Политика конфиденциальности](https://estateart.homes/privacy/)
+- [Карта сайта](https://estateart.homes/sitemap.xml)
 
 ## Контакты
 

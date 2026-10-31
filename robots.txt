@@ -30,4 +30,4 @@ User-agent: YandexBot
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://ivanartastra.github.io/Art-estate/sitemap.xml
+Sitemap: https://estateart.homes/sitemap.xml

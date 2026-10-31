@@ -245,7 +245,7 @@ def detail_info(s, detail_url):
 _GEO_CACHE = {}
 CITY_EN = {"Дананг": "Da Nang", "Нячанг": "Nha Trang", "Пхукет": "Phuket",
            "Хошимин": "Ho Chi Minh City", "Ханой": "Hanoi"}
-NOMINATIM_UA = "EstateArt-catalog/1.0 (+https://ivanartastra.github.io/Art-estate/)"
+NOMINATIM_UA = "EstateArt-catalog/1.0 (+https://estateart.homes/)"
 
 
 def project_geo(s, project_url):
