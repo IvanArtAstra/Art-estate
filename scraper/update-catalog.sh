@@ -29,6 +29,9 @@ python3 scraper/build_pages.py
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Пересобираю диапазоны цен для ИИ-менеджера…"
 python3 tools/price_ranges.py
 
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Обновляю отпечатки стилей и скриптов…"
+python3 tools/stamp_assets.py
+
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Готово. Не забудьте: git add -A && git commit && git push"
 
 # ─────────────────────────────────────────────────────────────────────────────
