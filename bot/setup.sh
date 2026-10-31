@@ -47,6 +47,12 @@ printf '%s' "$WEBHOOK_SECRET" | wrangler secret put WEBHOOK_SECRET
 echo "  ✓ WEBHOOK_SECRET сгенерирован случайно — запоминать не нужно"
 
 echo
+echo "  ANTHROPIC_API_KEY — ключ Claude для первичного менеджера."
+echo "  Пропустите (Ctrl-C на приглашении), если менеджер пока не нужен:"
+echo "  без ключа бот работает как простой мост до дежурного."
+wrangler secret put ANTHROPIC_API_KEY || echo "  … пропущено, менеджер выключен"
+
+echo
 echo "  AGENT_CHAT_ID — кому падают заявки. Несколько дежурных — через запятую."
 echo "  Свой id: напишите боту /start, затем откройте"
 echo "  https://api.telegram.org/bot<ТОКЕН>/getUpdates и возьмите message.chat.id"

@@ -125,7 +125,8 @@
       const r = await fetch(`${endpoint}/api/poll?s=${encodeURIComponent(sessionId())}&after=${lastId}`, { cache: 'no-store' });
       if (!r.ok) return;
       const data = await r.json();
-      const fresh = (data.messages || []).filter(m => m.from === 'agent');
+      const seen = new Set(log.map(m => m.id));
+      const fresh = (data.messages || []).filter(m => m.from === 'agent' && !seen.has(m.id));
       if (fresh.length) {
         fresh.forEach(m => { log.push(m); lastId = Math.max(lastId, m.id); });
         save(); render();
@@ -161,6 +162,17 @@
         hint.className = 'chat__hint chat__hint--err';
       } else {
         hint.textContent = '';
+        // Первичный менеджер отвечает в том же запросе — показываем сразу,
+        // не дожидаясь следующего опроса: четыре секунды тишины после
+        // отправленного сообщения читаются как «не дошло»
+        if (data.id) lastId = Math.max(lastId, data.id);
+        if (data.reply) {
+          // Ответ помощника лежит в сессии следующим номером — забираем его
+          // здесь и двигаем счётчик, иначе опрос принесёт то же самое второй раз
+          lastId = Math.max(lastId, data.id + 1);
+          log.push({ id: data.id + 1, from: 'agent', text: data.reply, at: new Date().toISOString() });
+          save(); render();
+        }
       }
     } catch (e) {
       delete local.pending;

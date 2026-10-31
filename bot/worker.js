@@ -5,15 +5,42 @@
  * от имени бота → агент отвечает реплаем на это сообщение → ответ возвращается
  * в виджет на сайте.
  *
- * Токен бота и chat_id агента живут в секретах Cloudflare и в браузер не попадают.
- * Настройка — в bot/README.md.
+ * Первым в диалоге отвечает менеджер на Claude (bot/ai.js): доводит разговор до
+ * контакта и передаёт живому агенту готовой карточкой. Если ключа Anthropic нет
+ * или запрос упал — сообщение уходит дежурному напрямую, как раньше.
+ *
+ * Токен бота, chat_id агента и ключ Anthropic живут в секретах Cloudflare и в
+ * браузер не попадают. Настройка — в bot/README.md.
  */
+import { aiReply, leadCard } from './ai.js';
 
 const MAX_TEXT = 2000;        // длиннее Telegram всё равно порежет
 const MAX_NAME = 80;
 const SESSION_TTL = 60 * 60 * 24 * 14;   // переписка живёт две недели
 const RATE_LIMIT = 20;        // сообщений с одного IP в минуту
 const MAX_MESSAGES = 200;     // потолок на сессию, чтобы KV не пух
+const AI_TURNS = 12;          // после этого передаём человеку в любом случае
+const RANGES_TTL = 60 * 60 * 6;
+
+/**
+ * Таблица диапазонов цен. Лежит на сайте, собирается tools/price_ranges.py.
+ * Держим в KV, чтобы не ходить за ней на каждое сообщение.
+ */
+async function priceRanges(env) {
+  try {
+    const cached = await env.CHAT.get('ranges:v1');
+    if (cached) return JSON.parse(cached);
+    const base = (env.SITE_URL || 'https://estateart.homes/').replace(/\/+$/, '');
+    const r = await fetch(base + '/data/price-ranges.json', { cf: { cacheTtl: 3600 } });
+    if (!r.ok) return null;
+    const data = await r.json();
+    await env.CHAT.put('ranges:v1', JSON.stringify(data), { expirationTtl: RANGES_TTL });
+    return data;
+  } catch (e) {
+    console.log('ranges error:', e && e.message);
+    return null;   // без таблицы ИИ просто не станет называть цифры
+  }
+}
 
 /**
  * Дежурные менеджеры. AGENT_CHAT_ID принимает один id или несколько через запятую.
@@ -122,6 +149,39 @@ async function handleSend(request, env) {
   const msg = { id: session.messages.length + 1, from: 'user', text, at: new Date().toISOString() };
   session.messages.push(msg);
 
+  /* ---------- первичный менеджер ----------
+     Пока он ведёт разговор, дежурным ничего не летит: иначе каждый уточняющий
+     вопрос был бы отдельным уведомлением. В Telegram уходит одна карточка —
+     когда контакт собран. Любой ответ дежурного реплаем снимает ИИ с диалога. */
+  if (!session.handedOff && session.aiTurns !== -1 && (session.aiTurns || 0) < AI_TURNS) {
+    const ranges = await priceRanges(env);
+    const ai = await aiReply(env, session, null, ranges);   // текст уже в messages
+    if (ai && ai.text) {
+      session.aiTurns = (session.aiTurns || 0) + 1;
+      session.messages.push({
+        id: session.messages.length + 1, from: 'agent', text: ai.text,
+        at: new Date().toISOString(), by: 'ai',
+      });
+      if (ai.lead) {
+        session.lead = ai.lead;
+        session.handedOff = true;
+        if (ai.lead.name) session.name = ai.lead.name;
+        if (ai.lead.contact) session.contact = ai.lead.contact;
+        const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+        const card = await tg(env, 'sendMessage', {
+          chat_id: to, parse_mode: 'HTML', text: leadCard(ai.lead, id, esc),
+        });
+        if (card.ok && card.result && card.result.message_id) {
+          await env.CHAT.put(mapKey(card.result.message_id), id, { expirationTtl: SESSION_TTL });
+        }
+      }
+      await saveSession(env, id, session);
+      return json({ ok: true, id: msg.id, delivered: true, reply: ai.text, handedOff: !!ai.lead });
+    }
+    // Помощник недоступен — дальше по-старому, и больше его не дёргаем в этой сессии
+    session.aiTurns = -1;
+  }
+
   const header = first
     ? `🟢 <b>Новый диалог с сайта</b>\n<b>${esc(session.name)}</b>` +
       (session.contact ? ` · ${esc(session.contact)}` : '') +
@@ -195,14 +255,7 @@ async function handleTelegram(request, env) {
   // Отвечать может любой из дежурных — chat_id сверяем со списком
   const list = managers(env);
   if (!list.some(m => String(m) === String(message.chat.id))) {
-    if (message.text.startsWith('/start')) {
-      await tg(env, 'sendMessage', {
-        chat_id: message.chat.id,
-        text: 'Это служебный бот Estate Art. Напишите нам через чат на сайте: ' +
-              (env.SITE_URL || 'https://estateart.homes/'),
-      });
-    }
-    return new Response('ok');
+    return handleVisitorDM(message, env);
   }
 
   if (message.text.startsWith('/chatid')) {
@@ -250,18 +303,155 @@ async function handleTelegram(request, env) {
     return new Response('ok');
   }
 
+  const answer = clean(message.text, MAX_TEXT);
   session.messages.push({
     id: session.messages.length + 1,
     from: 'agent',
-    text: clean(message.text, MAX_TEXT),
+    text: answer,
     at: new Date().toISOString(),
   });
+
+  // Диалог из бота: виджета на сайте нет, опрашивать некому — досылаем сами
+  if (sessionId.startsWith('tg')) {
+    const to = sessionId.slice(2);
+    const ok = await tg(env, 'sendMessage', { chat_id: to, text: answer });
+    if (!ok.ok) {
+      await tg(env, 'sendMessage', {
+        chat_id: message.chat.id,
+        text: 'Не смог доставить ответ клиенту в Telegram — возможно, он заблокировал бота.',
+      });
+    }
+  }
+
   // Кто фактически ответил — тот и ведёт диалог дальше
   session.manager = String(message.chat.id);
+  // И с этого момента говорит он, а не помощник: два голоса в одном чате
+  // клиент читает как неразбериху, а не как заботу
+  session.handedOff = true;
   await saveSession(env, sessionId, session);
   await tg(env, 'setMessageReaction', {
     chat_id: message.chat.id, message_id: message.message_id, reaction: [{ type: 'emoji', emoji: '👌' }],
   });
+  return new Response('ok');
+}
+
+/* ---------- посетитель пишет боту напрямую ----------
+   Тот же первичный менеджер, что и в чате на сайте, и та же карточка дежурному.
+   Разговор, начатый в Telegram, и разговор с сайта не должны вести себя
+   по-разному — иначе у клиента два разных агентства. */
+async function handleVisitorDM(message, env) {
+  const chatId = String(message.chat.id);
+  const id = 'tg' + chatId;
+  const text = clean(message.text, MAX_TEXT);
+
+  if (text.startsWith('/catalog')) {
+    await tg(env, 'sendMessage', {
+      chat_id: chatId,
+      text: 'Каталог объектов: ' + (env.SITE_URL || 'https://estateart.homes/') + '#catalog',
+    });
+    return new Response('ok');
+  }
+  if (text.startsWith('/duty')) {
+    await tg(env, 'sendMessage', { chat_id: chatId, text: 'Эта команда — для дежурных менеджеров.' });
+    return new Response('ok');
+  }
+
+  let session = await loadSession(env, id);
+  if (!session) {
+    const who = [message.from && message.from.first_name, message.from && message.from.last_name]
+      .filter(Boolean).join(' ');
+    session = {
+      created: new Date().toISOString(),
+      name: clean(who, MAX_NAME) || 'Гость',
+      contact: message.from && message.from.username ? '@' + message.from.username : '',
+      page: 'Telegram',
+      source: 'telegram',
+      messages: [],
+    };
+    session.manager = await assignManager(env, id);
+  }
+
+  if (text.startsWith('/start')) {
+    session.messages = [];
+    delete session.handedOff;
+    delete session.aiTurns;
+    await saveSession(env, id, session);
+    await tg(env, 'sendMessage', {
+      chat_id: chatId,
+      text: 'Estate Art — виллы и квартиры на Пхукете, в Дананге и Нячанге.\n\n' +
+            'Расскажите, что ищете: город, тип жилья, примерный бюджет. ' +
+            'Подберу направление и передам агенту.',
+    });
+    return new Response('ok');
+  }
+
+  session.messages.push({
+    id: session.messages.length + 1, from: 'user', text, at: new Date().toISOString(),
+  });
+
+  // Дежурный уже подхватил — пересылаем ему, помощник молчит
+  if (session.handedOff) {
+    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const sent = await tg(env, 'sendMessage', {
+      chat_id: to, parse_mode: 'HTML',
+      text: `<b>${esc(session.name)}</b> (Telegram)\n\n${esc(text)}\n\n<code>#${id}</code>\n` +
+            `<i>Ответьте реплаем — ответ уйдёт клиенту в Telegram.</i>`,
+    });
+    if (sent.ok && sent.result && sent.result.message_id) {
+      await env.CHAT.put(mapKey(sent.result.message_id), id, { expirationTtl: SESSION_TTL });
+    }
+    await saveSession(env, id, session);
+    return new Response('ok');
+  }
+
+  await tg(env, 'sendChatAction', { chat_id: chatId, action: 'typing' });
+  const ranges = await priceRanges(env);
+  const ai = (session.aiTurns === -1 || (session.aiTurns || 0) >= AI_TURNS)
+    ? null : await aiReply(env, session, null, ranges);
+
+  if (!ai || !ai.text) {
+    // Помощник недоступен — не теряем человека, отдаём дежурному сразу
+    session.aiTurns = -1;
+    session.handedOff = true;
+    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const sent = await tg(env, 'sendMessage', {
+      chat_id: to, parse_mode: 'HTML',
+      text: `🟢 <b>Обращение в бот</b>\n<b>${esc(session.name)}</b>` +
+            (session.contact ? ` · ${esc(session.contact)}` : '') +
+            `\n\n${esc(text)}\n\n<code>#${id}</code>\n` +
+            `<i>Ответьте реплаем — ответ уйдёт клиенту в Telegram.</i>`,
+    });
+    if (sent.ok && sent.result && sent.result.message_id) {
+      await env.CHAT.put(mapKey(sent.result.message_id), id, { expirationTtl: SESSION_TTL });
+    }
+    await tg(env, 'sendMessage', { chat_id: chatId, text: 'Передаю вас агенту — он ответит здесь.' });
+    await saveSession(env, id, session);
+    return new Response('ok');
+  }
+
+  session.aiTurns = (session.aiTurns || 0) + 1;
+  session.messages.push({
+    id: session.messages.length + 1, from: 'agent', text: ai.text,
+    at: new Date().toISOString(), by: 'ai',
+  });
+  await tg(env, 'sendMessage', { chat_id: chatId, text: ai.text });
+
+  if (ai.lead) {
+    session.lead = ai.lead;
+    session.handedOff = true;
+    if (ai.lead.name) session.name = ai.lead.name;
+    if (ai.lead.contact) session.contact = ai.lead.contact;
+    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const card = await tg(env, 'sendMessage', {
+      chat_id: to, parse_mode: 'HTML',
+      text: leadCard(ai.lead, id, esc).replace('Заявка с сайта', 'Заявка из бота'),
+    });
+    if (card.ok && card.result && card.result.message_id) {
+      await env.CHAT.put(mapKey(card.result.message_id), id, { expirationTtl: SESSION_TTL });
+    }
+  }
+
+  await saveSession(env, id, session);
   return new Response('ok');
 }
 
