@@ -107,6 +107,9 @@ def main():
     r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "seo_schema.py")],
                        cwd=ROOT, capture_output=True, text=True)
     print("  " + (r.stdout.strip().splitlines() or ["без вывода"])[-1])
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "price_ranges.py")],
+                       cwd=ROOT, capture_output=True, text=True)
+    print("  " + (r.stdout.strip().splitlines() or ["без вывода"])[-1])
 
     print(f"""
 Дальше вручную:

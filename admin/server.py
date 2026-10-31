@@ -176,6 +176,10 @@ def run_pipeline(pages, limit, gallery):
                      "Скачивание галереи фото") or True  # галерея не критична
     if ok:
         ok = job_run([PY_BIN, "scraper/build_pages.py"], "Генерация страниц и sitemap")
+    if ok:
+        # Вилки цен, которыми оперирует ИИ-менеджер, должны соответствовать
+        # свежему каталогу — иначе он называет клиентам вчерашние цифры
+        ok = job_run([PY_BIN, "tools/price_ranges.py"], "Диапазоны цен для ИИ-менеджера")
     job_log("✓ Готово. Нажмите «Опубликовать», чтобы обновить сайт." if ok else "✗ Завершено с ошибкой.")
     JOB.update(running=False, done=True, ok=ok)
 
