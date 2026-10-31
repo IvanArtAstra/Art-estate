@@ -616,6 +616,7 @@
     const f = getFilters();
     const list = sortItems(allItems.filter(it => matches(it, f)), f.sort);
     const page = list.slice(0, shown);
+    syncHeroCount();
     grid.innerHTML = page.map(cardHTML).join('');
     grid.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
     grid.classList.remove('is-pending');
@@ -631,6 +632,11 @@
   function countryCount(code) {
     return allItems.filter(it => !code || it.country === code).length;
   }
+  const heroCount = document.getElementById('heroCount');
+  function syncHeroCount() {
+    if (heroCount && allItems.length) heroCount.textContent = allItems.length;
+  }
+
   function renderGeoSwitch() {
     if (!geoSwitch) return;
     const list = COUNTRIES.filter(c => !c.code || allItems.some(it => it.country === c.code));
@@ -1169,6 +1175,11 @@
       d_allcities: 'All cities', d_alldistricts: 'All districts',
       cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
       drawer_sound: 'Interface sound', sound_on: 'On', sound_off: 'Off',
+      hero_f_objects: 'listings in the catalogue', hero_f_cities: 'coastal cities',
+      hero_f_years: 'years on the islands',
+      hero_p_legal: 'Every property checked by a lawyer',
+      hero_p_money: 'Safe settlements and transfer support',
+      hero_p_remote: 'Buy remotely — from viewing to keys',
       reloc_eyebrow: 'Relocation', reloc_title: 'Free relocation consultation',
       reloc_cta: 'Send a request on the site',
       reloc_wa_vn: 'Vietnam · WhatsApp', reloc_wa_th: 'Thailand · WhatsApp',
@@ -1212,6 +1223,11 @@
       d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
       cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
       drawer_sound: 'เสียงอินเทอร์เฟซ', sound_on: 'เปิด', sound_off: 'ปิด',
+      hero_f_objects: 'รายการในแคตตาล็อก', hero_f_cities: 'เมืองริมทะเล',
+      hero_f_years: 'ปีบนเกาะ',
+      hero_p_legal: 'ตรวจสอบเอกสารทุกรายการ',
+      hero_p_money: 'การชำระเงินที่ปลอดภัย',
+      hero_p_remote: 'ซื้อจากระยะไกลได้ทั้งหมด',
       reloc_eyebrow: 'ย้ายถิ่นฐาน', reloc_title: 'ปรึกษาการย้ายถิ่นฐานฟรี',
       reloc_cta: 'ส่งคำขอผ่านเว็บไซต์',
       reloc_wa_vn: 'เวียดนาม · WhatsApp', reloc_wa_th: 'ไทย · WhatsApp',

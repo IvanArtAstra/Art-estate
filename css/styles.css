@@ -290,6 +290,50 @@ h1, h2, h3, h4 {
 }
 .hero__layer.active { opacity: 1; pointer-events: auto; }
 
+/* ---------- ЦИФРЫ И ПРЕИМУЩЕСТВА ПОВЕРХ ОБЛЁТА ----------
+   Появляются вторым планом, с задержкой после заголовка: сначала человек
+   читает крупное, потом замечает детали. На узком экране цифры встают в
+   строку — три коротких числа читаются и так. */
+.hero__facts {
+  display: flex; gap: clamp(1.4rem, 5vw, 3.2rem); margin-top: clamp(1.6rem, 4vw, 2.6rem);
+  justify-content: center; flex-wrap: wrap;
+}
+.hero__fact { text-align: center; min-width: 5.5rem; }
+.hero__fact b {
+  display: block; font-family: 'Cormorant Garamond', serif; font-weight: 500;
+  font-size: clamp(1.9rem, 5vw, 2.9rem); color: var(--gold-light);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.hero__fact span {
+  display: block; margin-top: .35rem; font-size: var(--fs-2xs);
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(255,253,248,.72);
+}
+.hero__points {
+  list-style: none; margin: clamp(1.3rem, 3.5vw, 2rem) 0 0;
+  display: flex; flex-direction: column; gap: .55rem; align-items: center;
+}
+.hero__points li {
+  font-size: var(--fs-sm); letter-spacing: .02em; color: rgba(255,253,248,.84);
+  display: flex; align-items: center; gap: .6rem;
+}
+.hero__points li::before {
+  content: ''; width: 16px; height: 1px; background: var(--gold-light); flex: none;
+}
+/* Второй план входит позже заголовка — тем же шагом, что каскад в сетках */
+.hero__layer .hero__facts,
+.hero__layer .hero__points {
+  opacity: 0; transform: translateY(var(--d-enter));
+  transition: opacity var(--t-reveal) var(--ease-out), transform var(--t-reveal) var(--ease-out);
+  transition-delay: calc(var(--t-stagger) * 3);
+}
+.hero__layer.active .hero__facts,
+.hero__layer.active .hero__points { opacity: 1; transform: none; }
+
+@media (max-width: 420px) {
+  .hero__facts { gap: 1.1rem; }
+  .hero__points li { font-size: var(--fs-xs); }
+}
+
 .hero__eyebrow {
   text-transform: uppercase; letter-spacing: .42em; font-size: var(--fs-sm); font-weight: 600;
   color: var(--gold-light); margin-bottom: 1.4rem;
