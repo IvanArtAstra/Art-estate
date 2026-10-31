@@ -1186,26 +1186,27 @@
       reloc_wa_vn: 'Vietnam · WhatsApp', reloc_wa_th: 'Thailand · WhatsApp',
       channels_label: 'Our channels', chan_studio: 'Our studio', chan_studio_sub: 'Websites, AI, video · @IISoSArt',
       chan_ai: 'On AI and tech', chan_ai_sub: 'Deep dives and practice · @IvanArtxJarvis',
-      hero_eyebrow: 'Real estate in Phuket', hero_title: 'Your dream home <em>by the ocean</em>',
-      hero_sub: 'Villas and apartments in Phuket with full personal support of your deal from A to Z.',
+      hero_eyebrow: 'Property by the sea', hero_title: 'Your dream home <em>by the ocean</em>',
+      hero_sub: 'Villas and apartments in Thailand and Vietnam. We check the paperwork, handle the settlements and take the deal through to the keys — even if you never fly over.',
       hero_big2: 'Villas<br>with infinity<br>pools', hero_big3: 'Step<br>inside the dream', hero_enter: 'View listings →',
-      sb_eyebrow: 'Find your property', sb_title: 'Find your home in Phuket', sb_btn: 'Search', sb_ph: 'District, type or property name…',
-      trust_families: 'happy families', trust_years: 'years on the island', trust_legal: '% legal protection', trust_objects: 'verified listings',
-      districts_eyebrow: 'Locations', districts_title: 'Districts of Phuket',
+      sb_eyebrow: 'Find your property', sb_title: 'Find your property', sb_btn: 'Search', sb_ph: 'District, type or property name…',
+      trust_objects: 'listings in the catalogue', trust_countries: 'countries, a third on the way',
+      trust_years: 'years in the market', trust_langs: 'languages we work in',
+      districts_eyebrow: 'Locations', districts_title: 'Districts and cities',
       catalog_eyebrow: 'Catalog', catalog_title: 'Featured listings in Thailand and Vietnam',
       urgent_eyebrow: 'Best value', urgent_title: 'Urgent sale',
       map_eyebrow: 'On the map', map_title: 'Listings on the map',
       finance_eyebrow: 'Financing', finance_title: 'Flexible ways to buy',
-      whyphuket_eyebrow: 'Dream location', whyphuket_title: 'Why Phuket',
-      whyus_eyebrow: 'Why us', whyus_title: 'Buying in Phuket — easy and safe',
+      whyphuket_eyebrow: 'Dream location', whyphuket_title: 'Why here',
+      whyus_eyebrow: 'Why us', whyus_title: 'Buying abroad — without the nerves',
       steps_eyebrow: 'How we work', steps_title: 'Your path to property',
       faq_eyebrow: 'Q&A', faq_title: 'Frequently asked questions',
-      journal_eyebrow: 'Journal', journal_title: 'Useful guides about buying in Phuket',
+      journal_eyebrow: 'Journal', journal_title: 'Useful guides about buying',
       reviews_eyebrow: 'Reviews', reviews_title: 'Trusted by clients',
-      about_eyebrow: 'Your personal agent', contacts_eyebrow: 'Contacts', contacts_title: 'Let’s find your home in Phuket',
+      about_eyebrow: 'Your personal agent', contacts_eyebrow: 'Contacts', contacts_title: 'Let’s find your home by the sea',
       catalog_cta_btn: 'Get a selection', whyus_cta: 'Get a consultation', journal_all: 'All journal articles',
       contacts_lead: 'Leave a request — I’ll reply personally and help you take the first step to your dream property.',
-      contacts_role: 'Personal agent at Estate Art', contacts_note: 'Working across Phuket · Online viewings from anywhere in the world',
+      contacts_role: 'Personal agent at Estate Art', contacts_note: 'Phuket, Da Nang, Nha Trang · Online viewings from anywhere in the world',
       lead_submit: 'Send request via WhatsApp', lead_consent: 'I agree to the processing of personal data and accept the <a href="privacy/" target="_blank" rel="noopener">privacy policy</a>',
       lead_name_ph: 'Your name', lead_phone_ph: 'Phone or @telegram', lead_msg_ph: 'What are you looking for: area, budget, type? (optional)',
       d_found: 'Listings found', d_fav: 'favorites', d_more: 'Details', d_price_req: 'Price on request',
@@ -1234,26 +1235,27 @@
       reloc_wa_vn: 'เวียดนาม · WhatsApp', reloc_wa_th: 'ไทย · WhatsApp',
       channels_label: 'ช่องของเรา', chan_studio: 'สตูดิโอของเรา', chan_studio_sub: 'เว็บไซต์ AI วิดีโอ · @IISoSArt',
       chan_ai: 'เรื่อง AI และเทคโนโลยี', chan_ai_sub: 'บทวิเคราะห์และการใช้งานจริง · @IvanArtxJarvis',
-      hero_eyebrow: 'อสังหาริมทรัพย์ในภูเก็ต', hero_title: 'บ้านในฝัน <em>ริมทะเล</em>',
-      hero_sub: 'วิลล่าและคอนโดในภูเก็ต พร้อมบริการดูแลการซื้อขายแบบครบวงจร',
+      hero_eyebrow: 'อสังหาริมทรัพย์ริมทะเล', hero_title: 'บ้านในฝัน <em>ริมทะเล</em>',
+      hero_sub: 'วิลล่าและคอนโดในไทยและเวียดนาม ตรวจสอบเอกสาร ดูแลการชำระเงิน และปิดดีลจนถึงวันรับกุญแจ',
       hero_big2: 'วิลล่า<br>พร้อมสระว่ายน้ำ<br>อินฟินิตี้', hero_big3: 'ก้าวเข้าสู่<br>บ้านในฝัน', hero_enter: 'ดูรายการ →',
-      sb_eyebrow: 'ค้นหาอสังหาฯ', sb_title: 'ค้นหาบ้านของคุณในภูเก็ต', sb_btn: 'ค้นหา', sb_ph: 'ทำเล ประเภท หรือชื่อโครงการ…',
-      trust_families: 'ครอบครัวที่พึงพอใจ', trust_years: 'ปีบนเกาะ', trust_legal: '% คุ้มครองทางกฎหมาย', trust_objects: 'รายการที่ตรวจสอบแล้ว',
-      districts_eyebrow: 'ทำเล', districts_title: 'ทำเลในภูเก็ต',
+      sb_eyebrow: 'ค้นหาอสังหาฯ', sb_title: 'ค้นหาอสังหาฯ ของคุณ', sb_btn: 'ค้นหา', sb_ph: 'ทำเล ประเภท หรือชื่อโครงการ…',
+      trust_objects: 'รายการในแคตตาล็อก', trust_countries: 'ประเทศ เร็ว ๆ นี้ประเทศที่สาม',
+      trust_years: 'ปีในตลาด', trust_langs: 'ภาษาที่ให้บริการ',
+      districts_eyebrow: 'ทำเล', districts_title: 'ทำเลและเมือง',
       catalog_eyebrow: 'แคตตาล็อก', catalog_title: 'รายการแนะนำในไทยและเวียดนาม',
       urgent_eyebrow: 'คุ้มค่า', urgent_title: 'ขายด่วน',
       map_eyebrow: 'บนแผนที่', map_title: 'รายการบนแผนที่',
       finance_eyebrow: 'การเงิน', finance_title: 'วิธีการซื้อที่ยืดหยุ่น',
-      whyphuket_eyebrow: 'ทำเลในฝัน', whyphuket_title: 'ทำไมต้องภูเก็ต',
-      whyus_eyebrow: 'ทำไมต้องเรา', whyus_title: 'ซื้อในภูเก็ต — ง่ายและปลอดภัย',
+      whyphuket_eyebrow: 'ทำเลในฝัน', whyphuket_title: 'ทำไมต้องที่นี่',
+      whyus_eyebrow: 'ทำไมต้องเรา', whyus_title: 'ซื้อในต่างประเทศ — อย่างสบายใจ',
       steps_eyebrow: 'ขั้นตอนการทำงาน', steps_title: 'เส้นทางสู่อสังหาฯ ของคุณ',
       faq_eyebrow: 'คำถาม', faq_title: 'คำถามที่พบบ่อย',
-      journal_eyebrow: 'บทความ', journal_title: 'คู่มือการซื้ออสังหาฯ ในภูเก็ต',
+      journal_eyebrow: 'บทความ', journal_title: 'คู่มือการซื้ออสังหาฯ',
       reviews_eyebrow: 'รีวิว', reviews_title: 'ลูกค้าไว้วางใจเรา',
-      about_eyebrow: 'ตัวแทนส่วนตัวของคุณ', contacts_eyebrow: 'ติดต่อ', contacts_title: 'มาหาบ้านของคุณในภูเก็ตกัน',
+      about_eyebrow: 'ตัวแทนส่วนตัวของคุณ', contacts_eyebrow: 'ติดต่อ', contacts_title: 'มาหาบ้านริมทะเลของคุณกัน',
       catalog_cta_btn: 'ขอรายการที่คัดสรร', whyus_cta: 'ขอคำปรึกษา', journal_all: 'บทความทั้งหมด',
       contacts_lead: 'ฝากข้อมูลไว้ — ฉันจะตอบกลับด้วยตนเองและช่วยคุณเริ่มต้น',
-      contacts_role: 'ตัวแทนส่วนตัว Estate Art', contacts_note: 'ให้บริการทั่วภูเก็ต · ชมออนไลน์ได้จากทุกที่',
+      contacts_role: 'ตัวแทนส่วนตัว Estate Art', contacts_note: 'ภูเก็ต ดานัง ญาจาง · ชมออนไลน์ได้จากทุกที่',
       lead_submit: 'ส่งคำขอผ่าน WhatsApp', lead_consent: 'ฉันยินยอมให้ประมวลผลข้อมูลส่วนบุคคลและยอมรับ <a href="privacy/" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>',
       lead_name_ph: 'ชื่อของคุณ', lead_phone_ph: 'โทรศัพท์ หรือ @telegram', lead_msg_ph: 'คุณกำลังมองหาอะไร: ทำเล งบประมาณ ประเภท? (ไม่บังคับ)',
       d_found: 'พบรายการ', d_fav: 'รายการโปรด', d_more: 'รายละเอียด', d_price_req: 'ราคาตามสอบถาม',
@@ -1898,13 +1900,24 @@
       counters.forEach(el => { el.textContent = parseInt(el.dataset.count, 10) || 0; });
       return;
     }
+    // Число объектов — из каталога, а не из разметки
+    const tObj = document.getElementById('trustObjects');
+    if (tObj && allItems.length) tObj.dataset.count = allItems.length;
     counters.forEach(el => {
       const end = parseInt(el.dataset.count, 10) || 0;
       const dur = cssMs('--t-curtain', 900); const t0 = performance.now();
+      /* Подпись пересобирается вместе с числом. Статическая подпись при
+         бегущем счётчике показывает «2 лет на рынке» и «41 % защита» —
+         это видит каждый, кто листает не рывком, и на сайте про деньги
+         такой кадр дороже самой анимации. */
+      const label = el.parentElement && el.parentElement.querySelector('[data-plural]');
+      const forms = label ? label.dataset.plural.split('|') : null;
       function tick(now) {
         const k = Math.min((now - t0) / dur, 1);
         const eased = 1 - Math.pow(1 - k, 3);
-        el.textContent = Math.round(end * eased);
+        const v = Math.round(end * eased);
+        el.textContent = v;
+        if (forms) label.textContent = plural(v, forms[0], forms[1], forms[2]) + (forms[3] || '');
         if (k < 1) requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
