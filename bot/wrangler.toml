@@ -12,6 +12,14 @@ name = "estate-art-chat"
 main = "worker.js"
 compatibility_date = "2026-09-01"
 
+# Воркер по умолчанию выполняется в ближайшей к посетителю точке — для нас это
+# Гонконг, а оттуда запросы к Anthropic отбивает защита перед их API: 403
+# отдаёт Cloudflare, а не сам API (в ответе нет ни одного заголовка anthropic-*).
+# Smart placement переносит выполнение ближе к бэкенду, с которым воркер
+# разговаривает больше всего.
+[placement]
+mode = "smart"
+
 [vars]
 # Откуда виджету разрешено обращаться. Через запятую, без пробелов.
 ALLOWED_ORIGINS = "https://estateart.homes,https://www.estateart.homes,https://ivanartastra.github.io,http://localhost:8123"
@@ -20,3 +28,13 @@ SITE_URL = "https://estateart.homes/"
 [[kv_namespaces]]
 binding = "CHAT"
 id = "f50b5d6be4764a169857081df5f1ac59"
+
+# Реле к Anthropic, закреплённое за регионом. Регион задаётся не здесь,
+# а при создании объекта — locationHint в bot/ai.js.
+[[durable_objects.bindings]]
+name = "AI_RELAY"
+class_name = "AnthropicRelay"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AnthropicRelay"]

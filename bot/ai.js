@@ -185,18 +185,28 @@ function toMessages(session, userText) {
   return out;
 }
 
+/* Регион, из которого уходят запросы к Anthropic. Воркер сам выполняется
+   рядом с посетителем — для нашей аудитории это Гонконг, откуда защита перед
+   API Anthropic отбивает запросы наглухо: восемь отказов из восьми, все с
+   colo=HKG, при том что тот же запрос с обычной машины проходит. Smart
+   placement помогал через раз, а через раз — это не работает.
+   Durable Object с locationHint закрепляет выполнение за регионом явно. */
+const RELAY_REGION = 'enam';   // восток Северной Америки
+
 async function callClaude(env, messages, system) {
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'user-agent': 'estate-art-chat/1.0 (cloudflare-worker)',
-    },
-    body: JSON.stringify({ model: MODEL, max_tokens: MAX_TOKENS, system, tools: TOOLS, messages }),
-  });
-  if (!r.ok) throw new Error('anthropic ' + r.status + ' ' + (await r.text()).slice(0, 300));
+  const body = JSON.stringify({ model: MODEL, max_tokens: MAX_TOKENS, system, tools: TOOLS, messages });
+
+  const id = env.AI_RELAY.idFromName('anthropic-' + RELAY_REGION);
+  const stub = env.AI_RELAY.get(id, { locationHint: RELAY_REGION });
+  const r = await stub.fetch('https://relay/', { method: 'POST', body });
+
+  const colo = r.headers.get('x-relay-colo') || '?';
+  if (!r.ok) {
+    const text = (await r.text()).slice(0, 300);
+    console.log('anthropic отказ', JSON.stringify({ status: r.status, relay_colo: colo, model: MODEL }));
+    throw new Error('anthropic ' + r.status + ' ' + text);
+  }
+  console.log('anthropic ok, реле в', colo);
   return r.json();
 }
 

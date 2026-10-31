@@ -13,6 +13,7 @@
  * браузер не попадают. Настройка — в bot/README.md.
  */
 import { aiReply, leadCard } from './ai.js';
+export { AnthropicRelay } from './relay.js';
 
 const MAX_TEXT = 2000;        // длиннее Telegram всё равно порежет
 const MAX_NAME = 80;
