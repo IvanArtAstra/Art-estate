@@ -171,10 +171,34 @@
     save(); render();
   }
 
+  /* Длительность ухода читаем из того же токена, что и остальные слои */
+  function exitMs() {
+    const v = (getComputedStyle(document.documentElement).getPropertyValue('--t-exit') || '').trim();
+    if (/ms$/.test(v)) return parseFloat(v);
+    if (/s$/.test(v)) return parseFloat(v) * 1000;
+    return 240;
+  }
+
   /* ---------- поведение ---------- */
+  let closeTimer = 0;
   function toggle(next) {
     open = next;
-    panel.hidden = !open;
+    /* Открытие и закрытие теперь одно движение в обе стороны. До этого панель
+       входила анимацией, а исчезала установкой hidden в один кадр. */
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = 0; }
+    const S = window.Sound;
+    if (open) {
+      panel.classList.remove('is-closing');
+      panel.hidden = false;
+      if (S) S.play('open');
+    } else if (!panel.hidden) {
+      const ms = exitMs();
+      panel.classList.add('is-closing');
+      closeTimer = setTimeout(() => {
+        panel.hidden = true; panel.classList.remove('is-closing'); closeTimer = 0;
+      }, ms + 40);
+      if (S) S.play('close');
+    }
     fab.setAttribute('aria-expanded', String(open));
     fab.setAttribute('aria-label', open ? 'Свернуть чат' : 'Открыть чат');
     root.classList.toggle('is-open', open);
@@ -182,7 +206,7 @@
       setUnread(0);
       intro.hidden = !!who;
       render();
-      setTimeout(() => (who ? input : nameEl).focus(), 120);
+      panel.addEventListener('animationend', () => { try { (who ? input : nameEl).focus(); } catch (e) {} }, { once: true });
       poll();
     }
     schedule();

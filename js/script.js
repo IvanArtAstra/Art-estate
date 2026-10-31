@@ -4,7 +4,36 @@
 (function () {
   'use strict';
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* Длительности живут в CSS-токенах. Читаем их оттуда, а не дублируем числами:
+     хардкод 300/350 мс уже один раз разъехался с .35s/.4s в стилях. */
+  const ROOT_STYLE = getComputedStyle(document.documentElement);
+  const msCache = {};
+  function cssMs(name, fallback) {
+    if (msCache[name] != null) return msCache[name];
+    const v = (ROOT_STYLE.getPropertyValue(name) || '').trim();
+    let ms = fallback || 0;
+    if (/ms$/.test(v)) ms = parseFloat(v);
+    else if (/s$/.test(v)) ms = parseFloat(v) * 1000;
+    msCache[name] = ms || fallback || 0;
+    return msCache[name];
+  }
+  const T_EXIT = () => cssMs('--t-exit', 240);
+
+  /* Звуковой слой живёт в js/sound.js. Если файл не подключён, заглушка
+     молча проглатывает вызовы: script.js и sound.js — независимые IIFE. */
+  const Sound = window.Sound || { play() {}, set() {}, toggle() { return false; }, enabled: false, available: false };
+  const T_STAGGER = () => cssMs('--t-stagger', 60);
+
+  // Настройку можно переключить, не перезагружая страницу
+  const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduceMotion = mqReduce.matches;
+  const reduceListeners = [];
+  const onReduceChange = (fn) => reduceListeners.push(fn);
+  (mqReduce.addEventListener ? mqReduce.addEventListener.bind(mqReduce, 'change')
+                             : mqReduce.addListener.bind(mqReduce))((e) => {
+    reduceMotion = e.matches;
+    reduceListeners.forEach(fn => { try { fn(reduceMotion); } catch (err) {} });
+  });
 
   // Плавное проявление изображений карточек при загрузке
   document.addEventListener('load', (e) => {
@@ -26,6 +55,8 @@
   const preloaderPct = document.getElementById('preloaderPct');
 
   if (preloader) {
+    // Пока идёт загрузка, прокрутка под полотном бессмысленна
+    document.documentElement.classList.add('is-loading');
     const STAGES = [
       { at: 0.25, done: false },   // разметка разобрана
       { at: 0.55, done: false },   // шрифты готовы
@@ -57,7 +88,8 @@
       if (shown < cap - 0.01) shown += (cap - shown) * 0.012;
       shown = Math.min(shown, cap);
       const pct = Math.round(shown * 100);
-      preloaderBar.style.width = pct + '%';
+      // scaleX, а не width: width пересчитывает раскладку каждый кадр
+      preloaderBar.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
       if (preloaderPct) preloaderPct.textContent = pct;
       preloader.setAttribute('aria-valuenow', pct);
       if (!finished) raf = requestAnimationFrame(paint);
@@ -70,11 +102,31 @@
       if (finished) return;
       finished = true;
       cancelAnimationFrame(raf);
-      preloaderBar.style.width = '100%';
+      preloaderBar.style.transform = 'scaleX(1)';
       if (preloaderPct) preloaderPct.textContent = '100';
       preloader.setAttribute('aria-valuenow', 100);
       // короткая пауза, чтобы глаз успел увидеть завершённую полосу
-      setTimeout(() => preloader.classList.add('hidden'), 420);
+      setTimeout(() => {
+        preloader.classList.add('hidden');
+        document.documentElement.classList.remove('is-loading');
+        // Пока шла загрузка, прокрутка была заблокирована, и браузер не смог
+        // уехать к якорю из адреса. Доводим сами — иначе ссылка вида
+        // /#districts всегда открывала первый экран.
+        if (location.hash.length > 1) {
+          const target = document.getElementById(location.hash.slice(1));
+          if (target) {
+            target.scrollIntoView({ behavior: 'instant', block: 'start' });
+            // Прыжок через полстраницы наблюдатель не всегда отрабатывает —
+            // без этого блоки в точке назначения оставались невидимыми
+            setTimeout(sweepReveal, 80);
+          }
+        }
+        // первый экран входит не за занавесом, а когда полотно уже поехало
+        setTimeout(() => document.body.classList.add('is-revealed'), 220);
+        const done = () => { preloader.style.display = 'none'; preloader.style.willChange = 'auto'; };
+        preloader.addEventListener('transitionend', (e) => { if (e.target === preloader) done(); }, { once: true });
+        setTimeout(done, cssMs('--t-curtain', 900) + 200);
+      }, 420);
     }
 
     reach(0);
@@ -95,7 +147,22 @@
 
     // Подстраховка: если какое-то событие не придёт, сайт всё равно откроется
     setTimeout(() => { reach(3); finish(); }, 6000);
+  } else {
+    document.body.classList.add('is-revealed');
   }
+
+  /* ---------- ЩЕЛЧОК НА НАЖАТИЕ ----------
+     Один делегированный pointerdown: звук идёт в момент нажатия, а не клика,
+     иначе он отстаёт от пальца на длину жеста. Фильтры и селекты сюда не
+     входят осознанно — результат выбора виден на экране сразу, звук там
+     ничего не сообщает, а сброс фильтров высыпал бы пачку щелчков. */
+  const TAPPABLE = '.btn, .card, .dcard, .jcard, .rbanner, .chan, .header__cta, .header__call,' +
+    ' .nav a, .drawer__nav a, .chip, .card__fav, .card__compare, .burger, .to-top,' +
+    ' .floating__btn, .curr-switch button, .geo-switch button, .lang-switch button, summary';
+  document.addEventListener('pointerdown', (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.target.closest(TAPPABLE)) Sound.play('tap');
+  }, { passive: true });
 
   /* ---------- ШАПКА ПРИ СКРОЛЛЕ ---------- */
   const header = document.getElementById('header');
@@ -113,8 +180,14 @@
     const h = document.documentElement;
     const max = h.scrollHeight - h.clientHeight;
     const p = max > 0 ? window.scrollY / max : 0;
-    if (progressBar) progressBar.style.width = (p * 100).toFixed(2) + '%';
-    if (toTop) toTop.classList.toggle('show', window.scrollY > window.innerHeight * 0.9);
+    if (progressBar) progressBar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    if (toTop) {
+      // hidden снимаем один раз: вернуть атрибут значит убить затухание,
+      // потому что [hidden] { display: none !important }
+      const show = window.scrollY > window.innerHeight * 0.9;
+      if (show && toTop.hasAttribute('hidden')) toTop.removeAttribute('hidden');
+      toTop.classList.toggle('show', show);
+    }
   }
   onScrollUI();
   window.addEventListener('scroll', onScrollUI, { passive: true });
@@ -125,14 +198,19 @@
   const spyLinks = Array.from(document.querySelectorAll('.nav a[href^="#"], .drawer__nav a[href^="#"]'));
   const spyMap = {};
   spyLinks.forEach(a => { const id = a.getAttribute('href').slice(1); (spyMap[id] = spyMap[id] || []).push(a); });
+  const spyActive = new Set();
   if ('IntersectionObserver' in window) {
     const spyIO = new IntersectionObserver((entries) => {
+      /* Раньше подсветка только ставилась. Поэтому «Контакты» горели всё время,
+         пока человек пятью экранами выше смотрел облёт: последний сработавший
+         пункт оставался активным навсегда. */
       entries.forEach(e => {
-        if (e.isIntersecting) {
-          spyLinks.forEach(a => a.classList.remove('active'));
-          (spyMap[e.target.id] || []).forEach(a => a.classList.add('active'));
-        }
+        if (e.isIntersecting) spyActive.add(e.target.id);
+        else spyActive.delete(e.target.id);
       });
+      const id = Array.from(spyActive)[0];
+      spyLinks.forEach(a => a.classList.remove('active'));
+      if (id) (spyMap[id] || []).forEach(a => a.classList.add('active'));
     }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
     Object.keys(spyMap).forEach(id => { const s = document.getElementById(id); if (s) spyIO.observe(s); });
   }
@@ -142,11 +220,16 @@
   if (!reduceMotion && parEls.length) {
     let parTick = false;
     function applyParallax() {
+      // Сначала читаем всё, потом пишем всё: чередование чтения и записи
+      // заставляло браузер пересчитывать раскладку на каждом элементе
       const vh = window.innerHeight;
+      const plan = [];
       parEls.forEach(el => {
         const r = el.getBoundingClientRect();
         if (r.bottom < -120 || r.top > vh + 120) return;
-        const off = (r.top + r.height / 2 - vh / 2) / vh; // ≈ -0.5..0.5
+        plan.push([el, (r.top + r.height / 2 - vh / 2) / vh]);   // ≈ -0.5..0.5
+      });
+      plan.forEach(([el, off]) => {
         if (el.hasAttribute('data-parallax')) {
           const k = parseFloat(el.getAttribute('data-parallax')) || 6;
           const base = el.classList.contains('whyus__video') ? 'scale(1.1) ' : '';
@@ -188,6 +271,7 @@
   // Целевое и текущее время видео — для плавного догоняющего скраба
   let targetTime = 0;
   let curTime = 0;
+  let scrubRaf = 0;   // объявлено до onScrollHero: первый вызов идёт раньше цикла
 
   function heroProgress() {
     if (!heroTrack) return 0;
@@ -198,11 +282,17 @@
   }
 
   // Какой слой активен в зависимости от прогресса
+  let actIdx = 1;
   function updateLayers(p) {
-    let idx;
-    if (p < 0.34) idx = 1;        // акт 1: облёт острова
-    else if (p < 0.68) idx = 2;   // акт 2: вилла → вход
-    else idx = 3;                 // акт 3: влёт в интерьер
+    // Гистерезис ±0.03: без него слои мигали на стыке актов, стоило
+    // пальцу дрогнуть на пиксель
+    const H = 0.03;
+    let idx = actIdx;
+    if (actIdx === 1 && p > 0.34 + H) idx = 2;
+    else if (actIdx === 2 && p < 0.34 - H) idx = 1;
+    else if (actIdx === 2 && p > 0.68 + H) idx = 3;
+    else if (actIdx === 3 && p < 0.68 - H) idx = 2;
+    actIdx = idx;
     layers.forEach(l => {
       l.classList.toggle('active', Number(l.dataset.layer) === idx);
     });
@@ -213,37 +303,125 @@
     const p = heroProgress();
     updateLayers(p);
     if (videoReady && videoDuration) {
-      targetTime = p * (videoDuration - 0.05);
+      // не просим кадр, которого ещё нет в буфере — именно отсюда самый
+      // заметный рывок на входе при видео на 17 МБ
+      let want = p * (videoDuration - 0.05);
+      try {
+        const b = heroVideo.buffered;
+        if (b && b.length) want = Math.min(want, b.end(b.length - 1) - 0.05);
+      } catch (e) {}
+      targetTime = Math.max(0, want);
     }
+    wakeScrub();
   }
   window.addEventListener('scroll', onScrollHero, { passive: true });
   window.addEventListener('resize', onScrollHero);
   onScrollHero();
 
-  // Плавный rAF-цикл скраба (lerp), чтобы видео скользило без рывков
-  function rafScrub() {
-    if (videoReady && videoDuration) {
-      curTime += (targetTime - curTime) * 0.12;
-      if (Math.abs(targetTime - curTime) > 0.01) {
-        try { heroVideo.currentTime = curTime; } catch (e) {}
-      }
-    }
-    requestAnimationFrame(rafScrub);
+  /* Плавный rAF-цикл скраба (lerp). Цикл засыпает, когда видео догнало цель
+     или герой уехал за верх экрана: раньше он гонял 60 seek-ов в секунду всё
+     время, пока человек читал FAQ пятью экранами ниже, и на этот фон ложились
+     все остальные анимации сайта. */
+  function heroVisible() {
+    if (!heroTrack) return false;
+    const r = heroTrack.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
   }
-  if (!reduceMotion) requestAnimationFrame(rafScrub);
+  function rafScrub() {
+    scrubRaf = 0;
+    if (reduceMotion || !videoReady || !videoDuration) return;
+    curTime += (targetTime - curTime) * 0.12;
+    if (Math.abs(targetTime - curTime) > 0.01) {
+      try { heroVideo.currentTime = curTime; } catch (e) {}
+      if (heroVisible()) scrubRaf = requestAnimationFrame(rafScrub);
+    }
+  }
+  function wakeScrub() {
+    if (!scrubRaf && !reduceMotion) scrubRaf = requestAnimationFrame(rafScrub);
+  }
+  wakeScrub();
+  onReduceChange((on) => { if (on && scrubRaf) { cancelAnimationFrame(scrubRaf); scrubRaf = 0; } else wakeScrub(); });
 
-  /* ---------- REVEAL ПРИ ПОЯВЛЕНИИ (переиспользуемый наблюдатель) ---------- */
+  /* ---------- REVEAL ПРИ ПОЯВЛЕНИИ ----------
+     Каскад считаем здесь, а не через :nth-child в CSS: nth-child знает место
+     элемента в разметке, а не на экране, поэтому врал при любом числе колонок,
+     кроме трёх, и выдавал задержку секциям во весь экран за их место в <main>.
+     Партию, пришедшую одним колбэком, сортируем по верхней кромке и ставим
+     --rv только там, где родитель — сетка: каскад имеет смысл для плиток,
+     а не для одиночного блока.
+     threshold: 0 плюс rootMargin и подметающий проход — чтобы блок, который
+     пролетели быстрым фликом, не остался невидимым навсегда. */
   let revealIO = null;
+  const revealPending = new Set();
+  /* Счётчик каскада ведём на каждую сетку отдельно. Общий счётчик по партии
+     ломался, когда браузер разносил одну строку плиток по разным колбэкам:
+     каждая плитка оказывалась первой в своей партии и получала нулевую
+     задержку. Волна внутри сетки живёт 400 мс — дальше начинается новая. */
+  const revealWave = new WeakMap();
+  function waveIndex(parent) {
+    const now = performance.now();
+    const w = revealWave.get(parent);
+    const step = (w && now - w.at < 400) ? w.step : 0;
+    revealWave.set(parent, { step: step + 1, at: now });
+    return Math.min(step, 5);
+  }
+
+  function showReveal(el, idx) {
+    if (idx) el.style.setProperty('--rv', idx);
+    el.classList.add('is-moving');
+    el.classList.add('in');
+    const drop = () => el.classList.remove('is-moving');
+    el.addEventListener('animationend', drop, { once: true });
+    setTimeout(drop, cssMs('--t-reveal', 560) + idx * T_STAGGER() + 120);
+  }
+  function isGridChild(el) {
+    const p = el.parentElement;
+    if (!p) return false;
+    const d = getComputedStyle(p).display;
+    return d === 'grid' || d === 'inline-grid';
+  }
   if ('IntersectionObserver' in window && !reduceMotion) {
     revealIO = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); }
+      const batch = entries.filter(e => e.isIntersecting).map(e => e.target);
+      if (!batch.length) return;
+      batch.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+      batch.forEach(el => {
+        revealIO.unobserve(el);
+        revealPending.delete(el);
+        showReveal(el, isGridChild(el) ? waveIndex(el.parentElement) : 0);
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
   }
   function observeReveal(els) {
-    els.forEach(el => { if (revealIO) revealIO.observe(el); else el.classList.add('in'); });
+    els.forEach(el => {
+      if (el.classList.contains('in')) return;
+      if (revealIO) { revealPending.add(el); revealIO.observe(el); }
+      else el.classList.add('in');
+    });
   }
+  // Подметающий проход: всё, что уже в кадре, но не получило колбэк
+  let sweepTimer = 0;
+  function sweepReveal() {
+    if (!revealPending.size) return;
+    const vh = window.innerHeight;
+    Array.from(revealPending).forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.88 && r.bottom > 0) {
+        revealIO.unobserve(el); revealPending.delete(el);
+        // Каскад считаем и здесь: иначе блоки, которые подобрал подметающий
+        // проход, появлялись все разом, а соседние — ступенькой
+        showReveal(el, isGridChild(el) ? waveIndex(el.parentElement) : 0);
+      }
+    });
+  }
+  window.addEventListener('scroll', () => {
+    clearTimeout(sweepTimer); sweepTimer = setTimeout(sweepReveal, 140);
+  }, { passive: true });
+  if ('onscrollend' in window) window.addEventListener('scrollend', sweepReveal);
+  window.addEventListener('resize', () => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweepReveal, 140); });
+  window.addEventListener('load', () => setTimeout(sweepReveal, 120));
+  onReduceChange((on) => { if (on) { revealPending.forEach(el => el.classList.add('in')); revealPending.clear(); } });
+
   observeReveal(Array.from(document.querySelectorAll('.reveal')));
 
   /* ======================================================================
@@ -428,6 +606,10 @@
     };
     return by[sort] ? arr.slice().sort(by[sort]) : arr;
   }
+  /* Карточки, появившиеся в ответ на клик или набор текста, не «въезжают»:
+     это отклик на действие, а не появление блока при скролле. Вход играли
+     заново на каждую букву в поиске, и сетка стробила. Единственная обратная
+     связь на время дебаунса — просадка прозрачности всей сетки. */
   function render(resetPage) {
     if (!grid) return;
     if (resetPage) shown = PAGE_SIZE;
@@ -435,7 +617,8 @@
     const list = sortItems(allItems.filter(it => matches(it, f)), f.sort);
     const page = list.slice(0, shown);
     grid.innerHTML = page.map(cardHTML).join('');
-    observeReveal(Array.from(grid.querySelectorAll('.reveal')));
+    grid.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    grid.classList.remove('is-pending');
     markLoaded(grid);
     if (catalogCount) catalogCount.textContent = list.length ? (t('d_found', 'Найдено объектов') + ': ' + list.length + (favOnly ? ' · ' + t('d_fav', 'избранное') : '')) : '';
     if (catalogEmpty) catalogEmpty.hidden = list.length > 0;
@@ -450,12 +633,26 @@
   }
   function renderGeoSwitch() {
     if (!geoSwitch) return;
-    geoSwitch.innerHTML = COUNTRIES
-      .filter(c => !c.code || allItems.some(it => it.country === c.code))
-      .map(c => `<button type="button" data-country="${c.code}"${c.code === country ? ' class="is-active"' : ''} aria-pressed="${c.code === country}">
+    const list = COUNTRIES.filter(c => !c.code || allItems.some(it => it.country === c.code));
+    const have = Array.from(geoSwitch.querySelectorAll('[data-country]'));
+    const same = have.length === list.length &&
+      have.every((b, i) => b.dataset.country === list[i].code);
+    /* Пересобираем разметку только когда состав кнопок изменился. Иначе
+       меняем состояние у существующих: innerHTML сбрасывал фокус на body и
+       отменял объявленный в CSS переход фона — кнопка просто перекрашивалась. */
+    if (!same) {
+      geoSwitch.innerHTML = list.map(c => `<button type="button" data-country="${c.code}">
         ${c.code ? `<i class="flag flag--${c.code}" aria-hidden="true"></i>` : ''}${esc(countryName(c.code))}
-        <span class="geo-switch__count">${countryCount(c.code)}</span>
+        <span class="geo-switch__count"></span>
       </button>`).join('');
+    }
+    geoSwitch.querySelectorAll('[data-country]').forEach(b => {
+      const on = b.dataset.country === country;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const cnt = b.querySelector('.geo-switch__count');
+      if (cnt) cnt.textContent = countryCount(b.dataset.country);
+    });
   }
   function fillCities() {
     if (!fCity) return;
@@ -503,13 +700,26 @@
   const compareOpen = document.getElementById('compareOpen');
   const compareClear = document.getElementById('compareClear');
 
-  function toggleCompare(id) {
+  function toggleCompare(id, btn) {
     id = String(id);
     if (compare.has(id)) compare.delete(id);
-    else { if (compare.size >= MAX_COMPARE) { flashBar(); return; } compare.add(id); }
+    else { if (compare.size >= MAX_COMPARE) { flashBar(btn); return; } compare.add(id); }
     syncCompareUI();
   }
-  function flashBar() { if (!compareBar) return; compareBar.classList.add('shake'); setTimeout(() => compareBar.classList.remove('shake'), 500); }
+  function flashBar(btn) {
+    // Одиночный толчок-упор вместо четырёх рывков «дрожащей» панели
+    if (compareBar) {
+      compareBar.classList.remove('shake'); void compareBar.offsetWidth;
+      compareBar.classList.add('shake');
+      setTimeout(() => compareBar.classList.remove('shake'), cssMs('--t-quick', 160) + 60);
+    }
+    if (btn) {
+      btn.classList.remove('is-denied'); void btn.offsetWidth;
+      btn.classList.add('is-denied');
+      setTimeout(() => btn.classList.remove('is-denied'), cssMs('--t-quick', 160) + 60);
+    }
+    Sound.play('block');
+  }
   function toggleFav(id, btn) {
     id = String(id);
     if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
@@ -526,7 +736,19 @@
     // панель сравнения перекрывает плавающие кнопки — приподнимаем их
     document.body.classList.toggle('has-compare', compare.size > 0);
     if (!compareBar) return;
-    compareBar.hidden = compare.size === 0;
+    if (compare.size === 0) {
+      // Уход за --t-exit, а не hidden в один кадр: панель выдёргивало из кадра
+      if (!compareBar.hidden && !compareBar.classList.contains('is-closing')) {
+        compareBar.classList.add('is-closing');
+        setTimeout(() => {
+          if (compare.size === 0) compareBar.hidden = true;
+          compareBar.classList.remove('is-closing');
+        }, T_EXIT() + 40);
+      }
+    } else {
+      compareBar.classList.remove('is-closing');
+      compareBar.hidden = false;
+    }
     if (compareCount) compareCount.textContent = compare.size;
     if (compareChips) {
       compareChips.innerHTML = Array.from(compare).map(id => {
@@ -696,29 +918,70 @@
     wireMap(it);
   }
 
+  /* ---------- БЛОКИРОВКА ПРОКРУТКИ ----------
+     Со счётчиком: модалка поверх бокового меню раньше снимала блокировку
+     целиком. Фиксируем body и компенсируем ширину полосы прокрутки, иначе
+     страница под размытым оверлеем дёргается на её ширину. */
+  let lockCount = 0, lockTop = 0;
+  function lockScroll() {
+    if (++lockCount > 1) return;
+    lockTop = window.scrollY;
+    const gap = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.position = 'fixed';
+    document.body.style.top = -lockTop + 'px';
+    document.body.style.left = '0'; document.body.style.right = '0';
+    if (gap > 0) document.body.style.paddingRight = gap + 'px';
+  }
+  function unlockScroll() {
+    if (lockCount === 0) return;
+    if (--lockCount > 0) return;
+    document.body.style.position = ''; document.body.style.top = '';
+    document.body.style.left = ''; document.body.style.right = '';
+    document.body.style.paddingRight = '';
+    // 'instant', а не 'auto': при scroll-behavior: smooth в :root 'auto'
+    // означает «как задано в CSS», и страница после закрытия модалки
+    // медленно уезжала обратно вместо того, чтобы просто остаться на месте
+    window.scrollTo({ top: lockTop, behavior: 'instant' });
+  }
+
   /* ---------- УНИВЕРСАЛЬНЫЕ МОДАЛКИ ---------- */
   function setModal(boxId, html) { const b = document.getElementById(boxId); if (b) b.innerHTML = html; }
   let openModalEl = null;
+  const closeTimers = new WeakMap();
   function openModal(id) {
     const m = document.getElementById(id); if (!m) return;
+    const pending = closeTimers.get(m);
+    if (pending) { clearTimeout(pending); closeTimers.delete(m); }
     m.hidden = false; m.setAttribute('aria-hidden', 'false');
-    requestAnimationFrame(() => m.classList.add('open'));
-    document.body.style.overflow = 'hidden';
+    // Форсируем раскладку: без этого браузер применяет hidden=false и .open
+    // в одном кадре, перехода не возникает вовсе. Модалка объекта ехала
+    // плавно только случайно — там layout форсировал L.map().
+    void m.offsetWidth;
+    m.classList.add('open');
+    lockScroll();
+    Sound.play('open');
     openModalEl = m;
+    const first = m.querySelector('.modal__close');
+    if (first) m.addEventListener('transitionend', () => {
+      try { first.focus({ preventScroll: true }); } catch (e) {}
+    }, { once: true });
   }
   function closeModal(m) {
-    m = m || openModalEl; if (!m) return;
+    m = m || openModalEl; if (!m || m.hidden) return;
     m.classList.remove('open'); m.setAttribute('aria-hidden', 'true');
-    setTimeout(() => { m.hidden = true; }, 300);
-    document.body.style.overflow = '';
-    openModalEl = null;
+    const pending = closeTimers.get(m);
+    if (pending) clearTimeout(pending);
+    closeTimers.set(m, setTimeout(() => { m.hidden = true; closeTimers.delete(m); }, T_EXIT() + 40));
+    unlockScroll();
+    Sound.play('close');
+    if (openModalEl === m) openModalEl = null;
     destroyMap();
   }
 
   /* ---------- СОБЫТИЯ ---------- */
   function cardClick(e) {
     const cmp = e.target.closest('[data-action="compare"]');
-    if (cmp) { e.stopPropagation(); toggleCompare(cmp.dataset.id); return; }
+    if (cmp) { e.stopPropagation(); toggleCompare(cmp.dataset.id, cmp); return; }
     const fav = e.target.closest('[data-action="fav"]');
     if (fav) { e.stopPropagation(); toggleFav(fav.dataset.id, fav); return; }
     const det = e.target.closest('[data-action="detail"]');
@@ -742,9 +1005,19 @@
       pMin.value = 0; pMax.value = priceCeil; clampSliders();
     }
   }
-  [fSearch, fType, fDistrict, fBeds, fArea, fSort].forEach(el => el && el.addEventListener('input', () => { render(true); refreshAllMap(); }));
-  pMin && pMin.addEventListener('input', () => { clampSliders('min'); render(true); });
-  pMax && pMax.addEventListener('input', () => { clampSliders('max'); render(true); });
+  /* Дебаунс только для набора текста и ползунков: выбор из списка — жест
+     дискретный, задержка на нём читается как тормоз. clampSliders остаётся
+     синхронным, чтобы подписи цен шли за пальцем. */
+  let renderTimer = 0;
+  function renderSoon() {
+    if (grid) grid.classList.add('is-pending');
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(() => { render(true); refreshAllMap(); }, 180);
+  }
+  [fSearch, fArea].forEach(el => el && el.addEventListener('input', renderSoon));
+  [fType, fDistrict, fBeds, fSort].forEach(el => el && el.addEventListener('input', () => { render(true); refreshAllMap(); }));
+  pMin && pMin.addEventListener('input', () => { clampSliders('min'); renderSoon(); });
+  pMax && pMax.addEventListener('input', () => { clampSliders('max'); renderSoon(); });
   fBeach && fBeach.addEventListener('click', () => {
     beachOnly = !beachOnly;
     fBeach.classList.toggle('is-active', beachOnly);
@@ -767,7 +1040,21 @@
     if (fBeach) { fBeach.classList.remove('is-active'); fBeach.setAttribute('aria-pressed', 'false'); }
     render(true); refreshAllMap();
   });
-  catalogMore && catalogMore.addEventListener('click', () => { shown += PAGE_SIZE; render(); });
+  catalogMore && catalogMore.addEventListener('click', () => {
+    // Дописываем хвост: перерисовка всей сетки гасила и заново поднимала
+    // карточки, которые человек уже читает
+    const f = getFilters();
+    const list = sortItems(allItems.filter(it => matches(it, f)), f.sort);
+    const tail = list.slice(shown, shown + PAGE_SIZE);
+    shown += PAGE_SIZE;
+    if (grid && tail.length) {
+      grid.insertAdjacentHTML('beforeend', tail.map(cardHTML).join(''));
+      observeReveal(Array.from(grid.querySelectorAll('.reveal:not(.in)')));
+      markLoaded(grid);
+      syncCompareUI();
+    }
+    if (catalogMore) catalogMore.hidden = list.length <= shown;
+  });
   compareOpen && compareOpen.addEventListener('click', openCompare);
   compareClear && compareClear.addEventListener('click', () => { compare.clear(); syncCompareUI(); });
   compareChips && compareChips.addEventListener('click', (e) => {
@@ -826,20 +1113,30 @@
   /* ---------- БОКОВОЕ МЕНЮ (DRAWER) ---------- */
   const drawer = document.getElementById('drawer');
   const burger = document.getElementById('burger');
+  if (burger) burger.setAttribute('aria-expanded', 'false');
+  let drawerTimer = 0;
   function openDrawer() {
     if (!drawer) return;
+    if (drawerTimer) { clearTimeout(drawerTimer); drawerTimer = 0; }
     drawer.hidden = false; drawer.setAttribute('aria-hidden', 'false');
-    requestAnimationFrame(() => drawer.classList.add('open'));
-    document.body.style.overflow = 'hidden';
+    void drawer.offsetWidth;
+    drawer.classList.add('open');
+    lockScroll();
+    Sound.play('open');
     if (burger) burger.setAttribute('aria-expanded', 'true');
+    // фокус внутрь по концу перехода, а не по таймеру на треть пути панели
     const first = drawer.querySelector('.drawer__close');
-    if (first) setTimeout(() => first.focus(), 120);
+    if (first) drawer.addEventListener('transitionend', () => {
+      try { first.focus({ preventScroll: true }); } catch (e) {}
+    }, { once: true });
   }
   function closeDrawer() {
     if (!drawer || drawer.hidden) return;
     drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
-    setTimeout(() => { drawer.hidden = true; }, 350);
-    document.body.style.overflow = '';
+    if (drawerTimer) clearTimeout(drawerTimer);
+    drawerTimer = setTimeout(() => { drawer.hidden = true; drawerTimer = 0; }, T_EXIT() + 40);
+    unlockScroll();
+    Sound.play('close');
     if (burger) { burger.setAttribute('aria-expanded', 'false'); burger.focus({ preventScroll: true }); }
   }
   document.addEventListener('click', (e) => {
@@ -871,6 +1168,7 @@
       partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
       d_allcities: 'All cities', d_alldistricts: 'All districts',
       cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
+      drawer_sound: 'Interface sound', sound_on: 'On', sound_off: 'Off',
       reloc_eyebrow: 'Relocation', reloc_title: 'Free relocation consultation',
       reloc_cta: 'Send a request on the site',
       reloc_wa_vn: 'Vietnam · WhatsApp', reloc_wa_th: 'Thailand · WhatsApp',
@@ -913,6 +1211,7 @@
       partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',
       d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
       cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
+      drawer_sound: 'เสียงอินเทอร์เฟซ', sound_on: 'เปิด', sound_off: 'ปิด',
       reloc_eyebrow: 'ย้ายถิ่นฐาน', reloc_title: 'ปรึกษาการย้ายถิ่นฐานฟรี',
       reloc_cta: 'ส่งคำขอผ่านเว็บไซต์',
       reloc_wa_vn: 'เวียดนาม · WhatsApp', reloc_wa_th: 'ไทย · WhatsApp',
@@ -1270,16 +1569,17 @@
       e.preventDefault();
       let ok = true;
       [nameEl, phoneEl].forEach(el => { const bad = !el.value.trim(); el.classList.toggle('err', bad); if (bad) ok = false; });
-      if (!ok) { if (hintEl) hintEl.textContent = 'Укажите имя и контакт — и я свяжусь с вами.'; return; }
+      if (!ok) { if (hintEl) { hintEl.textContent = 'Укажите имя и контакт — и я свяжусь с вами.'; hintEl.className = 'lead__hint lead__hint--err'; } return; }
       if (consentEl && !consentEl.checked) {
         const c = consentEl.closest('.lead__consent'); if (c) c.classList.add('err');
-        if (hintEl) hintEl.textContent = 'Отметьте согласие на обработку персональных данных.';
+        if (hintEl) { hintEl.textContent = 'Отметьте согласие на обработку персональных данных.'; hintEl.className = 'lead__hint lead__hint--err'; }
         return;
       }
       const text = 'Заявка с сайта Estate Art\nИмя: ' + nameEl.value.trim() +
         '\nКонтакт: ' + phoneEl.value.trim() +
         (msgEl && msgEl.value.trim() ? '\nЗапрос: ' + msgEl.value.trim() : '');
-      if (hintEl) hintEl.textContent = 'Открываем WhatsApp с вашей заявкой…';
+      if (hintEl) { hintEl.textContent = 'Открываем WhatsApp с вашей заявкой…'; hintEl.className = 'lead__hint lead__hint--ok'; }
+      Sound.play('success');
       window.open('https://wa.me/79124869508?text=' + encodeURIComponent(text), '_blank', 'noopener');
     });
     [nameEl, phoneEl].forEach(el => el && el.addEventListener('input', () => el.classList.remove('err')));
@@ -1430,8 +1730,13 @@
     // Лента дублируется: анимация сдвигает ровно на половину и стыкуется без шва
     const once = all.map(item).join('');
     track.innerHTML = once + once;
-    // Чем длиннее лента, тем дольше цикл — скорость остаётся одинаковой на глаз
-    track.style.animationDuration = Math.max(40, all.length * 2.2) + 's';
+    /* Скорость задаём в пикселях в секунду и считаем длительность от реально
+       измеренной ширины. Прежняя формула «длина × 2.2» привязывала скорость к
+       числу записей, а не к ширине, и лента то летела, то ползла. */
+    requestAnimationFrame(() => {
+      const half = track.scrollWidth / 2;
+      if (half > 0) track.style.animationDuration = Math.max(20, half / 45).toFixed(1) + 's';
+    });
 
     if (marqueeNote) {
       // В русском три формы множественного: 1 комплекс, 2 комплекса, 5 комплексов
@@ -1526,15 +1831,38 @@
       });
   }
 
+  /* ---------- ПЕРЕКЛЮЧАТЕЛЬ ЗВУКА ---------- */
+  const soundToggle = document.getElementById('soundToggle');
+  function syncSoundUI() {
+    if (!soundToggle) return;
+    const on = Sound.enabled;
+    soundToggle.setAttribute('aria-checked', on ? 'true' : 'false');
+    soundToggle.classList.toggle('is-on', on);
+    const label = soundToggle.querySelector('.sound-toggle__label');
+    if (label) {
+      label.textContent = on ? t('sound_on', 'Включён') : t('sound_off', 'Выключен');
+      label.setAttribute('data-i18n', on ? 'sound_on' : 'sound_off');
+    }
+  }
+  if (soundToggle) {
+    if (!Sound.available) soundToggle.closest('.drawer__group').hidden = true;
+    soundToggle.addEventListener('click', () => { Sound.toggle(); syncSoundUI(); });
+    syncSoundUI();
+  }
+
   /* ---------- СЧЁТЧИКИ ЦИФР ---------- */
   const counters = document.querySelectorAll('[data-count]');
   let countersDone = false;
   function runCounters() {
     if (countersDone) return;
     countersDone = true;
+    if (reduceMotion) {
+      counters.forEach(el => { el.textContent = parseInt(el.dataset.count, 10) || 0; });
+      return;
+    }
     counters.forEach(el => {
       const end = parseInt(el.dataset.count, 10) || 0;
-      const dur = 1600; const t0 = performance.now();
+      const dur = cssMs('--t-curtain', 900); const t0 = performance.now();
       function tick(now) {
         const k = Math.min((now - t0) / dur, 1);
         const eased = 1 - Math.pow(1 - k, 3);

@@ -153,10 +153,10 @@
 
   <!-- ============ ДОВЕРИЕ / ЦИФРЫ ============ -->
   <section class="trust reveal">
-    <div class="trust__item"><b data-count="120">0</b><span data-i18n="trust_families">довольных семей</span></div>
-    <div class="trust__item"><b data-count="8">0</b><span data-i18n="trust_years">лет на острове</span></div>
-    <div class="trust__item"><b data-count="100">0</b><span data-i18n="trust_legal">% юридическая защита</span></div>
-    <div class="trust__item"><b data-count="50">0</b><span data-i18n="trust_objects">проверенных объектов</span></div>
+    <div class="trust__item"><b data-count="120">120</b><span data-i18n="trust_families">довольных семей</span></div>
+    <div class="trust__item"><b data-count="8">8</b><span data-i18n="trust_years">лет на острове</span></div>
+    <div class="trust__item"><b data-count="100">100</b><span data-i18n="trust_legal">% юридическая защита</span></div>
+    <div class="trust__item"><b data-count="50">50</b><span data-i18n="trust_objects">проверенных объектов</span></div>
   </section>
 
   <!-- ============ ПОЧЕМУ С НАМИ (видео) ============ -->
@@ -671,6 +671,15 @@
         </div>
       </div>
 
+      <div class="drawer__group">
+        <span class="drawer__label" data-i18n="drawer_sound">Звук интерфейса</span>
+        <button class="sound-toggle" id="soundToggle" type="button" role="switch" aria-checked="false">
+          <i class="ico ico--sound" aria-hidden="true"></i>
+          <span class="sound-toggle__label" data-i18n="sound_off">Выключен</span>
+          <span class="sound-toggle__track" aria-hidden="true"><span class="sound-toggle__knob"></span></span>
+        </button>
+      </div>
+
       <nav class="drawer__nav">
         <a href="#districts" data-drawer-close data-i18n="nav_districts">Районы</a>
         <a href="#catalog" data-drawer-close data-i18n="nav_objects">Объекты</a>
@@ -749,6 +758,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/sound.js"></script>
   <script src="js/script.js"></script>
   <script src="js/chat.js" defer></script>
 </body>

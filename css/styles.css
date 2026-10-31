@@ -28,7 +28,27 @@
   --ease:        cubic-bezier(.16,.84,.32,1);
   --ease-out:    cubic-bezier(.22,1,.36,1);
   --ease-soft:   cubic-bezier(.4,0,.2,1);
+  --ease-press:  cubic-bezier(.3,0,.2,1);   /* нажатие вниз: щелчок, а не прыжок */
   --maxw:        1240px;
+
+  /* Длительности. До этого в файле жило 22 значения (.07 .12 .14 .2 .21 .25 .28
+     .3 .32 .35 .4 .45 .5 .55 .6 .7 .8 .9 1 1.1 1.6 1.9s) и ни одного в токене —
+     соседние ступени различались на 20 мс, то есть не различались вовсе.
+     Здесь семь ступеней с шагом ~1.5×: каждая читается как другая скорость. */
+  --t-tap:      90ms;   /* нажатие вниз (:active) и щелчок звука */
+  --t-quick:   160ms;   /* цвет, граница, иконка — ничего не двигается */
+  --t-hover:   240ms;   /* подъём плиток и кнопок, тень, фокус-кольцо, возврат */
+  --t-exit:    240ms;   /* уход слоя: модалка, меню, чат, панель сравнения */
+  --t-enter:   360ms;   /* вход слоя. Уход всегда быстрее входа */
+  --t-reveal:  560ms;   /* появление блока при скролле, проявление фото */
+  --t-curtain: 900ms;   /* занавес прелоадера, медленный зум фото, отсчёт цифр */
+  --t-stagger:  60ms;   /* шаг каскада внутри одной сетки */
+
+  /* Геометрия движения. Было: вход панелей 14/26/30px, подъёмы 2/3/4/6px. */
+  --d-enter:     16px;
+  --d-lift:       4px;  /* кнопки и мелкие плитки */
+  --d-lift-card:  6px;  /* карточки каталога и районов — потолок дизайн-языка */
+  --s-press:     .985;  /* масштаб нажатия */
 
   /* Типографическая шкала. До этого в диапазоне .66–1.5rem жило 22 значения,
      часть отличалась на 0.02rem — различие не читалось как замысел. Роль
@@ -53,6 +73,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 [hidden] { display: none !important; }
 
+html.is-loading { overflow: hidden; }
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;            /* чтобы якоря не прятались под шапкой */
@@ -105,7 +126,7 @@ h1, h2, h3, h4 {
   display: grid; place-items: center;
   /* Уход занавесом вверх вместо простого затухания: полотно уезжает,
      открывая герой снизу вверх. */
-  transition: transform 1s var(--ease-out), visibility 1s;
+  transition: transform var(--t-curtain) var(--ease), visibility var(--t-curtain);
   will-change: transform;
 }
 /* Тонкая золотая линия по нижней кромке полотна — она же «край занавеса» */
@@ -114,7 +135,7 @@ h1, h2, h3, h4 {
   background: linear-gradient(90deg, transparent, rgba(227,195,120,.5), transparent);
 }
 .preloader.hidden { transform: translateY(-100%); visibility: hidden; }
-.preloader.hidden .preloader__inner { opacity: 0; transition: opacity .45s var(--ease-out); }
+.preloader.hidden .preloader__inner { opacity: 0; transition: opacity var(--t-exit) var(--ease-out); }
 
 .preloader__inner { width: min(420px, 82vw); text-align: center; }
 
@@ -129,8 +150,8 @@ h1, h2, h3, h4 {
 .preloader__logo span span {
   display: inline-block; opacity: 0; transform: translateY(.45em);
   letter-spacing: .2em;
-  animation: preloaderLetter .8s var(--ease-out) forwards;
-  animation-delay: calc(var(--i) * 60ms);
+  animation: preloaderLetter var(--t-reveal) var(--ease-out) forwards;
+  animation-delay: calc(var(--i) * var(--t-stagger));
 }
 .preloader__logo .is-gold { color: var(--gold-light); }
 @keyframes preloaderLetter {
@@ -141,26 +162,20 @@ h1, h2, h3, h4 {
   position: relative; height: 1px; width: 100%;
   background: rgba(255,253,248,.14); overflow: hidden;
 }
+/* Сглаживание прогресса живёт в rAF (lerp 0.16). Второй сглаживатель поверх —
+   ровно то, из-за чего честный прогресс отставал на полсекунды и доезжал уже
+   под занавесом. Поэтому перехода здесь нет, а едем масштабом, не шириной. */
 .preloader__rule span {
-  display: block; height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--gold), var(--gold-light));
-  transition: width .5s var(--ease-out);
-}
-/* Блик, бегущий по линии, пока идёт загрузка */
-.preloader__rule::after {
-  content: ''; position: absolute; top: 0; left: 0; width: 34%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,253,248,.55), transparent);
-  animation: preloaderSheen 1.9s var(--ease-soft) infinite;
-}
-@keyframes preloaderSheen {
-  from { transform: translateX(-120%); }
-  to   { transform: translateX(400%); }
+  display: block; height: 100%; width: 100%;
+  background: var(--gold-light);
+  transform: scaleX(0); transform-origin: 0 50%;
+  will-change: transform;
 }
 
 .preloader__meta {
   display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
   margin-top: .9rem;
-  opacity: 0; animation: preloaderMeta .8s var(--ease-out) .55s forwards;
+  opacity: 0; animation: preloaderMeta var(--t-reveal) var(--ease-out) .55s forwards;
 }
 @keyframes preloaderMeta { to { opacity: 1; } }
 .preloader__tag {
@@ -182,18 +197,19 @@ h1, h2, h3, h4 {
 .header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1.5rem clamp(1.2rem, 4vw, 3.2rem);
-  transition: background .4s var(--ease), padding .4s var(--ease), box-shadow .4s var(--ease);
+  padding-block: 1.5rem; padding-inline: clamp(1.2rem, 4vw, 3.2rem);
+  contain: layout style;
+  transition: background var(--t-quick) var(--ease-soft), padding-block var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out);
 }
 .header.scrolled {
   background: rgba(246,241,231,.85);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  padding: .9rem clamp(1.2rem, 4vw, 3.2rem);
+  padding-block: .9rem;
   box-shadow: 0 1px 0 rgba(20,32,31,.07);
 }
 .logo {
   font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700;
-  letter-spacing: .2em; color: var(--cream); transition: color .4s var(--ease);
+  letter-spacing: .2em; color: var(--cream); transition: color var(--t-quick) var(--ease-soft);
 }
 .logo span { color: var(--gold-light); }
 .header.scrolled .logo { color: var(--teal); }
@@ -202,11 +218,11 @@ h1, h2, h3, h4 {
 .nav { display: flex; gap: 2rem; }
 .nav a {
   font-size: var(--fs-sm); font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-  color: rgba(255,255,255,.85); position: relative; transition: color .3s;
+  color: rgba(255,255,255,.85); position: relative; transition: color var(--t-quick) var(--ease-soft);
 }
 .nav a::after {
   content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 1.5px;
-  background: var(--gold); transition: width .3s var(--ease);
+  background: var(--gold); transition: width var(--t-hover) var(--ease-out);
 }
 .nav a:hover { color: #fff; }
 .nav a:hover::after { width: 100%; }
@@ -216,19 +232,30 @@ h1, h2, h3, h4 {
 .header__cta {
   font-weight: 600; font-size: var(--fs-base); letter-spacing: .04em; font-variant-numeric: tabular-nums;
   padding: .6rem 1.2rem; border: 1px solid rgba(255,255,255,.55); border-radius: var(--radius-sm);
-  color: #fff; transition: all .3s var(--ease); white-space: nowrap;
+  color: #fff; white-space: nowrap;
+  transition: background var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft),
+              color var(--t-quick) var(--ease-soft), transform var(--t-hover) var(--ease-out);
 }
 .header__cta:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
 .header.scrolled .header__cta { color: var(--teal); border-color: rgba(15,63,58,.3); }
 .header.scrolled .header__cta:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 
 .burger { display: none; background: none; border: 0; cursor: pointer; flex-direction: column; gap: 5px; padding: 6px; }
-.burger span { display: block; width: 26px; height: 2px; background: #fff; transition: .3s; }
+.burger span {
+  display: block; width: 26px; height: 2px; background: #fff;
+  transform-origin: center;
+  transition: background var(--t-quick) var(--ease-soft), transform var(--t-hover) var(--ease-out), opacity var(--t-quick) var(--ease-soft);
+}
+/* Бургер превращается в крестик. background остаётся в transition выше,
+   иначе смена цвета полосок при .header.scrolled станет мгновенной. */
+.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(.4); }
+.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 .header.scrolled .burger span { background: var(--teal); }
 
 /* ---------- HERO / СКРОЛЛ-ОБЛЁТ ---------- */
 .hero { position: relative; }
-.hero__scroll-track { height: 500vh; position: relative; }   /* длина = длительность скролл-анимации */
+.hero__scroll-track { height: 320vh; position: relative; }   /* длина = длительность скролл-анимации, ~1 экран на акт */
 .hero__sticky {
   position: sticky; top: 0; height: 100vh; width: 100%;
   overflow: hidden; background: var(--teal-deep);
@@ -242,9 +269,9 @@ h1, h2, h3, h4 {
   background-image: -webkit-image-set(url('../assets/hero-phuket.webp') type('image/webp'), url('../assets/hero-phuket.jpg') type('image/jpeg'));
   background-image: image-set(url('../assets/hero-phuket.webp') type('image/webp'), url('../assets/hero-phuket.jpg') type('image/jpeg'));
   background-size: cover; background-position: center;
-  transition: opacity .8s var(--ease);
+  transition: opacity var(--t-quick) var(--ease-soft);
 }
-.hero__video { opacity: 0; transition: opacity 1s var(--ease); }
+.hero__video { opacity: 0; transition: opacity var(--t-quick) var(--ease-soft); }
 .hero__video.ready { opacity: 1; }
 .hero__video.ready ~ .hero__fallback { opacity: 0; }
 
@@ -260,7 +287,6 @@ h1, h2, h3, h4 {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 0 1.5rem; color: #fff;
   opacity: 0; pointer-events: none;
-  transition: opacity .5s var(--ease);
 }
 .hero__layer.active { opacity: 1; pointer-events: auto; }
 
@@ -276,7 +302,7 @@ h1, h2, h3, h4 {
   margin-top: 2.2rem; display: inline-flex; align-items: center; gap: .5rem;
   padding: 1.05rem 2.4rem; background: var(--gold-fill); color: #fff; border-radius: var(--radius-sm);
   font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: var(--fs-sm);
-  box-shadow: 0 16px 36px -14px rgba(0,0,0,.45); transition: transform .3s var(--ease), box-shadow .3s, background .3s;
+  box-shadow: 0 16px 36px -14px rgba(0,0,0,.45); transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-soft);
 }
 .hero__enter:hover { transform: translateY(-2px); background: #9c7c34; }
 
@@ -284,16 +310,24 @@ h1, h2, h3, h4 {
   position: absolute; bottom: 2.4rem; left: 50%; transform: translateX(-50%); z-index: 4;
   display: flex; flex-direction: column; align-items: center; gap: .7rem;
   color: rgba(255,255,255,.8); font-size: var(--fs-2xs); letter-spacing: .25em; text-transform: uppercase;
-  transition: opacity .4s;
+  transition: opacity var(--t-quick) var(--ease-soft);
 }
 .hero__scroll-hint i {
   width: 24px; height: 38px; border: 2px solid rgba(255,255,255,.5); border-radius: 14px; position: relative;
 }
 .hero__scroll-hint i::after {
-  content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 8px; background: #fff; border-radius: 4px; animation: wheel 1.6s infinite;
+  content: ''; position: absolute; top: 7px; left: 50%;
+  width: 4px; height: 8px; background: #fff; border-radius: 4px;
+  animation: wheel 1.6s var(--ease-soft) infinite;
 }
-@keyframes wheel { 0% { opacity: 0; top: 7px; } 40% { opacity: 1; } 100% { opacity: 0; top: 20px; } }
+/* Колёсико едет transform, а не top: top пересчитывал раскладку 60 раз в секунду
+   на первом экране, где и так грузится видео. Цикл оставлен бесконечным
+   осознанно — это единственная подсказка, и она гаснет на первых 5% прокрутки. */
+@keyframes wheel {
+  0%   { opacity: 0; transform: translate(-50%, 0); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 13px); }
+}
 
 /* ---------- ДОВЕРИЕ / ЦИФРЫ ---------- */
 .trust {
@@ -304,7 +338,7 @@ h1, h2, h3, h4 {
 }
 .trust__item { text-align: center; }
 .trust__item + .trust__item { border-left: 1px solid rgba(255,253,248,.14); }
-.trust__item b { display: block; font-family: 'Cormorant Garamond', serif; font-size: clamp(2.6rem, 5vw, 4rem); color: var(--gold-light); font-weight: 500; }
+.trust__item b { display: block; font-variant-numeric: tabular-nums; font-family: 'Cormorant Garamond', serif; font-size: clamp(2.6rem, 5vw, 4rem); color: var(--gold-light); font-weight: 500; }
 .trust__item span { font-size: var(--fs-xs); letter-spacing: .16em; text-transform: uppercase; color: rgba(255,253,248,.65); }
 @media (max-width: 980px) { .trust__item + .trust__item { border-left: 0; } }
 
@@ -319,11 +353,10 @@ h1, h2, h3, h4 {
   display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
   padding: 1rem 2rem; border-radius: var(--radius-sm); font-weight: 600; font-size: var(--fs-sm);
   letter-spacing: .14em; text-transform: uppercase;
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease), background .3s;
   cursor: pointer; border: none;
 }
 .btn--lg { padding: 1.15rem 2.4rem; font-size: var(--fs-base); }
-.btn:hover { transform: translateY(-2px); }
+.btn:hover { transform: translateY(calc(-1 * var(--d-lift))); }
 .btn--gold { background: var(--gold-fill); color: #fff; box-shadow: var(--shadow-sm); }
 .btn--gold:hover { background: #9c7c34; box-shadow: var(--shadow); }
 .btn--wa { background: var(--wa); color: #fff; }
@@ -336,13 +369,12 @@ h1, h2, h3, h4 {
   background: var(--cream); border-radius: var(--radius); overflow: hidden;
   border: 1px solid var(--hairline); box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column;
-  transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s;
 }
 .card__body { display: flex; flex-direction: column; flex: 1; }
 .card__bottom { margin-top: auto; }
-.card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(176,140,61,.35); }
+.card:hover { transform: translateY(calc(-1 * var(--d-lift-card))); box-shadow: var(--shadow); border-color: rgba(176,140,61,.35); }
 .card__media { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--sand-deep); }
-.card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
 .card:hover .card__media img { transform: scale(1.05); }
 .card__tag {
   position: absolute; top: 1rem; left: 1rem; background: rgba(8,40,37,.85); color: #fff;
@@ -391,7 +423,7 @@ h1, h2, h3, h4 {
 .filter {
   font-family: inherit; font-size: var(--fs-base); color: var(--ink); background: var(--cream);
   border: 1px solid rgba(15,63,58,.18); border-radius: var(--radius-sm); padding: .72rem 1.1rem;
-  transition: border-color .25s, box-shadow .25s; cursor: pointer; outline: none;
+  transition: border-color var(--t-quick) var(--ease-soft), box-shadow var(--t-hover) var(--ease-out); cursor: pointer; outline: none;
 }
 .filter:hover { border-color: rgba(15,63,58,.35); }
 .filter:focus-visible, .filter--search:focus-within {
@@ -416,9 +448,9 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   display: inline-flex; align-items: center; gap: .35rem; cursor: pointer;
   background: rgba(255,253,248,.92); color: var(--teal); border: 1.5px solid transparent;
   border-radius: 8px; padding: .42rem .8rem; font-size: var(--fs-2xs); font-weight: 700;
-  letter-spacing: .02em; backdrop-filter: blur(4px); transition: all .25s var(--ease);
+  letter-spacing: .02em; backdrop-filter: blur(4px);
 }
-.card__compare svg { opacity: .35; transition: opacity .2s; }
+.card__compare svg { opacity: .35; transition: opacity var(--t-quick) var(--ease-soft); }
 .card__compare:hover { box-shadow: 0 8px 20px -8px rgba(8,40,37,.5); }
 .card__compare.is-active { background: var(--gold-fill); color: #fff; border-color: var(--gold-fill); }
 .card__compare.is-active svg { opacity: 1; }
@@ -431,11 +463,16 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   display: flex; align-items: center; gap: 1rem; max-width: calc(100vw - 2rem);
   background: var(--teal-deep); color: var(--cream); padding: .8rem .8rem .8rem 1.4rem;
   border-radius: 100px; box-shadow: 0 24px 50px -16px rgba(8,40,37,.7);
-  animation: barUp .4s var(--ease);
+  animation: barUp var(--t-enter) var(--ease-out);
 }
-@keyframes barUp { from { opacity: 0; transform: translate(-50%, 30px); } to { opacity: 1; transform: translate(-50%, 0); } }
-.compare-bar.shake { animation: shake .45s; }
-@keyframes shake { 0%,100%{transform:translate(-50%,0)} 25%{transform:translate(-52%,0)} 75%{transform:translate(-48%,0)} }
+@keyframes barUp { from { opacity: 0; transform: translate(-50%, var(--d-enter)); } to { opacity: 1; transform: translate(-50%, 0); } }
+/* Уход быстрее входа — иначе панель выдёргивало из кадра без следа */
+.compare-bar.is-closing { animation: barDown var(--t-exit) var(--ease-soft) forwards; }
+@keyframes barDown { to { opacity: 0; transform: translate(-50%, calc(var(--d-enter) / 2)); } }
+/* Отказ при лимите: один толчок-упор, а не четыре рывка «дрожащей» панели */
+.compare-bar.shake { animation: nudge var(--t-quick) var(--ease-soft); }
+@keyframes nudge { 50% { transform: translate(-50%, 0) translateX(4px); } }
+.filter.is-denied, .card__compare.is-denied { animation: nudge var(--t-quick) var(--ease-soft); }
 .compare-bar__info { display: flex; flex-direction: column; line-height: 1.05; }
 .compare-bar__info b { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold-light); }
 .compare-bar__info span { font-size: var(--fs-2xs); text-transform: uppercase; letter-spacing: .1em; color: rgba(255,253,248,.6); }
@@ -451,17 +488,17 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 /* ---------- МОДАЛКИ ---------- */
 .modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 1.2rem; }
 .modal[hidden] { display: none; }
-.modal__overlay { position: absolute; inset: 0; background: rgba(6,32,29,.6); backdrop-filter: blur(6px); opacity: 0; transition: opacity .3s; }
+.modal__overlay { position: absolute; inset: 0; background: rgba(6,32,29,.6); backdrop-filter: blur(6px); opacity: 0; transition: opacity var(--t-enter) var(--ease-out); }
 .modal.open .modal__overlay { opacity: 1; }
 .modal__box {
   position: relative; z-index: 1; background: var(--sand); border-radius: var(--radius); width: min(720px, 100%);
   max-height: 92vh; overflow-y: auto; padding: clamp(1.4rem, 4vw, 2.4rem);
   box-shadow: var(--shadow); transform: translateY(24px) scale(.98); opacity: 0;
-  transition: transform .35s var(--ease), opacity .35s var(--ease);
+  transition: transform var(--t-enter) var(--ease-out), opacity var(--t-enter) var(--ease-out);
 }
 .modal.open .modal__box { transform: none; opacity: 1; }
 .modal__box--wide { width: min(1040px, 100%); }
-.modal__close { position: absolute; top: 1rem; right: 1rem; z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(8,40,37,.08); color: var(--teal); font-size: 1.5rem; line-height: 1; cursor: pointer; transition: background .25s; }
+.modal__close { position: absolute; top: 1rem; right: 1rem; z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(8,40,37,.08); color: var(--teal); font-size: 1.5rem; line-height: 1; cursor: pointer; transition: background var(--t-quick) var(--ease-soft); }
 .modal__close:hover { background: rgba(8,40,37,.18); }
 .modal__title { font-size: var(--fs-title-sm); color: var(--teal); margin-bottom: 1.4rem; }
 
@@ -518,7 +555,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .searchband__form input { flex: 1; font: inherit; font-size: var(--fs-md); padding: .95rem 1.3rem; border: 1px solid rgba(15,63,58,.2); border-radius: var(--radius-sm); outline: none; background: #fff; }
 .searchband__form input:focus-visible { border-color: var(--gold-ink); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--gold-ink); outline: none; }
 .searchband__chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1.1rem; }
-.chip { background: var(--sand); border: 1px solid rgba(15,63,58,.14); color: var(--ink-soft); border-radius: 6px; padding: .45rem 1rem; font: inherit; font-size: var(--fs-sm); font-weight: 600; letter-spacing: .04em; cursor: pointer; transition: all .25s; }
+.chip { background: var(--sand); border: 1px solid rgba(15,63,58,.14); color: var(--ink-soft); border-radius: 6px; padding: .45rem 1rem; font: inherit; font-size: var(--fs-sm); font-weight: 600; letter-spacing: .04em; cursor: pointer; }
 .chip:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 
 /* ---------- БЕЙДЖИ / ИЗБРАННОЕ / СКИДКА ---------- */
@@ -529,8 +566,8 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .badge { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .36rem .7rem; border-radius: 6px; color: #fff; box-shadow: 0 6px 16px -6px rgba(0,0,0,.35); }
 .badge--yield { background: linear-gradient(135deg, var(--emerald), var(--teal)); }
 .badge--disc { background: #c0392b; }
-.card__fav { position: absolute; top: .9rem; right: .9rem; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,253,248,.92); color: var(--ink-soft); cursor: pointer; display: grid; place-items: center; backdrop-filter: blur(4px); transition: all .25s var(--ease); }
-.card__fav svg { fill: currentColor; transition: transform .2s; }
+.card__fav { position: absolute; top: .9rem; right: .9rem; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,253,248,.92); color: var(--ink-soft); cursor: pointer; display: grid; place-items: center; backdrop-filter: blur(4px); }
+.card__fav svg { fill: currentColor; transition: transform var(--t-hover) var(--ease-out); }
 .card__fav:hover { color: #e87a86; }
 .card__fav.is-active { color: #e23b54; }
 .card__fav.is-active svg { transform: scale(1.12); }
@@ -538,8 +575,9 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .card__price s { display: inline-block; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-soft); margin-right: .5rem; text-decoration: line-through; }
 
 .catalog__more { text-align: center; margin-top: 2.2rem; }
-.filter--fav, .filter--toggle { background: var(--cream); border-style: dashed; }
-.filter--fav.is-active, .filter--toggle.is-active { border-style: solid; }
+/* Пунктир убран: «выключено» уже несут фон и цвет границы, а dashed → solid
+   переход не анимируется, поэтому включение щёлкало без кадра движения. */
+.filter--fav, .filter--toggle { background: var(--cream); }
 .filter--fav.is-active { background: var(--rose-fill); color: #fff; border-color: var(--rose-fill); }
 .filter--toggle.is-active { background: var(--ocean-fill); color: #fff; border-color: var(--ocean-fill); }
 
@@ -556,7 +594,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 /* ---------- РАЙОНЫ ---------- */
 .districts__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(.9rem, 2vw, 1.4rem); }
 .dcard { position: relative; aspect-ratio: 4/5; border-radius: var(--radius); overflow: hidden; border: 0; cursor: pointer; padding: 0; box-shadow: var(--shadow-sm); }
-.dcard img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
+.dcard img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--t-curtain) var(--ease); }
 .dcard::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,32,29,.85) 5%, rgba(6,32,29,.1) 55%); }
 .dcard:hover img { transform: scale(1.05); }
 .dcard__name { position: absolute; left: 1rem; bottom: 1.5rem; z-index: 1; color: #fff; font-family: 'Cormorant Garamond', serif; font-size: var(--fs-h3); font-weight: 600; }
@@ -564,7 +602,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 
 /* ---------- ФИНАНСИРОВАНИЕ ---------- */
 .finance__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
-.fin-card { background: var(--cream); border-radius: var(--radius); padding: 1.8rem 1.5rem; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: .6rem; transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
+.fin-card { background: var(--cream); border-radius: var(--radius); padding: 1.8rem 1.5rem; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: .6rem; transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out); }
 .fin-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
 .fin-card__ico { line-height: 1; color: var(--gold); }
 .fin-card__ico svg { width: 34px; height: 34px; stroke: currentColor; }
@@ -588,16 +626,20 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 /* ---------- БОКОВОЕ МЕНЮ (DRAWER) ---------- */
 .drawer { position: fixed; inset: 0; z-index: 300; }
 .drawer[hidden] { display: none; }
-.drawer__overlay { position: absolute; inset: 0; background: rgba(6,32,29,.6); backdrop-filter: blur(6px); opacity: 0; transition: opacity .35s; }
+.drawer__overlay { position: absolute; inset: 0; background: rgba(6,32,29,.6); backdrop-filter: blur(6px); opacity: 0; transition: opacity var(--t-enter) var(--ease-out); }
 .drawer.open .drawer__overlay { opacity: 1; }
 .drawer__panel {
   position: absolute; top: 0; right: 0; height: 100%; width: min(380px, 88vw);
   background: var(--sand); box-shadow: -30px 0 70px -30px rgba(8,40,37,.5);
   padding: 1.6rem clamp(1.4rem, 4vw, 2rem); overflow-y: auto;
-  transform: translateX(100%); transition: transform .4s var(--ease);
+  transform: translateX(100%); transition: transform var(--t-enter) var(--ease-out);
   display: flex; flex-direction: column; gap: 1.4rem;
 }
 .drawer.open .drawer__panel { transform: none; }
+.drawer:not(.open) .drawer__panel,
+.drawer:not(.open) .drawer__overlay,
+.modal:not(.open) .modal__overlay,
+.modal:not(.open) .modal__box { transition-duration: var(--t-exit); }
 .drawer__top { display: flex; align-items: center; justify-content: space-between; }
 .logo--drawer { color: var(--teal); font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: .2em; }
 .logo--drawer span { color: var(--gold); }
@@ -607,11 +649,11 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .drawer__group { display: flex; flex-direction: column; gap: .6rem; }
 .drawer__label { font-size: var(--fs-2xs); text-transform: uppercase; letter-spacing: .12em; color: var(--ink-soft); font-weight: 700; }
 .curr-switch { display: flex; background: var(--sand-deep); border-radius: 100px; padding: 4px; }
-.curr-switch button { flex: 1; border: 0; background: none; font: inherit; font-size: var(--fs-sm); font-weight: 700; color: var(--ink-soft); padding: .55rem .4rem; border-radius: 100px; cursor: pointer; transition: all .25s; }
+.curr-switch button { flex: 1; border: 0; background: none; font: inherit; font-size: var(--fs-sm); font-weight: 700; color: var(--ink-soft); padding: .55rem .4rem; border-radius: 100px; cursor: pointer; }
 .curr-switch button.is-active { background: var(--teal); color: #fff; box-shadow: 0 6px 16px -8px rgba(8,40,37,.6); }
 .drawer__nav { display: flex; flex-direction: column; }
-.drawer__nav a { padding: .85rem 0; border-bottom: 1px solid rgba(15,63,58,.1); font-weight: 600; color: var(--ink); transition: color .2s, padding-left .2s; }
-.drawer__nav a:hover { color: var(--gold); padding-left: .4rem; }
+.drawer__nav a { padding: .85rem 0; border-bottom: 1px solid rgba(15,63,58,.1); font-weight: 600; color: var(--ink); transition: color var(--t-quick) var(--ease-soft), transform var(--t-hover) var(--ease-out); }
+.drawer__nav a:hover { color: var(--gold); transform: translateX(.4rem); }
 .drawer__contacts { margin-top: auto; display: flex; flex-direction: column; gap: .7rem; padding-top: 1rem; }
 .drawer__phone { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: var(--teal); }
 .drawer__social { display: flex; gap: .6rem; }
@@ -685,7 +727,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 }
 .step {
   background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
-  border-radius: var(--radius); padding: 1.8rem 1.5rem; transition: transform .4s var(--ease), background .4s, border-color .4s;
+  border-radius: var(--radius); padding: 1.8rem 1.5rem; transition: transform var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft);
 }
 .step:hover { transform: translateY(-5px); background: rgba(255,255,255,.09); border-color: rgba(227,195,120,.4); }
 .step__num { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 500; color: var(--gold-light); display: block; margin-bottom: .6rem; }
@@ -728,7 +770,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .contacts__phone {
   display: inline-block; font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 700; color: var(--gold-light); margin-bottom: 2rem; letter-spacing: .02em; position: relative;
-  transition: color .3s;
+  transition: color var(--t-quick) var(--ease-soft);
 }
 .contacts__phone:hover { color: #fff; }
 .contacts__actions { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; position: relative; }
@@ -742,7 +784,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 }
 .logo--footer { color: var(--cream); }
 .footer__nav { display: flex; flex-wrap: wrap; gap: 1.6rem; }
-.footer__nav a { font-size: var(--fs-base); transition: color .3s; }
+.footer__nav a { font-size: var(--fs-base); transition: color var(--t-quick) var(--ease-soft); }
 .footer__nav a:hover { color: var(--gold-light); }
 .footer__bottom {
   max-width: var(--maxw); margin: 1.6rem auto 0; display: flex; justify-content: space-between;
@@ -754,27 +796,40 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .floating { position: fixed; right: 1.4rem; bottom: 1.4rem; z-index: 90; display: flex; flex-direction: column; gap: .8rem; }
 .floating__btn {
   width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: #fff;
-  box-shadow: 0 14px 30px -8px rgba(0,0,0,.4); transition: transform .3s var(--ease);
+  box-shadow: 0 14px 30px -8px rgba(0,0,0,.4); transition: transform var(--t-hover) var(--ease-out);
 }
-.floating__btn:hover { transform: scale(1.12) translateY(-2px); }
 .floating__btn--wa { background: var(--wa); }
+/* Раздувание круга на 12% — приём из бесплатных шаблонов, и рядом на .chat__fab
+   стоял свой scale(1.04): два масштаба на двух соседних круглых кнопках. */
+.floating__btn, .to-top, .chat__fab { translate: 0 calc(-1 * var(--lift, 0px)); transition-property: opacity, transform, background, box-shadow, translate; }
+.floating__btn:hover, .chat__fab:hover { transform: translateY(calc(-1 * var(--d-lift))); box-shadow: 0 18px 34px -12px rgba(8,40,37,.5); }
 .floating__btn--tg { background: var(--tg); }
 
 /* ---------- REVEAL-АНИМАЦИИ ---------- */
-.reveal {
-  opacity: 0; transform: translateY(26px);
-  transition: opacity .8s var(--ease-out), transform .8s var(--ease-out);
-  will-change: opacity, transform;
+/* will-change здесь держал ~170 вечных композиторных слоёв — главная причина,
+   почему прокрутка дёргалась на слабых машинах. Слой нужен только на время
+   перехода, поэтому его ставит и снимает JS.
+   Каскад: индекс --rv считает IO-колбэк, отсортировав партию по положению на
+   экране. nth-child врал при любом числе колонок, кроме трёх, и выдавал
+   задержку секциям во весь экран за их место в <main>. */
+.reveal { opacity: 0; }
+/* Появление — анимация, а не переход. Переходом оно сталкивалось с ховером:
+   у .dcard, .jcard, .step и остальных плиток своё объявление transition, и оно
+   целиком перебивало переход .reveal вместе с задержкой каскада — плитки
+   появлялись рывком и все разом. Анимация с переходами не конкурирует. */
+.reveal.in {
+  opacity: 1;
+  animation: revealIn var(--t-reveal) var(--ease-out) backwards;
+  animation-delay: calc(var(--rv, 0) * var(--t-stagger));
 }
-.reveal.in { opacity: 1; transform: none; }
-.reveal:nth-child(2) { transition-delay: .07s; }
-.reveal:nth-child(3) { transition-delay: .14s; }
-.reveal:nth-child(4) { transition-delay: .21s; }
-.reveal:nth-child(5) { transition-delay: .28s; }
-.reveal:nth-child(6) { transition-delay: .35s; }
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(var(--d-enter)); }
+  to   { opacity: 1; transform: none; }
+}
+.reveal.is-moving { will-change: opacity, transform; }
 
 /* Плавное проявление изображений карточек/районов при загрузке */
-.card__media img, .dcard img { opacity: 0; transition: opacity .6s var(--ease-out), transform .9s var(--ease); }
+.card__media img, .dcard img { opacity: 0; }
 .card__media img.is-loaded, .dcard img.is-loaded { opacity: 1; }
 
 /* ---------- АДАПТИВ ---------- */
@@ -792,7 +847,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 @media (max-width: 760px) {
   .nav { display: none; }
   .header__cta { display: none; }
-  .hero__scroll-track { height: 400vh; }
+  .hero__scroll-track { height: 220vh; }
   .catalog__grid, .reviews__grid, .journal__grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
@@ -824,37 +879,78 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 /* ============================================================
    ПОЛИРОВКА ПЕРЕХОДОВ И МИКРО-ВЗАИМОДЕЙСТВИЙ
    ============================================================ */
+/* Единственный источник истины по переходам. Раньше таймингов было два
+   поколения: ранние объявления у .btn, .card, .card__media img и .hero__layer
+   молча перебивались этим блоком, поэтому половина правок не давала эффекта.
+   Ранние объявления сняты — править тайминги теперь можно только здесь. */
 .btn {
-  transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out), background .3s var(--ease-out), color .25s var(--ease-out), border-color .25s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out),
+              background var(--t-quick) var(--ease-out), color var(--t-quick) var(--ease-out),
+              border-color var(--t-quick) var(--ease-out);
 }
-.btn:active { transform: translateY(-1px) scale(.99); }
-.card { transition: transform .55s var(--ease-out), box-shadow .55s var(--ease-out), border-color .4s var(--ease-out); }
-.card__media img { transition: transform 1s var(--ease-out), opacity .6s var(--ease-out); }
+.card { transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out), border-color var(--t-quick) var(--ease-out); }
+.card__media img, .dcard img { transition: transform var(--t-curtain) var(--ease), opacity var(--t-reveal) var(--ease-out); }
 
 /* лёгкий подъём интерактивных плиток */
-.spec, .review { transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out); }
-.spec:hover { transform: translateY(-2px); }
-.review:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.dcard, .fin-card, .step { transition: transform .45s var(--ease-out), background .4s var(--ease-out), box-shadow .45s var(--ease-out); }
+.spec, .review { transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out); }
+.spec:hover { transform: translateY(calc(-1 * var(--d-lift))); }
+.review:hover { transform: translateY(calc(-1 * var(--d-lift))); box-shadow: var(--shadow); }
+.dcard, .fin-card, .step, .wp-card, .jcard, .rbanner, .chan {
+  transition: transform var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-out), box-shadow var(--t-hover) var(--ease-out);
+}
 
-.card__link { transition: color .25s var(--ease-out); }
+.card__link { transition: color var(--t-quick) var(--ease-out); }
 
 /* плавная смена состояний фильтров/чипсов/валюты */
-.filter, .chip, .curr-switch button, .card__fav, .card__compare { transition: background .28s var(--ease-out), color .28s var(--ease-out), border-color .28s var(--ease-out), box-shadow .28s var(--ease-out), transform .28s var(--ease-out); }
-.chip:active, .curr-switch button:active { transform: scale(.96); }
+.filter, .chip, .curr-switch button, .card__fav, .card__compare {
+  transition: background var(--t-quick) var(--ease-out), color var(--t-quick) var(--ease-out),
+              border-color var(--t-quick) var(--ease-out), box-shadow var(--t-quick) var(--ease-out),
+              transform var(--t-hover) var(--ease-out);
+}
+
+/* ---------- НАЖАТИЕ ----------
+   Вниз — за --t-tap и без отскока, обратно — по --t-hover основного правила.
+   На тач-экране это единственная обратная связь, которая там вообще возможна:
+   до этого карточка каталога, главный элемент конверсии, не отвечала ни одним
+   кадром и даже не показывала курсор-палец. */
+.btn:active, .card:active, .dcard:active, .jcard:active, .rbanner:active, .chan:active,
+.header__cta:active, .header__call:active, .filter:active, .chip:active,
+.curr-switch button:active, .geo-switch button:active, .card__fav:active,
+.card__compare:active, .burger:active, .modal__close:active, .drawer__close:active,
+.compare-chip button:active, .floating__btn:active, .to-top:active, .chat__fab:active {
+  transform: scale(var(--s-press));
+  transition-duration: var(--t-tap);
+  transition-timing-function: var(--ease-press);
+}
+.card { cursor: pointer; }
+.card:active { transform: translateY(calc(-1 * var(--d-lift))) scale(var(--s-press)); }
 
 /* мягкое проявление текстовых слоёв героя */
-.hero__layer { transition: opacity .7s var(--ease-out), transform .9s var(--ease-out); }
-.hero__layer:not(.active) { transform: translateY(14px); }
+.hero__layer { transition: opacity var(--t-reveal) var(--ease-out), transform var(--t-curtain) var(--ease-out); }
+.hero__layer:not(.active) { transform: translateY(var(--d-enter)); }
 .hero__layer.active { transform: none; }
-
-/* «дыхание» подсказки скролла убрано в пользу плавности уже есть */
+/* Первый экран входит, когда занавес уже поехал вверх, а не за ним:
+   до этого вход отыгрывался под полотном, и оно открывало статичную страницу */
+body:not(.is-revealed) .hero__layer.active { opacity: 0; transform: translateY(var(--d-enter)); }
 
 /* ---------- ПРОГРЕСС ПРОКРУТКИ ---------- */
+/* Полоса едет масштабом, а не шириной: width пересчитывает раскладку каждый
+   кадр прокрутки, а transition на ней добавлял постоянное отставание ~120 мс.
+   Цвет однотонный — сжимающийся градиент выглядел бы как брак. */
 .scroll-progress {
-  position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 400;
-  background: linear-gradient(90deg, var(--gold), var(--gold-light));
-  transition: width .12s linear;
+  position: fixed; top: 0; left: 0; height: 2px; width: 100%; z-index: 400;
+  background: var(--gold);
+  transform: scaleX(0); transform-origin: 0 50%;
+  will-change: transform;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-progress {
+      animation: scrollProgress linear;
+      animation-timeline: scroll(root block);
+    }
+    @keyframes scrollProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  }
 }
 
 /* ---------- КНОПКА «НАВЕРХ» ---------- */
@@ -864,7 +960,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   background: var(--teal); color: var(--cream); display: grid; place-items: center;
   opacity: 0; transform: translateY(14px) scale(.9); pointer-events: none;
   box-shadow: 0 14px 30px -10px rgba(8,40,37,.55);
-  transition: opacity .4s var(--ease-out), transform .4s var(--ease-out), background .25s var(--ease-out);
+  transition: opacity var(--t-quick) var(--ease-soft), transform var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-soft);
 }
 .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
 .to-top:hover { background: var(--gold); transform: translateY(-3px); }
@@ -873,17 +969,17 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .nav a.active { color: #fff; }
 .nav a.active::after { width: 100%; }
 .header.scrolled .nav a.active { color: var(--teal); }
-.drawer__nav a.active { color: var(--gold); padding-left: .4rem; }
+.drawer__nav a.active { color: var(--gold); transform: translateX(.4rem); }
 
 
 /* ---------- ГРАДИЕНТ НА ФОТО КАРТОЧЕК ---------- */
 .card__media::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(6,32,29,.42), transparent 48%);
-  opacity: .55; transition: opacity .5s var(--ease-out);
+  opacity: .55; transition: opacity var(--t-quick) var(--ease-soft);
 }
 .card:hover .card__media::after { opacity: 1; }
-.card__arrow { display: inline-block; transition: transform .3s var(--ease-out); }
+.card__arrow { display: inline-block; transition: transform var(--t-hover) var(--ease-out); }
 .card:hover .card__arrow, .card__link:hover .card__arrow { transform: translateX(5px); }
 
 /* ---------- АКЦЕНТНАЯ ЛИНИЯ У EYEBROW ---------- */
@@ -905,13 +1001,13 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 /* ---------- ФОРМА ЗАЯВКИ ---------- */
 .lead { position: relative; max-width: 520px; margin: 0 auto 1.8rem; display: flex; flex-direction: column; gap: .7rem; }
 .lead__row { display: flex; gap: .7rem; }
-.lead input { flex: 1; width: 100%; font: inherit; font-size: var(--fs-md); color: var(--cream); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-sm); padding: .9rem 1.3rem; outline: none; transition: border-color .25s var(--ease-out), background .25s var(--ease-out), box-shadow .25s var(--ease-out); }
+.lead input { flex: 1; width: 100%; font: inherit; font-size: var(--fs-md); color: var(--cream); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-sm); padding: .9rem 1.3rem; outline: none; transition: border-color var(--t-quick) var(--ease-soft), background var(--t-quick) var(--ease-soft), box-shadow var(--t-hover) var(--ease-out); }
 .lead input::placeholder { color: rgba(255,253,248,.55); }
 .lead input:focus-visible { border-color: var(--gold-light); background: rgba(255,255,255,.13); box-shadow: 0 0 0 2px var(--teal-deep), 0 0 0 4px var(--gold-light); outline: none; }
 .lead input.err { border-color: #e8a0a0; background: rgba(192,57,43,.14); }
 .lead__submit { width: 100%; margin-top: .3rem; }
 .lead__hint { font-size: var(--fs-base); color: var(--gold-light); min-height: 1.15em; margin: .2rem 0 0; }
-.lead__consent { display: flex; align-items: flex-start; gap: .6rem; text-align: left; font-size: var(--fs-sm); line-height: 1.4; color: rgba(255,253,248,.78); cursor: pointer; transition: color .2s; }
+.lead__consent { display: flex; align-items: flex-start; gap: .6rem; text-align: left; font-size: var(--fs-sm); line-height: 1.4; color: rgba(255,253,248,.78); cursor: pointer; transition: color var(--t-quick) var(--ease-soft); }
 .lead__consent input { margin-top: .15rem; width: 16px; height: 16px; accent-color: var(--gold); flex: none; cursor: pointer; }
 .lead__consent a { color: var(--gold-light); text-decoration: underline; }
 .lead__consent.err { color: #f0b8b8; }
@@ -920,7 +1016,7 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 
 /* ---------- ПОЧЕМУ ПХУКЕТ ---------- */
 .whyphuket__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
-.wp-card { background: var(--cream); border-radius: var(--radius); padding: 1.9rem 1.4rem; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); text-align: center; transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out); }
+.wp-card { background: var(--cream); border-radius: var(--radius); padding: 1.9rem 1.4rem; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); text-align: center; transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out); }
 .wp-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
 .wp-card__ico { display: block; margin: 0 auto .8rem; color: var(--gold); }
 .wp-card__ico svg { width: 36px; height: 36px; stroke: currentColor; }
@@ -937,25 +1033,25 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 
 /* ---------- FAQ ---------- */
 .faq__list { max-width: 820px; margin: 0 auto; }
-.faq__item { background: var(--cream); border-radius: var(--radius-sm); margin-bottom: .8rem; border: 1px solid var(--hairline); box-shadow: none; overflow: hidden; transition: box-shadow .3s; }
+.faq__item { background: var(--cream); border-radius: var(--radius-sm); margin-bottom: .8rem; border: 1px solid var(--hairline); box-shadow: none; overflow: hidden; transition: box-shadow var(--t-hover) var(--ease-out); }
 .faq__item[open] { box-shadow: var(--shadow-sm); }
-.faq__item summary { cursor: pointer; list-style: none; padding: 1.15rem 1.5rem; font-weight: 700; color: var(--teal); font-size: var(--fs-lg); display: flex; justify-content: space-between; align-items: center; gap: 1rem; transition: background .25s; }
+.faq__item summary { cursor: pointer; list-style: none; padding: 1.15rem 1.5rem; font-weight: 700; color: var(--teal); font-size: var(--fs-lg); display: flex; justify-content: space-between; align-items: center; gap: 1rem; transition: background var(--t-quick) var(--ease-soft); }
 .faq__item summary:hover { background: rgba(15,63,58,.04); }
 .faq__item summary::-webkit-details-marker { display: none; }
 .faq__item summary::after {
   content: ''; flex: none; width: 18px; height: 18px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2385692e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat center / contain;
-  transition: transform .3s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease-out);
 }
 .faq__item[open] summary::after { transform: rotate(180deg); }
 .faq__item p { padding: 0 1.5rem 1.3rem; color: var(--ink-soft); line-height: 1.7; }
 
 /* ---------- ЖУРНАЛ (на главной) ---------- */
 .journal__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
-.jcard { display: flex; flex-direction: column; background: var(--cream); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out), border-color .4s; }
+.jcard { display: flex; flex-direction: column; background: var(--cream); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out), border-color var(--t-quick) var(--ease-soft); }
 .jcard:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(176,140,61,.35); }
 .jcard__media { aspect-ratio: 16/10; overflow: hidden; }
-.jcard__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-out); }
+.jcard__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--t-curtain) var(--ease-out); }
 .jcard:hover .jcard__media img { transform: scale(1.07); }
 .jcard__body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
 .jcard__tag { font-size: var(--fs-2xs); text-transform: uppercase; letter-spacing: .1em; color: var(--gold-ink); font-weight: 700; }
@@ -971,12 +1067,14 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .review__who span { font-size: var(--fs-sm); color: var(--ink-soft); }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .reveal, .reveal.in { opacity: 1; transform: none; filter: none; }
   .card__media img, .dcard img { opacity: 1; }
   .hero__scroll-track { height: 100vh; }
   .hero__layer:not(.active) { transform: none; }
   .whyus__video { transform: none; }
   .scroll-progress { display: none; }
+  .reveal.is-moving { will-change: auto; }
+  .floating, .to-top, .chat { transition-duration: 1ms; }
   * { animation: none !important; }
   html { scroll-behavior: auto; }
 }
@@ -1029,7 +1127,7 @@ body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
   padding: .75rem 1.2rem; border-radius: var(--radius-sm);
   background: var(--teal); color: var(--cream);
   font-size: var(--fs-sm); font-weight: 700; letter-spacing: .02em;
-  transform: translateY(-180%); transition: transform .25s var(--ease-out);
+  transform: translateY(-180%); transition: transform var(--t-hover) var(--ease-out);
 }
 .skip-link:focus-visible { transform: none; }
 
@@ -1044,7 +1142,7 @@ body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
   display: block; border-radius: var(--radius); overflow: hidden;
   background: var(--teal-deep); border: 1px solid var(--hairline);
   box-shadow: var(--shadow-sm);
-  transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out), border-color .4s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out), border-color var(--t-quick) var(--ease-soft);
 }
 /* Фиксируем пропорции заранее — картинка ленивая, а место под неё уже занято */
 .rbanner img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; }
@@ -1082,7 +1180,7 @@ body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
   display: flex; align-items: center; gap: .85rem; min-height: 44px;
   padding: .8rem 1rem; border-radius: var(--radius-sm);
   border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
-  transition: border-color .3s var(--ease-out), background .3s var(--ease-out), transform .3s var(--ease-out);
+  transition: border-color var(--t-quick) var(--ease-soft), background var(--t-quick) var(--ease-soft), transform var(--t-hover) var(--ease-out);
 }
 .chan:hover { border-color: rgba(227,195,120,.45); background: rgba(255,255,255,.07); transform: translateY(-2px); }
 .chan__ico {
@@ -1118,7 +1216,7 @@ body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
   display: none; width: 44px; height: 44px; border-radius: 50%;
   place-items: center; flex: none;
   border: 1px solid rgba(255,255,255,.45); color: #fff;
-  transition: background .3s var(--ease-out), border-color .3s var(--ease-out), color .3s var(--ease-out);
+  transition: background var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft);
 }
 .header__call:hover { background: var(--gold); border-color: var(--gold); }
 .header.scrolled .header__call { color: var(--teal); border-color: rgba(15,63,58,.28); }
@@ -1170,20 +1268,22 @@ body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
 .floating { right: calc(1.4rem + env(safe-area-inset-right)); bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
 .to-top { left: calc(1.4rem + env(safe-area-inset-left)); bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
 .compare-bar { bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
-.floating, .to-top { transition: bottom .35s var(--ease-out), opacity .4s var(--ease-out), transform .4s var(--ease-out), background .25s var(--ease-out); }
+.floating, .to-top, .chat {
+  translate: 0 calc(-1 * var(--lift, 0px));
+  transition: translate var(--t-enter) var(--ease-out), opacity var(--t-hover) var(--ease-out),
+              transform var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-out);
+}
 body.has-compare .floating,
-body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
+body.has-compare .to-top { --lift: 5rem; }
 
 @media (max-width: 760px) {
   .compare-bar {
     left: 1rem; right: 1rem; max-width: none; transform: none;
-    border-radius: var(--radius); animation: barUpMobile .4s var(--ease);
+    border-radius: var(--radius); animation: barUpMobile var(--t-enter) var(--ease-out);
   }
-  @keyframes barUpMobile { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
-  .compare-bar.shake { animation: shakeMobile .45s; }
-  @keyframes shakeMobile { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  @keyframes barUpMobile { from { opacity: 0; transform: translateY(var(--d-enter)); } to { opacity: 1; transform: none; } }
   body.has-compare .floating,
-  body.has-compare .to-top { bottom: calc(7.2rem + env(safe-area-inset-bottom)); }
+  body.has-compare .to-top { --lift: 5.8rem; }
 }
 
 /* Модалка на телефоне — как нижний лист */
@@ -1234,7 +1334,7 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   display: inline-flex; align-items: center; gap: .55rem;
   border: 0; background: none; font: inherit; font-size: var(--fs-base); font-weight: 600;
   color: var(--ink-soft); padding: .6rem 1.1rem; border-radius: 8px; cursor: pointer;
-  transition: background .28s var(--ease-out), color .28s var(--ease-out);
+  transition: background var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft);
 }
 .geo-switch button:hover { color: var(--teal); }
 .geo-switch button.is-active { background: var(--teal); color: #fff; }
@@ -1268,7 +1368,7 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--ink-soft);
   background: var(--cream); border: 1px solid rgba(15,63,58,.16);
   border-radius: var(--radius-sm); padding: .6rem 1.1rem; cursor: pointer;
-  transition: background .28s var(--ease-out), color .28s var(--ease-out), border-color .28s var(--ease-out);
+  transition: background var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft);
 }
 .partners__tabs button:hover { border-color: rgba(15,63,58,.34); }
 .partners__tabs button.is-active { background: var(--teal); color: #fff; border-color: var(--teal); }
@@ -1279,7 +1379,7 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   display: flex; flex-direction: column; gap: .7rem;
   background: var(--cream); border: 1px solid var(--hairline); border-radius: var(--radius);
   box-shadow: var(--shadow-sm); padding: 1.4rem 1.4rem 1.5rem;
-  transition: box-shadow .45s var(--ease-out), border-color .4s var(--ease-out);
+  transition: box-shadow var(--t-hover) var(--ease-out), border-color var(--t-quick) var(--ease-soft);
 }
 .pcard__top { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
 .pcard__kind {
@@ -1344,7 +1444,7 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
 .reg-form input[type=text] {
   font: inherit; font-size: var(--fs-md); color: var(--ink); background: var(--cream);
   border: 1px solid rgba(15,63,58,.2); border-radius: var(--radius-sm); padding: .85rem 1.1rem; outline: none;
-  transition: border-color .25s var(--ease-out), box-shadow .25s var(--ease-out);
+  transition: border-color var(--t-quick) var(--ease-soft), box-shadow var(--t-hover) var(--ease-out);
 }
 .reg-form input[type=text]:focus-visible { border-color: var(--gold-ink); box-shadow: 0 0 0 2px var(--sand), 0 0 0 4px var(--gold-ink); }
 .reg-form input.err { border-color: #c0392b; background: rgba(192,57,43,.06); }
@@ -1388,9 +1488,9 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   position: relative; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer;
   display: grid; place-items: center; color: var(--cream); background: var(--teal);
   box-shadow: 0 14px 30px -8px rgba(8,40,37,.5), 0 0 0 1px rgba(227,195,120,.4);
-  transition: transform .3s var(--ease), background .3s var(--ease);
+  transition: transform var(--t-hover) var(--ease-out), background var(--t-quick) var(--ease-soft);
 }
-.chat__fab:hover { transform: translateY(-2px) scale(1.04); background: var(--teal-deep); }
+.chat__fab:hover { background: var(--teal-deep); }
 .chat.is-open .chat__fab { background: var(--gold-fill); }
 .chat__badge {
   position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px;
@@ -1403,10 +1503,12 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
   display: flex; flex-direction: column; max-height: min(560px, calc(100vh - 8rem));
   background: var(--sand); border: 1px solid var(--hairline); border-radius: var(--radius);
   box-shadow: 0 30px 70px -28px rgba(8,40,37,.6); overflow: hidden;
-  animation: chatIn .32s var(--ease-out);
+  animation: chatIn var(--t-enter) var(--ease-out);
 }
 .chat__panel[hidden] { display: none; }
-@keyframes chatIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.chat__panel.is-closing { animation: chatOut var(--t-exit) var(--ease-soft) forwards; }
+@keyframes chatIn  { from { opacity: 0; transform: translateY(var(--d-enter)); } to { opacity: 1; transform: none; } }
+@keyframes chatOut { to { opacity: 0; transform: translateY(calc(var(--d-enter) / 2)); } }
 
 .chat__head {
   display: flex; align-items: center; justify-content: space-between; gap: .8rem;
@@ -1418,7 +1520,7 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
 .chat__close {
   flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
   background: rgba(255,255,255,.1); color: var(--cream); display: grid; place-items: center;
-  transition: background .25s var(--ease-out);
+  transition: background var(--t-quick) var(--ease-soft);
 }
 .chat__close:hover { background: rgba(255,255,255,.2); }
 
@@ -1461,18 +1563,22 @@ body.has-compare .to-top { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
 .chat__send {
   flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); border: 0; cursor: pointer;
   background: var(--gold-fill); color: #fff; display: grid; place-items: center;
-  transition: background .25s var(--ease-out);
+  transition: background var(--t-quick) var(--ease-soft);
 }
 .chat__send:hover { background: var(--teal); }
 .chat__hint { margin-top: .5rem; font-size: var(--fs-2xs); color: var(--ink-soft); min-height: 1em; }
 .chat__hint--err { color: #c0392b; }
+/* Ошибка и успех больше не выглядят одинаково: раньше и то и другое
+   печаталось золотым текстом подсказки */
+.lead__hint--err { color: #ffb3a7; }
+.lead__hint--ok { color: var(--gold-light); }
 
 /* Чат занимает место плавающих кнопок — двигаем их выше.
    Класс на body, а не `.chat ~ .floating`: виджет вставляется скриптом
    в конец DOM, и сестринский селектор до .floating не дотягивается. */
-body.has-chat .floating { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
-body.has-compare .chat { bottom: calc(6.4rem + env(safe-area-inset-bottom)); }
-body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset-bottom)); }
+body.has-chat .floating { --lift: 5rem; }
+body.has-compare .chat { --lift: 5rem; }
+body.has-compare.has-chat .floating { --lift: 10rem; }
 
 @media (max-width: 560px) {
   .chat__panel {
@@ -1483,9 +1589,38 @@ body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chat__panel { animation: none; }
+  .chat__panel, .chat__panel.is-closing { animation: none; }
   .chat__fab:hover { transform: none; }
 }
+
+/* ---------- ПЕРЕКЛЮЧАТЕЛЬ ЗВУКА ---------- */
+.sound-toggle {
+  display: flex; align-items: center; gap: .7rem; width: 100%;
+  background: var(--sand-deep); border: 0; border-radius: 100px;
+  padding: .55rem .7rem .55rem 1rem; cursor: pointer;
+  font: inherit; font-size: var(--fs-sm); font-weight: 700; color: var(--ink-soft);
+  transition: background var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft);
+}
+.sound-toggle__label { margin-right: auto; }
+.sound-toggle__track {
+  flex: none; width: 38px; height: 22px; border-radius: 100px;
+  background: rgba(15,63,58,.18); padding: 3px; display: flex;
+  transition: background var(--t-quick) var(--ease-soft);
+}
+.sound-toggle__knob {
+  width: 16px; height: 16px; border-radius: 50%; background: var(--cream);
+  box-shadow: 0 2px 5px -1px rgba(8,40,37,.45);
+  transition: transform var(--t-hover) var(--ease-out);
+}
+.sound-toggle.is-on { background: var(--teal); color: var(--cream); }
+.sound-toggle.is-on .sound-toggle__track { background: var(--gold-fill); }
+.sound-toggle.is-on .sound-toggle__knob { transform: translateX(16px); }
+.sound-toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sand), 0 0 0 4px var(--gold-ink); }
+
+/* ---------- ПРОСАДКА СЕТКИ НА ВРЕМЯ ДЕБАУНСА ----------
+   Единственная обратная связь на набор текста в поиске. Вход карточек на
+   каждую букву давал строб, а полное отсутствие отклика читалось как зависание. */
+.catalog__grid.is-pending { opacity: .55; transition: opacity var(--t-quick) var(--ease-soft); }
 
 /* ============================================================
    ИКОНКИ
@@ -1499,6 +1634,7 @@ body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset
           mask: var(--ico) no-repeat center / contain;
 }
 
+.ico--sound { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M11%205%206%209H3v6h3l5%204z%22%2F%3E%3Cpath%20d%3D%22M16%209.3a3.5%203.5%200%200%201%200%205.4%22%2F%3E%3Cpath%20d%3D%22M19%206.5a7%207%200%200%201%200%2011%22%2F%3E%3C%2Fsvg%3E"); }
 .ico--bed { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204v16%22%2F%3E%3Cpath%20d%3D%22M2%208h18a2%202%200%200%201%202%202v10%22%2F%3E%3Cpath%20d%3D%22M2%2017h20%22%2F%3E%3Cpath%20d%3D%22M6%208v9%22%2F%3E%3C%2Fsvg%3E"); }
 .ico--bath { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M10%204%208%206%22%2F%3E%3Cpath%20d%3D%22M17%2019v2%22%2F%3E%3Cpath%20d%3D%22M2%2012h20%22%2F%3E%3Cpath%20d%3D%22M7%2019v2%22%2F%3E%3Cpath%20d%3D%22M9%205%207.5%203.5a2.12%202.12%200%200%200-3%203L6%208%22%2F%3E%3Cpath%20d%3D%22M4%2012V5a2%202%200%200%201%202-2h1%22%2F%3E%3Cpath%20d%3D%22M20%2012v3a4%204%200%200%201-4%204H8a4%204%200%200%201-4-4v-3%22%2F%3E%3C%2Fsvg%3E"); }
 .ico--area { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%203H5a2%202%200%200%200-2%202v3%22%2F%3E%3Cpath%20d%3D%22M21%208V5a2%202%200%200%200-2-2h-3%22%2F%3E%3Cpath%20d%3D%22M3%2016v3a2%202%200%200%200%202%202h3%22%2F%3E%3Cpath%20d%3D%22M16%2021h3a2%202%200%200%200%202-2v-3%22%2F%3E%3C%2Fsvg%3E"); }
@@ -1599,9 +1735,8 @@ body.has-compare.has-chat .floating { bottom: calc(11.4rem + env(safe-area-inset
    состояние у них — opacity: 0. Без этого блока логотип на прелоадере просто
    не появился бы. Поэтому здесь возвращаем конечное состояние вручную. */
 @media (prefers-reduced-motion: reduce) {
-  .preloader { transition: opacity .4s linear, visibility .4s; }
+  .preloader { transition: opacity var(--t-exit) linear, visibility var(--t-exit); }
   .preloader.hidden { transform: none; opacity: 0; }
   .preloader__logo span span { opacity: 1; transform: none; letter-spacing: .2em; }
   .preloader__meta { opacity: 1; }
-  .preloader__rule::after { display: none; }
 }
