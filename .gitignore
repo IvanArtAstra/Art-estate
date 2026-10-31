@@ -21,3 +21,12 @@ admin/admin_config.json
 # на диске, но в публичный репозиторий не уходят.
 docs/vietnam-commissions.md
 data/commissions.json
+
+# Секреты воркера. Репозиторий публичный: токен бота и ключ Anthropic,
+# попавшие в историю git, уводят в первые же часы, а счёт приходит владельцу.
+# Файл живёт только на диске, в Cloudflare уезжает через bot/push-secrets.sh.
+bot/.secrets.env
+bot/.dev.vars
+.dev.vars
+.env
+*.secrets.env
