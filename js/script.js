@@ -1175,7 +1175,7 @@
       partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
       d_allcities: 'All cities', d_alldistricts: 'All districts',
       cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
-      drawer_sound: 'Interface sound', sound_on: 'On', sound_off: 'Off',
+      drawer_sound: 'Interface sound', sound_on: 'On', sound_off: 'Off', partners_more: 'Show more',
       hero_f_objects: 'listings in the catalogue', hero_f_cities: 'coastal cities',
       hero_f_years: 'years on the islands',
       hero_p_legal: 'Every property checked by a lawyer',
@@ -1223,7 +1223,7 @@
       partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',
       d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
       cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
-      drawer_sound: 'เสียงอินเทอร์เฟซ', sound_on: 'เปิด', sound_off: 'ปิด',
+      drawer_sound: 'เสียงอินเทอร์เฟซ', sound_on: 'เปิด', sound_off: 'ปิด', partners_more: 'ดูเพิ่มเติม',
       hero_f_objects: 'รายการในแคตตาล็อก', hero_f_cities: 'เมืองริมทะเล',
       hero_f_years: 'ปีบนเกาะ',
       hero_p_legal: 'ตรวจสอบเอกสารทุกรายการ',
@@ -1699,11 +1699,32 @@
     </article>`;
   }
 
+  const PARTNERS_PAGE = 6;
+  let partnersShown = PARTNERS_PAGE;
+
   function renderPartners() {
     if (!partnersGrid || !channels) return;
     const byCity = channels.companies.slice().sort((a, b) =>
       (a.city || '').localeCompare(b.city || '', 'ru') || (a.name || '').localeCompare(b.name || '', 'ru'));
-    partnersGrid.innerHTML = byCity.map(companyCard).join('');
+    partnersGrid.innerHTML = byCity.slice(0, partnersShown).map(companyCard).join('');
+
+    /* Кнопка живёт рядом с сеткой и пересоздаётся вместе с ней: отдельный
+       элемент в разметке пришлось бы держать в синхроне руками. */
+    const rest = byCity.length - partnersShown;
+    let more = document.getElementById('partnersMore');
+    if (more) more.remove();
+    if (rest > 0) {
+      more = document.createElement('button');
+      more.id = 'partnersMore';
+      more.type = 'button';
+      more.className = 'btn btn--gold partners__more';
+      more.textContent = t('partners_more', 'Показать ещё') + ' · ' + rest;
+      more.addEventListener('click', () => {
+        partnersShown += PARTNERS_PAGE * 2;
+        renderPartners();
+      });
+      partnersGrid.insertAdjacentElement('afterend', more);
+    }
 
     if (partnersCommunities) {
       partnersCommunities.innerHTML = channels.communities.length
