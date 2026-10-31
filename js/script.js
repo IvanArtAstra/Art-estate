@@ -276,7 +276,7 @@
   function heroProgress() {
     if (!heroTrack) return 0;
     const rect = heroTrack.getBoundingClientRect();
-    const total = heroTrack.offsetHeight - window.innerHeight;
+    const total = heroTrack.offsetHeight - window.innerHeight * 0.3;
     const scrolled = Math.min(Math.max(-rect.top, 0), total);
     return total > 0 ? scrolled / total : 0;
   }
@@ -390,7 +390,7 @@
         revealPending.delete(el);
         showReveal(el, isGridChild(el) ? waveIndex(el.parentElement) : 0);
       });
-    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px 12% 0px' });
   }
   function observeReveal(els) {
     els.forEach(el => {
@@ -406,7 +406,7 @@
     const vh = window.innerHeight;
     Array.from(revealPending).forEach(el => {
       const r = el.getBoundingClientRect();
-      if (r.top < vh * 0.88 && r.bottom > 0) {
+      if (r.top < vh * 1.12 && r.bottom > 0) {
         revealIO.unobserve(el); revealPending.delete(el);
         // Каскад считаем и здесь: иначе блоки, которые подобрал подметающий
         // проход, появлялись все разом, а соседние — ступенькой
@@ -909,7 +909,8 @@
     if (!(it.lat && it.lng) || typeof L === 'undefined') return;
     const el = document.getElementById('detailMap'); if (!el) return;
     if (mapInst) { mapInst.remove(); mapInst = null; }
-    mapInst = L.map(el, { scrollWheelZoom: false }).setView([it.lat, it.lng], 14);
+    mapInst = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false })
+      .setView([it.lat, it.lng], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(mapInst);
     L.marker([it.lat, it.lng]).addTo(mapInst).bindPopup(it.title || 'Объект').openPopup();
     setTimeout(() => mapInst && mapInst.invalidateSize(), 250);
@@ -1518,7 +1519,7 @@
     const pts = allItems.filter(it => it.lat && it.lng && matches(it, f));
     if (!pts.length) return;
     if (!allMap) {
-      allMap = L.map(el, { scrollWheelZoom: false });
+      allMap = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(allMap);
     }
     if (clusterGroup) clusterGroup.clearLayers();

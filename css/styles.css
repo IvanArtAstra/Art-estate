@@ -395,7 +395,7 @@ h1, h2, h3, h4 {
 @media (max-width: 980px) { .trust__item + .trust__item { border-left: 0; } }
 
 /* ---------- ОБЩИЕ СЕКЦИИ ---------- */
-.section { max-width: var(--maxw); margin: 0 auto; padding: clamp(4.5rem, 10vw, 8rem) clamp(1.4rem, 5vw, 2.5rem); }
+.section { max-width: var(--maxw); margin: 0 auto; padding: clamp(2.6rem, 7vw, 6.5rem) clamp(1.4rem, 5vw, 2.5rem); }
 .section__head { max-width: 720px; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
 .eyebrow { text-transform: uppercase; letter-spacing: .35em; font-size: var(--fs-xs); font-weight: 700; color: var(--gold-ink); margin-bottom: 1rem; }
 .section__title { font-size: var(--fs-title-lg); color: var(--teal); margin-bottom: 1.2rem; }
@@ -904,7 +904,11 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 }
 @media (max-width: 520px) {
   .steps__grid { grid-template-columns: 1fr; }
-  .floating__btn { width: 50px; height: 50px; }
+  /* Колонка кнопок съедала 52 px из 380 и накрывала подписи в блоке цифр:
+     «8 лет на острове» читалось как «ЛЕТ НА ОСТР» */
+  .floating__btn { width: 44px; height: 44px; }
+  .floating { gap: .5rem; }
+  .trust { padding-inline: 3.6rem; }
 }
 
 @media (max-width: 760px) {
@@ -952,6 +956,11 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 }
 
 .card__link { transition: color var(--t-quick) var(--ease-out); }
+/* «Подробнее →» был 106×20 — ниже порога, в который попадают пальцем.
+   Отступ увеличивает область нажатия, не трогая вид. */
+@media (pointer: coarse) {
+  .card__link { display: inline-flex; align-items: center; min-height: 44px; padding-block: .6rem; }
+}
 
 /* плавная смена состояний фильтров/чипсов/валюты */
 .filter, .chip, .curr-switch button, .card__fav, .card__compare {
@@ -1099,7 +1108,7 @@ body:not(.is-revealed) .hero__layer.active { opacity: 0; transform: translateY(v
 .faq__item p { padding: 0 1.5rem 1.3rem; color: var(--ink-soft); line-height: 1.7; }
 
 /* ---------- ЖУРНАЛ (на главной) ---------- */
-.journal__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+.journal__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.4rem; }
 .jcard { display: flex; flex-direction: column; background: var(--cream); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--hairline); box-shadow: var(--shadow-sm); transition: transform var(--t-hover) var(--ease-out), box-shadow var(--t-hover) var(--ease-out), border-color var(--t-quick) var(--ease-soft); }
 .jcard:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(176,140,61,.35); }
 .jcard__media { aspect-ratio: 16/10; overflow: hidden; }
@@ -1482,7 +1491,12 @@ body.has-compare .to-top { --lift: 5rem; }
 .reg-state button:hover { color: var(--teal); }
 
 @media (max-width: 980px) { .partners__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 680px) { .partners__grid { grid-template-columns: 1fr; } }
+@media (max-width: 680px) {
+  .partners__grid { grid-template-columns: minmax(0, 1fr); }
+  /* Плашка типа переносится под заголовок, а не распирает карточку */
+  .pcard__top { flex-wrap: wrap; }
+  .pcard__kind { white-space: normal; }
+}
 
 @media (hover: hover) and (pointer: fine) {
   .pcard:hover { box-shadow: var(--shadow); border-color: rgba(176,140,61,.35); }
