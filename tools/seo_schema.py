@@ -46,7 +46,9 @@ def faq_from_index(idx):
     """Вопросы и ответы берём из живой секции FAQ, чтобы разметка не разошлась с текстом."""
     out = []
     for m in re.finditer(
-        r'<details class="faq__item">\s*<summary>(.*?)</summary>\s*<p>(.*?)</p>', idx, re.S):
+        # Атрибуты у тега допускаются: первый вопрос раскрыт через open, и
+        # жёсткое `<details class="faq__item">` молча выбрасывало его из разметки
+        r'<details class="faq__item"[^>]*>\s*<summary>(.*?)</summary>\s*<p>(.*?)</p>', idx, re.S):
         q = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).replace(" ", " ").strip()
         a = html.unescape(re.sub(r"<[^>]+>", "", m.group(2))).replace(" ", " ").strip()
         a = re.sub(r"\s+", " ", a)

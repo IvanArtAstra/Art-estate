@@ -745,11 +745,24 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
 .about__media { position: relative; }
 .about__photo {
   aspect-ratio: 3/4; border-radius: var(--radius); overflow: hidden;
-  background-image: linear-gradient(to top, rgba(8,40,37,.55), rgba(8,40,37,.05) 50%), -webkit-image-set(url('../assets/pool.webp') type('image/webp'), url('../assets/pool.jpg') type('image/jpeg'));
-  background-image: linear-gradient(to top, rgba(8,40,37,.55), rgba(8,40,37,.05) 50%), image-set(url('../assets/pool.webp') type('image/webp'), url('../assets/pool.jpg') type('image/jpeg'));
-  background-size: cover; background-position: center;
+  background: radial-gradient(120% 120% at 28% 18%, #14524a 0%, #0f3f3a 42%, #082825 100%);
   box-shadow: var(--shadow); display: grid; place-items: end center; padding-bottom: 1.4rem;
+  position: relative;
 }
+/* Монограмма вместо портрета: заглушка, которая не выдаёт себя за фотографию */
+.about__photo::before {
+  content: 'АА';
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+  font-size: clamp(3.4rem, 9vw, 5.4rem); letter-spacing: .14em; text-indent: .14em;
+  color: var(--gold-light); opacity: .9;
+}
+.about__photo::after {
+  content: ''; position: absolute; inset: 11%;
+  border: 1.5px solid rgba(176,140,61,.45); border-radius: 6px;
+}
+/* Когда появится настоящий портрет: снять ::before и ::after,
+   вернуть background-image с фотографией. */
 .about__badge {
   position: absolute; bottom: -22px; right: -10px; background: var(--gold); color: #fff;
   padding: 1.1rem 1.5rem; border-radius: 16px; box-shadow: var(--shadow);
