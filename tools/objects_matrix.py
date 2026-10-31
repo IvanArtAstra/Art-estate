@@ -210,6 +210,23 @@ def cmd_check(args):
     print("Снимаю текущие цены с листингов…")
     live_prices = fetch_listing_prices(s, args.delay)
     print(f"  в листингах сейчас: {len(live_prices)} объявлений")
+    if not live_prices:
+        probe = None
+        try:
+            probe = s.get(BASE + "/", timeout=25)
+        except requests.RequestException:
+            pass
+        blocked_now = probe is None or probe.status_code != 200 or "Just a moment" in probe.text[:600]
+        if blocked_now:
+            code = probe.status_code if probe is not None else "нет ответа"
+            print(f"\n✗ Источник недоступен (ответ: {code}).")
+            print("  Похоже на защиту от автоматических запросов, а не на проблему сети.")
+            print("  Проверка остановлена: отмечать объекты «живыми», ничего не проверив,")
+            print("  было бы враньём. Каталог и матрица не тронуты.")
+            matrix["lastCheck"] = {"date": TODAY, "checked": 0, "blocked": True,
+                                   "sourceStatus": str(code)}
+            save(MATRIX, matrix)
+            sys.exit(2)
 
     # Локальный импорт: разбор цены живёт в парсере, дублировать его не нужно
     import importlib.util
@@ -219,7 +236,7 @@ def cmd_check(args):
     spec.loader.exec_module(sf)
 
     stats = {"live": 0, "price-changed": 0, "currency-changed": 0, "gone": 0, "unknown": 0}
-    changes, gone, currency = [], [], []
+    changes, gone, currency, blocked = [], [], [], []
 
     for i, o in enumerate(todo, 1):
         oid = o["id"]
@@ -260,7 +277,15 @@ def cmd_check(args):
             else:
                 try:
                     r = s.get(url, timeout=30, allow_redirects=True)
-                    status = "gone" if r.status_code in (404, 410) else "live"
+                    if r.status_code in (404, 410):
+                        status = "gone"
+                    elif r.status_code == 200 and "Just a moment" not in r.text[:600]:
+                        status = "live"
+                    else:
+                        # 403/429/5xx и страница-челлендж — это не ответ про объект,
+                        # а отказ источника. Помечать такое как «живо» нельзя.
+                        status = "unknown"
+                        blocked.append(r.status_code)
                 except requests.RequestException:
                     status = "unknown"
                 time.sleep(args.delay)
@@ -317,6 +342,11 @@ def cmd_check(args):
     print(f"  сменилась валюта:      {stats.get('currency-changed', 0)}")
     print(f"  снято с продажи:       {stats.get('gone', 0)}")
     print(f"  не удалось проверить:  {stats.get('unknown', 0)}")
+    if blocked:
+        import collections as _c
+        codes = ", ".join(f"{k}×{v}" for k, v in _c.Counter(blocked).items())
+        print(f"\n! Источник отказал по {len(blocked)} объектам (коды: {codes}).")
+        print("  Их статус не изменён — это отказ площадки, а не ответ про объект.")
 
     if changes:
         print("\nИзменения цены (в исходной валюте объявления):")

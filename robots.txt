@@ -1,0 +1,33 @@
+# Estate Art — недвижимость на Пхукете, в Дананге и Нячанге
+# Мы хотим, чтобы нас находили: и поисковики, и ИИ-ассистенты.
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /scraper/
+Disallow: /tools/
+Disallow: /bot/
+
+# ИИ-ассистенты и их краулеры — доступ открыт намеренно.
+# Машиночитаемая выжимка о компании: /llms.txt
+# Каталог объектов в JSON: /data/catalog.json
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: CCBot
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
+User-agent: YandexBot
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://ivanartastra.github.io/Art-estate/sitemap.xml

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-28",
+  "updated": "2026-10-31",
   "note": "Реестр объектов: что когда появилось, по какой цене и живо ли сейчас. Обновляется командами sync и check из tools/objects_matrix.py.",
   "objects": [
     {
@@ -16,9 +16,9 @@
       "pageUrl": "object/nai-harn-beach-condominium-u5346015/",
       "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-nai-harn-beach-condominium-в-раваи-пхукет-u5346015",
       "firstSeen": "2026-09-28",
-      "lastChecked": "2026-09-28",
+      "lastChecked": "2026-10-31",
       "lastSeenInCatalog": "2026-09-28",
-      "status": "gone",
+      "status": "live",
       "priceHistory": [
         {
           "date": "2026-09-28",
@@ -41,7 +41,7 @@
       "pageUrl": "object/supalai-city-resort-phuket-u5350611/",
       "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-2-спальни-кондо-в-supalai-city-resort-phuket-в-ratsada-пхукет-u5350611",
       "firstSeen": "2026-09-28",
-      "lastChecked": "2026-09-28",
+      "lastChecked": "2026-10-31",
       "lastSeenInCatalog": "2026-09-28",
       "status": "live",
       "priceHistory": [
@@ -71,7 +71,7 @@
       "pageUrl": "object/baan-thai-surin-hill-u6416545/",
       "sourceUrl": "https://www.fazwaz.ru/продажа-недвижимости/купить-5-спальни-вилла-в-baan-thai-surin-hill-в-чернг-талай-пхукет-u6416545",
       "firstSeen": "2026-09-28",
-      "lastChecked": "2026-09-28",
+      "lastChecked": "2026-10-31",
       "lastSeenInCatalog": "2026-09-28",
       "status": "live",
       "priceHistory": [
@@ -2679,12 +2679,9 @@
     }
   ],
   "lastCheck": {
-    "date": "2026-09-28",
-    "checked": 4,
-    "live": 3,
-    "price-changed": 0,
-    "currency-changed": 0,
-    "gone": 1,
-    "unknown": 0
+    "date": "2026-10-31",
+    "checked": 0,
+    "blocked": true,
+    "sourceStatus": "403"
   }
 }
