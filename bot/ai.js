@@ -15,7 +15,7 @@
    нельзя терять из-за того, что сломался помощник.
    ============================================================ */
 
-const MODEL = 'claude-sonnet-5-5';   // дешевле и быстрее: claude-haiku-5-5
+const MODEL = 'claude-haiku-5-5';   // если ответы станут плоскими: claude-sonnet-5-5
 const MAX_TOKENS = 700;
 const MAX_TOOL_ROUNDS = 3;
 const HISTORY = 16;                  // сколько реплик держим в контексте
@@ -192,6 +192,7 @@ async function callClaude(env, messages, system) {
       'content-type': 'application/json',
       'x-api-key': env.ANTHROPIC_API_KEY,
       'anthropic-version': '2023-06-01',
+      'user-agent': 'estate-art-chat/1.0 (cloudflare-worker)',
     },
     body: JSON.stringify({ model: MODEL, max_tokens: MAX_TOKENS, system, tools: TOOLS, messages }),
   });

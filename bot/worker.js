@@ -344,10 +344,37 @@ async function handleVisitorDM(message, env) {
   const id = 'tg' + chatId;
   const text = clean(message.text, MAX_TEXT);
 
+  const site = (env.SITE_URL || 'https://estateart.homes/').replace(/\/+$/, '') + '/';
+
+  /* /chatid доступна всем, а не только дежурным: без неё новый менеджер не
+     может узнать свой id, чтобы его вписали в AGENT_CHAT_ID, — а узнать его
+     больше негде, потому что getUpdates молчит, пока стоит вебхук. Id чата
+     не секрет: он бесполезен без токена бота. */
+  if (text.startsWith('/chatid')) {
+    const kind = message.chat.type === 'private' ? 'личный чат' : 'группа';
+    await tg(env, 'sendMessage', {
+      chat_id: chatId, parse_mode: 'HTML',
+      text: `<b>chat_id:</b> <code>${esc(chatId)}</code>\n${kind}\n\n` +
+            `<i>Это значение нужно вписать в AGENT_CHAT_ID, чтобы сюда падали заявки.</i>`,
+    });
+    return new Response('ok');
+  }
   if (text.startsWith('/catalog')) {
     await tg(env, 'sendMessage', {
-      chat_id: chatId,
-      text: 'Каталог объектов: ' + (env.SITE_URL || 'https://estateart.homes/') + '#catalog',
+      chat_id: chatId, parse_mode: 'HTML',
+      text: 'Каталог: виллы и квартиры на Пхукете, в Дананге и Нячанге.',
+      reply_markup: { inline_keyboard: [[{ text: 'Открыть каталог', url: site + '#catalog' }]] },
+    });
+    return new Response('ok');
+  }
+  if (text.startsWith('/contact')) {
+    await tg(env, 'sendMessage', {
+      chat_id: chatId, parse_mode: 'HTML',
+      text: 'Напишите здесь, что ищете, — передам агенту. Или свяжитесь напрямую:',
+      reply_markup: { inline_keyboard: [[
+        { text: 'WhatsApp', url: 'https://wa.me/79124869508' },
+        { text: 'Сайт', url: site },
+      ]] },
     });
     return new Response('ok');
   }
@@ -377,10 +404,21 @@ async function handleVisitorDM(message, env) {
     delete session.aiTurns;
     await saveSession(env, id, session);
     await tg(env, 'sendMessage', {
-      chat_id: chatId,
-      text: 'Estate Art — виллы и квартиры на Пхукете, в Дананге и Нячанге.\n\n' +
-            'Расскажите, что ищете: город, тип жилья, примерный бюджет. ' +
-            'Подберу направление и передам агенту.',
+      chat_id: chatId, parse_mode: 'HTML',
+      disable_web_page_preview: true,
+      text:
+        `<b>ESTATE ART</b>\n` +
+        `<i>Недвижимость на Пхукете и во Вьетнаме</i>\n\n` +
+        `Виллы и квартиры в Таиланде и Вьетнаме: Пхукет, Дананг, Нячанг. ` +
+        `Подбираем объект под задачу — жить, сдавать или держать, — проверяем ` +
+        `документы и ведём сделку от первого показа до ключей.\n\n` +
+        `Работаем удалённо: онлайн-показы, видео-туры, сопровождение переводов.\n\n` +
+        `<b>Расскажите, что ищете</b> — город, тип жилья, примерный бюджет. ` +
+        `Отвечу по рынку и передам агенту.`,
+      reply_markup: { inline_keyboard: [
+        [{ text: 'Смотреть каталог', url: site + '#catalog' }],
+        [{ text: 'Районы', url: site + '#districts' }, { text: 'Вопросы и ответы', url: site + '#faq' }],
+      ] },
     });
     return new Response('ok');
   }
