@@ -15,6 +15,26 @@ const SESSION_TTL = 60 * 60 * 24 * 14;   // переписка живёт две
 const RATE_LIMIT = 20;        // сообщений с одного IP в минуту
 const MAX_MESSAGES = 200;     // потолок на сессию, чтобы KV не пух
 
+/**
+ * Дежурные менеджеры. AGENT_CHAT_ID принимает один id или несколько через запятую.
+ * Новый диалог уходит следующему по кругу, дальше вся переписка держится за ним —
+ * клиент не должен объяснять одно и то же разным людям. Отвечать при этом может
+ * любой из списка: если дежурный занят, коллега просто подхватывает.
+ */
+function managers(env) {
+  return String(env.AGENT_CHAT_ID || '')
+    .split(',').map(s => s.trim()).filter(Boolean);
+}
+
+async function assignManager(env, sessionId) {
+  const list = managers(env);
+  if (list.length <= 1) return list[0] || '';
+  const key = 'rr:counter';
+  const n = parseInt((await env.CHAT.get(key)) || '0', 10);
+  await env.CHAT.put(key, String((n + 1) % 100000));
+  return list[n % list.length];
+}
+
 const json = (data, status = 200, extra = {}) =>
   new Response(JSON.stringify(data), {
     status,
@@ -93,7 +113,9 @@ async function handleSend(request, env) {
   const first = !session;
   if (!session) {
     session = { created: new Date().toISOString(), name, contact, page, messages: [] };
+    session.manager = await assignManager(env, id);
   }
+  if (!session.manager) session.manager = await assignManager(env, id);
   if (name && name !== 'Гость') session.name = name;
   if (contact) session.contact = contact;
 
@@ -106,11 +128,31 @@ async function handleSend(request, env) {
       (page ? `\n<i>${esc(page)}</i>` : '')
     : `<b>${esc(session.name)}</b>`;
 
+  const list = managers(env);
+  const assigned = session.manager || list[0] || env.AGENT_CHAT_ID;
   const sent = await tg(env, 'sendMessage', {
-    chat_id: env.AGENT_CHAT_ID,
+    chat_id: assigned,
     parse_mode: 'HTML',
     text: `${header}\n\n${esc(text)}\n\n<code>#${id}</code>\n<i>Ответьте реплаем на это сообщение — ответ уйдёт на сайт.</i>`,
   });
+
+  // Остальным дежурным — короткое уведомление, чтобы заявка не потерялась,
+  // если назначенный не на связи. Отвечать по-прежнему можно реплаем у себя.
+  if (first && list.length > 1) {
+    for (const m of list) {
+      if (String(m) === String(assigned)) continue;
+      await tg(env, 'sendMessage', {
+        chat_id: m, parse_mode: 'HTML',
+        text: `🔔 Новая заявка с сайта от <b>${esc(session.name)}</b> — ` +
+              `назначена дежурному.\n<code>#${id}</code>\n` +
+              `<i>Если нужно перехватить, ответьте реплаем на это сообщение.</i>`,
+      }).then(r => {
+        if (r && r.ok && r.result) {
+          return env.CHAT.put(mapKey(r.result.message_id), id, { expirationTtl: SESSION_TTL });
+        }
+      }).catch(() => {});
+    }
+  }
 
   // Связываем сообщение в Telegram с сессией: по нему найдём адресата ответа
   if (sent.ok && sent.result && sent.result.message_id) {
@@ -150,8 +192,9 @@ async function handleTelegram(request, env) {
   const message = update.message || update.edited_message;
   if (!message || !message.text) return new Response('ok');
 
-  // Отвечать может только агент — chat_id сверяем с настроенным
-  if (String(message.chat.id) !== String(env.AGENT_CHAT_ID)) {
+  // Отвечать может любой из дежурных — chat_id сверяем со списком
+  const list = managers(env);
+  if (!list.some(m => String(m) === String(message.chat.id))) {
     if (message.text.startsWith('/start')) {
       await tg(env, 'sendMessage', {
         chat_id: message.chat.id,
@@ -164,6 +207,17 @@ async function handleTelegram(request, env) {
 
   if (message.text.startsWith('/chatid')) {
     await tg(env, 'sendMessage', { chat_id: message.chat.id, text: `chat_id: ${message.chat.id}` });
+    return new Response('ok');
+  }
+  if (message.text.startsWith('/duty')) {
+    const n = parseInt((await env.CHAT.get('rr:counter')) || '0', 10);
+    const next = list.length ? list[n % list.length] : '—';
+    await tg(env, 'sendMessage', {
+      chat_id: message.chat.id, parse_mode: 'HTML',
+      text: `Дежурных в ротации: <b>${list.length}</b>\n` +
+            `Следующая заявка уйдёт: <code>${esc(String(next))}</code>\n` +
+            (String(next) === String(message.chat.id) ? 'Это вы.' : ''),
+    });
     return new Response('ok');
   }
 
@@ -202,6 +256,8 @@ async function handleTelegram(request, env) {
     text: clean(message.text, MAX_TEXT),
     at: new Date().toISOString(),
   });
+  // Кто фактически ответил — тот и ведёт диалог дальше
+  session.manager = String(message.chat.id);
   await saveSession(env, sessionId, session);
   await tg(env, 'setMessageReaction', {
     chat_id: message.chat.id, message_id: message.message_id, reaction: [{ type: 'emoji', emoji: '👌' }],
