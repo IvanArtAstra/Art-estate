@@ -175,8 +175,30 @@ def brief(t, lang):
     lines = ["Адресат: %s (%s)" % (t["name"], t.get("kind", "компания"))]
     if t.get("city"):
         lines.append("Где: %s, %s" % (t["city"], t.get("country", "")))
-    if t.get("projects"):
+    # Сначала то, что проверено разведкой, потом общий список из первой версии:
+    # проверенное конкретнее и даёт первую фразу, ради которой письмо читают
+    if t.get("projects_current"):
+        lines.append("Что строят сейчас (проверено на их сайте):")
+        for p in t["projects_current"]:
+            lines.append("  — " + p)
+    elif t.get("projects"):
         lines.append("Их проекты: " + ", ".join(t["projects"]))
+    if t.get("partner_page"):
+        lines.append("Партнёрская страница у них: " + t["partner_page"])
+    if t.get("foreign_focus"):
+        lines.append("Как работают с иностранцами: " + t["foreign_focus"])
+    if t.get("extras"):
+        lines.append("Чем выделяются: " + t["extras"])
+    if t.get("has_1plus1"):
+        lines.append("У них есть планировки 1+1 — наш покупатель спрашивает именно их.")
+    if t.get("prices_public") is False:
+        lines.append("Цен в открытом доступе нет — прайс закрытый.")
+    if t.get("hook"):
+        lines.append("ЗАХОД, с которого начинать письмо: " + t["hook"])
+    if t.get("approach"):
+        lines.append("ВАЖНО, как писать: " + t["approach"])
+    if t.get("competitor"):
+        lines.append("Это не только поставщик, но и конкурент — учти в тоне.")
     if t.get("partner_program"):
         lines.append("У них УЖЕ есть партнёрская программа — сошлись на неё, "
                      "это повод написать и половина разговора позади.")
