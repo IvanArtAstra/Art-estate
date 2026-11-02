@@ -187,12 +187,16 @@ def brief(t, lang):
         lines.append("Партнёрская страница у них: " + t["partner_page"])
     if t.get("foreign_focus"):
         lines.append("Как работают с иностранцами: " + t["foreign_focus"])
+    if t.get("contact_ru"):
+        lines.append("Русскоязычный контакт на их стороне: " + t["contact_ru"])
     if t.get("extras"):
         lines.append("Чем выделяются: " + t["extras"])
     if t.get("has_1plus1"):
         lines.append("У них есть планировки 1+1 — наш покупатель спрашивает именно их.")
     if t.get("prices_public") is False:
         lines.append("Цен в открытом доступе нет — прайс закрытый.")
+    if t.get("price_range"):
+        lines.append("Цены у них открыты: " + t["price_range"])
     if t.get("hook"):
         lines.append("ЗАХОД, с которого начинать письмо: " + t["hook"])
     if t.get("approach"):
@@ -204,6 +208,8 @@ def brief(t, lang):
                      "это повод написать и половина разговора позади.")
     if t.get("terms_known"):
         lines.append("Что известно про их условия: " + t["terms_known"])
+    if t.get("warnings"):
+        lines.append("НЕ УПОМИНАТЬ (разведка не подтвердила): " + t["warnings"])
     if t.get("note"):
         lines.append("Заметка: " + t["note"])
     lines.append("Язык письма: " + ("русский" if lang == "ru" else "английский"))
