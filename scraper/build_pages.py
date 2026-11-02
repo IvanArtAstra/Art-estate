@@ -27,6 +27,8 @@ STATIC_URLS = [
     "/blog/kak-kupit-nedvizhimost-na-phukete/",
     "/blog/freehold-vs-leasehold/",
     "/blog/rayony-phuketa/",
+    "/partners/",
+    "/partners/en/",
 ]
 
 TRANSLIT = {

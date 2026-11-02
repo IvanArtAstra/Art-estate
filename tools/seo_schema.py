@@ -96,11 +96,11 @@ def build(idx, catalog):
             "availableLanguage": ["Russian", "English"],
             "areaServed": ["TH", "VN"],
         }],
+        # Только каналы самого агентства: личные каналы студии и канал про ИИ
+        # в sameAs организации по недвижимости сбивают и поисковик, и человека
         "sameAs": [
             f"https://wa.me/{PHONE.lstrip('+')}",
-            f"https://t.me/{PHONE}",
-            "https://t.me/IISoSArt",
-            "https://t.me/IvanArtxJarvis",
+            "https://t.me/EstateArtHomesBot",
         ],
         "makesOffer": {
             "@type": "Offer",
