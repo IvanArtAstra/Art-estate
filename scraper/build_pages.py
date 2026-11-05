@@ -232,6 +232,8 @@ PAGE = """<!DOCTYPE html>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js" integrity="sha256-Jq8BT3sa8wjsEgt5HP92ZXu5wzg2M7UgM+bt+eXkzbU=" crossorigin=""></script>
+<script src="/js/basemap.js"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -248,7 +250,7 @@ PAGE = """<!DOCTYPE html>
   rp&&rp.addEventListener('input',function(){if(mp){mp.value=rp.value;recalcM();}});
   recalcM();recalcR();
   var ll=__LATLNG__;
-  if(ll&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);L.marker(ll).addTo(m).bindPopup(__TITLEJS__).openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+  if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);window.Basemap.attach(m,{maxZoom:18});L.marker(ll).addTo(m).bindPopup(__TITLEJS__).openPopup();setTimeout(function(){m.invalidateSize();},200);}}
 
   // Галерея + лайтбокс
   var IMAGES=__IMAGES_JS__, idx=0;
@@ -337,10 +339,12 @@ DISTRICT_PAGE = """<!DOCTYPE html>
   </div>
 </footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js" integrity="sha256-Jq8BT3sa8wjsEgt5HP92ZXu5wzg2M7UgM+bt+eXkzbU=" crossorigin=""></script>
+<script src="/js/basemap.js"></script>
 <script>
 (function(){
   var pts=__POINTS__;
-  if(pts.length&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
+  if(pts.length&&window.L){var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});window.Basemap.attach(m,{maxZoom:18});var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
 })();
 </script>
 </body>

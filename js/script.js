@@ -905,24 +905,13 @@
     recalcM(); recalcR();
   }
   let mapInst = null;
-  /* Leaflet 1.9 зашивает в подпись карты украинский флаг — он лежит прямо в
-     leaflet.js как SVG. Политическая картинка в карточке объекта — не наше
-     сообщение и не выбор покупателя, поэтому ставим свою подпись: кредит
-     библиотеке остаётся, флага нет. Ставим один раз, до первой карты. */
-  function mapCredit() {
-    if (typeof L === 'undefined') return;
-    L.Control.Attribution.prototype.options.prefix =
-      '<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';
-  }
-
   function wireMap(it) {
     if (!(it.lat && it.lng) || typeof L === 'undefined') return;
-    mapCredit();
     const el = document.getElementById('detailMap'); if (!el) return;
     if (mapInst) { mapInst.remove(); mapInst = null; }
     mapInst = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false })
       .setView([it.lat, it.lng], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' }).addTo(mapInst);
+    window.Basemap.attach(mapInst, { maxZoom: 18 });
     L.marker([it.lat, it.lng]).addTo(mapInst).bindPopup(it.title || 'Объект').openPopup();
     setTimeout(() => mapInst && mapInst.invalidateSize(), 250);
   }
@@ -1536,9 +1525,8 @@
     const pts = allItems.filter(it => it.lat && it.lng && matches(it, f));
     if (!pts.length) return;
     if (!allMap) {
-      mapCredit();
       allMap = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' }).addTo(allMap);
+      window.Basemap.attach(allMap, { maxZoom: 18 });
     }
     if (clusterGroup) clusterGroup.clearLayers();
     else { clusterGroup = (L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 50, showCoverageOnHover: false }) : L.layerGroup()); allMap.addLayer(clusterGroup); }

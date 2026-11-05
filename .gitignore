@@ -41,3 +41,5 @@ data/developers.json
 
 # Черновики писем: содержат имена адресатов и нашу тактику обхода
 data/outreach/
+_tiles-test.pmtiles
+tools/tiles/*.pmtiles

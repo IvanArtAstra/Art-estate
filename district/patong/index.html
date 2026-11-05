@@ -66,10 +66,12 @@
   </div>
 </footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js" integrity="sha256-Jq8BT3sa8wjsEgt5HP92ZXu5wzg2M7UgM+bt+eXkzbU=" crossorigin=""></script>
+<script src="/js/basemap.js"></script>
 <script>
 (function(){
   var pts=[[7.8839226, 98.2742644, "Absolute Twin Sands I", "../../object/absolute-twin-sands-i-u6414679/"], [7.906401, 98.3037336, "The Emerald Terrace", "../../object/the-emerald-terrace-u5727159/"], [7.8944991, 98.3070331, "Bayshore Oceanview Condominium", "../../object/bayshore-oceanview-condominium-u6800328/"], [7.9176002, 98.2913315, "The Baycliff Residence", "../../object/the-baycliff-residence-u6646675/"]];
-  if(pts.length&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
+  if(pts.length&&window.L){var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});window.Basemap.attach(m,{maxZoom:18});var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
 })();
 </script>
 </body>

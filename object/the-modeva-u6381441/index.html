@@ -160,6 +160,8 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js" integrity="sha256-Jq8BT3sa8wjsEgt5HP92ZXu5wzg2M7UgM+bt+eXkzbU=" crossorigin=""></script>
+<script src="/js/basemap.js"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -176,7 +178,7 @@
   rp&&rp.addEventListener('input',function(){if(mp){mp.value=rp.value;recalcM();}});
   recalcM();recalcR();
   var ll=[7.99103,98.2963236];
-  if(ll&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);L.marker(ll).addTo(m).bindPopup("The Modeva").openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+  if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);window.Basemap.attach(m,{maxZoom:18});L.marker(ll).addTo(m).bindPopup("The Modeva").openPopup();setTimeout(function(){m.invalidateSize();},200);}}
 
   // Галерея + лайтбокс
   var IMAGES=["../../assets/catalog/u6381441_g1.jpeg", "../../assets/catalog/u6381441_g2.jpeg", "../../assets/catalog/u6381441_g3.jpeg", "../../assets/catalog/u6381441_g4.jpeg", "../../assets/catalog/u6381441_g5.jpeg", "../../assets/catalog/u6381441_g6.jpeg"], idx=0;

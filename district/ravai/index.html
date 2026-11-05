@@ -66,10 +66,12 @@
   </div>
 </footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js" integrity="sha256-Jq8BT3sa8wjsEgt5HP92ZXu5wzg2M7UgM+bt+eXkzbU=" crossorigin=""></script>
+<script src="/js/basemap.js"></script>
 <script>
 (function(){
   var pts=[[7.7816414, 98.3149422, "Calypso Condo", "../../object/calypso-condo-u6419432/"], [7.781135, 98.314417, "ReLife The Windy", "../../object/relife-the-windy-u6419068/"], [7.779955, 98.314691, "Nai Harn Beach Condominium", "../../object/nai-harn-beach-condominium-u6802291/"], [7.800243, 98.336727, "The Beachfront", "../../object/the-beachfront-u6800881/"], [7.7702805, 98.3193047, "Brand New Luxury 3-Bedroom Villa for Sale & Rent – Rawai", "../../object/brand-new-luxury-3-bedroom-villa-for-sale-rent-rawai-u6806253/"], [7.7734722, 98.3204913, "The Title V", "../../object/the-title-v-u6806492/"], [7.777332, 98.315737, "Utopia Dream U2", "../../object/utopia-dream-u2-u2/"], [7.7979699, 98.326131, "Saiyuan Buri Condominium", "../../object/saiyuan-buri-condominium-u6745622/"], [7.7777563, 98.314952, "Utopia Loft", "../../object/utopia-loft-u6802850/"], [7.808801, 98.3326833, "Villa Suksan Soi King Suksan 4", "../../object/villa-suksan-soi-king-suksan-4-u2016969/"]];
-  if(pts.length&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
+  if(pts.length&&window.L){var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});window.Basemap.attach(m,{maxZoom:18});var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
 })();
 </script>
 </body>
