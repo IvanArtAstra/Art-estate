@@ -136,7 +136,7 @@ PAGE = """<!DOCTYPE html>
 <body>
 <header class="pp-header">
   <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
-  <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
+  <a href="https://t.me/EstateArtHomesBot" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)" data-chat-open target="_blank" rel="noopener">Задать вопрос</a>
 </header>
 
 <div class="pp-wrap">
@@ -248,7 +248,7 @@ PAGE = """<!DOCTYPE html>
   rp&&rp.addEventListener('input',function(){if(mp){mp.value=rp.value;recalcM();}});
   recalcM();recalcR();
   var ll=__LATLNG__;
-  if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);L.marker(ll).addTo(m).bindPopup(__TITLEJS__).openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+  if(ll&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);L.marker(ll).addTo(m).bindPopup(__TITLEJS__).openPopup();setTimeout(function(){m.invalidateSize();},200);}}
 
   // Галерея + лайтбокс
   var IMAGES=__IMAGES_JS__, idx=0;
@@ -304,7 +304,7 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 <body>
 <header class="pp-header">
   <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
-  <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
+  <a href="https://t.me/EstateArtHomesBot" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)" data-chat-open target="_blank" rel="noopener">Задать вопрос</a>
 </header>
 <div class="pp-wrap">
   <nav class="crumbs"><a href="../../">Главная</a> / <a href="../../#catalog">Каталог</a> / <span>__NAME__</span></nav>
@@ -340,7 +340,7 @@ DISTRICT_PAGE = """<!DOCTYPE html>
 <script>
 (function(){
   var pts=__POINTS__;
-  if(pts.length&&window.L){var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
+  if(pts.length&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=document.getElementById('dMap');var m=L.map(el,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);var g=[];pts.forEach(function(p){var mk=L.marker([p[0],p[1]]).addTo(m);mk.bindPopup('<b>'+p[2]+'</b><br><a href="'+p[3]+'">Подробнее</a>');g.push([p[0],p[1]]);});m.fitBounds(g,{padding:[40,40],maxZoom:14});setTimeout(function(){m.invalidateSize();},200);}
 })();
 </script>
 </body>

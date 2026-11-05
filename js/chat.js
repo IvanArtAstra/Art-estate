@@ -226,6 +226,14 @@
 
   fab.addEventListener('click', () => toggle(!open));
   $('.chat__close', root).addEventListener('click', () => toggle(false));
+
+  /* Кнопка в шапке ведёт в бота ссылкой — это рабочий путь на страницах, где
+     виджета нет. Там, где он есть, перехватываем клик и открываем чат здесь:
+     разговор начинается на той же странице, без ухода в мессенджер. */
+  document.querySelectorAll('[data-chat-open]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); toggle(true); });
+  });
+  window.EstateChat = { open: () => toggle(true), close: () => toggle(false) };
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && open) toggle(false); });
 
   // Enter отправляет, Shift+Enter переносит строку

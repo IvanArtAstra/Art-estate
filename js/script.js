@@ -905,13 +905,24 @@
     recalcM(); recalcR();
   }
   let mapInst = null;
+  /* Leaflet 1.9 зашивает в подпись карты украинский флаг — он лежит прямо в
+     leaflet.js как SVG. Политическая картинка в карточке объекта — не наше
+     сообщение и не выбор покупателя, поэтому ставим свою подпись: кредит
+     библиотеке остаётся, флага нет. Ставим один раз, до первой карты. */
+  function mapCredit() {
+    if (typeof L === 'undefined') return;
+    L.Control.Attribution.prototype.options.prefix =
+      '<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';
+  }
+
   function wireMap(it) {
     if (!(it.lat && it.lng) || typeof L === 'undefined') return;
+    mapCredit();
     const el = document.getElementById('detailMap'); if (!el) return;
     if (mapInst) { mapInst.remove(); mapInst = null; }
     mapInst = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false })
       .setView([it.lat, it.lng], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(mapInst);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' }).addTo(mapInst);
     L.marker([it.lat, it.lng]).addTo(mapInst).bindPopup(it.title || 'Объект').openPopup();
     setTimeout(() => mapInst && mapInst.invalidateSize(), 250);
   }
@@ -1174,7 +1185,7 @@
       nav_relocation: 'Relocation', nav_partners: 'Partners',
       partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
       d_allcities: 'All cities', d_alldistricts: 'All districts',
-      cta_request: 'Request a call', drawer_price: 'Currency', hero_hint: 'Scroll down',
+      cta_request: 'Request a call', header_ask: 'Ask a question', drawer_price: 'Currency', hero_hint: 'Scroll down',
       drawer_sound: 'Interface sound', sound_on: 'On', sound_off: 'Off', partners_more: 'Show more',
       hero_f_objects: 'listings in the catalogue', hero_f_cities: 'coastal cities',
       hero_f_years: 'years on the islands',
@@ -1225,7 +1236,7 @@
       nav_relocation: 'ย้ายถิ่นฐาน', nav_partners: 'พันธมิตร',
       partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',
       d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
-      cta_request: 'ขอให้ติดต่อกลับ', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
+      cta_request: 'ขอให้ติดต่อกลับ', header_ask: 'สอบถาม', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',
       drawer_sound: 'เสียงอินเทอร์เฟซ', sound_on: 'เปิด', sound_off: 'ปิด', partners_more: 'ดูเพิ่มเติม',
       hero_f_objects: 'รายการในแคตตาล็อก', hero_f_cities: 'เมืองริมทะเล',
       hero_f_years: 'ปีบนเกาะ',
@@ -1525,8 +1536,9 @@
     const pts = allItems.filter(it => it.lat && it.lng && matches(it, f));
     if (!pts.length) return;
     if (!allMap) {
+      mapCredit();
       allMap = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(allMap);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' }).addTo(allMap);
     }
     if (clusterGroup) clusterGroup.clearLayers();
     else { clusterGroup = (L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 50, showCoverageOnHover: false }) : L.layerGroup()); allMap.addLayer(clusterGroup); }

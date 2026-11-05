@@ -64,7 +64,7 @@
 <body>
 <header class="pp-header">
   <a href="../../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
-  <a href="tel:+79124869508" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)">+7 912 486-95-08</a>
+  <a href="https://t.me/EstateArtHomesBot" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)" data-chat-open target="_blank" rel="noopener">Задать вопрос</a>
 </header>
 
 <div class="pp-wrap">
@@ -176,7 +176,7 @@
   rp&&rp.addEventListener('input',function(){if(mp){mp.value=rp.value;recalcM();}});
   recalcM();recalcR();
   var ll=[16.0903701,108.2151813];
-  if(ll&&window.L){var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);L.marker(ll).addTo(m).bindPopup("Blooming Tower Danang").openPopup();setTimeout(function(){m.invalidateSize();},200);}}
+  if(ll&&window.L){L.Control.Attribution.prototype.options.prefix='<a href="https://leafletjs.com" rel="noopener">Leaflet</a>';var el=$('ppMap');if(el){var m=L.map(el,{scrollWheelZoom:false}).setView(ll,14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'}).addTo(m);L.marker(ll).addTo(m).bindPopup("Blooming Tower Danang").openPopup();setTimeout(function(){m.invalidateSize();},200);}}
 
   // Галерея + лайтбокс
   var IMAGES=["../../assets/catalog/u2059845.jpg"], idx=0;
