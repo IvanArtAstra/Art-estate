@@ -46,6 +46,8 @@
   /* ---------- разметка ---------- */
   const ICON_CHAT = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
   const ICON_CLOSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  const ICON_MIC = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>';
+  const ICON_STOP = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
   const ICON_SEND = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>';
 
   const root = document.createElement('div');
@@ -71,6 +73,7 @@
         </div>
         <div class="chat__row">
           <textarea class="chat__input" rows="1" placeholder="Напишите вопрос…" maxlength="2000"></textarea>
+          <button class="chat__mic" type="button" hidden aria-label="Нажмите, чтобы продиктовать; удерживайте, чтобы записать голосовое">${ICON_MIC}</button>
           <button class="chat__send" type="submit" aria-label="Отправить">${ICON_SEND}</button>
         </div>
         <p class="chat__hint" aria-live="polite"></p>
@@ -91,6 +94,7 @@
   const sendBtn = $('.chat__send', root);
   const hint = $('.chat__hint', root);
   const badge = $('.chat__badge', root);
+  const micBtn = $('.chat__mic', root);
 
   /* ---------- отрисовка ---------- */
   function time(iso) {
@@ -269,6 +273,197 @@
   });
 
   agreeEl.addEventListener('change', () => agreeEl.closest('.chat__consent').classList.remove('err'));
+
+  /* ---------- голос ----------
+     Одна кнопка на два действия. Короткое нажатие — диктовка: браузер сам
+     распознаёт речь, текст попадает в поле, и дальше это обычное сообщение,
+     на которое ИИ отвечает сразу. Удержание — настоящее голосовое: запись
+     уходит Алене в Telegram, потому что звук ИИ не слышит.
+
+     Второе работает везде, где есть микрофон. Первое — только там, где есть
+     распознавание речи (Safari и Chrome); иначе короткое нажатие тоже
+     начинает запись, и кнопка об этом честно говорит. */
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia &&
+                       window.MediaRecorder);
+  if (Rec || canRecord) {
+    micBtn.hidden = false;
+    micBtn.setAttribute('aria-label', Rec
+      ? 'Нажмите, чтобы продиктовать; удерживайте, чтобы записать голосовое'
+      : 'Удерживайте, чтобы записать голосовое');
+  }
+
+  function ensureWho() {
+    if (who) return true;
+    if (!agreeEl.checked) {
+      hint.textContent = 'Отметьте согласие на обработку персональных данных.';
+      hint.className = 'chat__hint chat__hint--err';
+      agreeEl.closest('.chat__consent').classList.add('err');
+      return false;
+    }
+    who = { name: nameEl.value.trim() || 'Гость', contact: contactEl.value.trim() };
+    store.set(KEY_WHO, who);
+    intro.hidden = true;
+    return true;
+  }
+
+  function say(text, err) {
+    hint.textContent = text;
+    hint.className = 'chat__hint' + (err ? ' chat__hint--err' : '');
+  }
+
+  /* --- диктовка --- */
+  let rec = null;
+  function dictate() {
+    if (rec) { try { rec.stop(); } catch (e) {} return; }
+    rec = new Rec();
+    rec.lang = (document.documentElement.lang || 'ru-RU').length > 2
+      ? document.documentElement.lang : 'ru-RU';
+    rec.interimResults = true;
+    rec.continuous = false;
+    const base = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
+    rec.onresult = e => {
+      let out = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) out += e.results[i][0].transcript;
+      input.value = base + out;
+      input.dispatchEvent(new Event('input'));
+    };
+    rec.onerror = e => {
+      say(e.error === 'not-allowed'
+        ? 'Не получили доступ к микрофону. Разрешите его в настройках браузера.'
+        : 'Не разобрали речь. Попробуйте ещё раз или напишите текстом.', true);
+    };
+    rec.onend = () => {
+      rec = null;
+      micBtn.classList.remove('is-live');
+      micBtn.innerHTML = ICON_MIC;
+      try { input.focus(); } catch (e) {}
+    };
+    try {
+      rec.start();
+      micBtn.classList.add('is-live');
+      micBtn.innerHTML = ICON_STOP;
+      say('Говорите — текст появится в поле.');
+    } catch (e) { rec = null; }
+  }
+
+  /* --- голосовое сообщение --- */
+  let mediaRec = null, chunks = [], startedAt = 0, tick = 0, cancelled = false;
+
+  function pickMime() {
+    const want = ['audio/ogg;codecs=opus', 'audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+    for (const t of want) {
+      if (window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t;
+    }
+    return '';   // Safari сам выберет mp4
+  }
+
+  async function startRecording() {
+    if (mediaRec || !canRecord) return;
+    if (!ensureWho()) return;
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      say('Не получили доступ к микрофону. Разрешите его в настройках браузера.', true);
+      return;
+    }
+    const mime = pickMime();
+    chunks = []; cancelled = false; startedAt = Date.now();
+    mediaRec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    mediaRec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const secs = Math.round((Date.now() - startedAt) / 1000);
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      mediaRec = null;
+      micBtn.classList.remove('is-rec');
+      micBtn.innerHTML = ICON_MIC;
+      clearInterval(tick);
+      if (cancelled) { say(''); return; }
+      if (secs < 1 || blob.size < 1200) { say('Слишком коротко — запись не ушла.'); return; }
+      sendVoice(blob, secs);
+    };
+    mediaRec.start();
+    micBtn.classList.add('is-rec');
+    micBtn.innerHTML = ICON_STOP;
+    tick = setInterval(() => {
+      const s = Math.round((Date.now() - startedAt) / 1000);
+      say('Запись ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') +
+          ' — отпустите, чтобы отправить. Esc отменит.');
+      if (s >= 60) stopRecording();      // дальше Telegram и так режет
+    }, 250);
+    say('Запись 0:00 — отпустите, чтобы отправить. Esc отменит.');
+  }
+
+  function stopRecording(cancel) {
+    if (!mediaRec) return;
+    cancelled = !!cancel;
+    try { mediaRec.stop(); } catch (e) {}
+  }
+
+  async function sendVoice(blob, secs) {
+    const local = {
+      id: ++lastId, from: 'user', kind: 'voice', at: new Date().toISOString(), pending: true,
+      text: '🎤 Голосовое сообщение, ' + secs + ' с',
+    };
+    log.push(local); save(); render();
+    try {
+      const fd = new FormData();
+      fd.append('audio', blob, 'voice');
+      fd.append('sessionId', sessionId());
+      fd.append('seconds', String(secs));
+      if (who && who.name) fd.append('name', who.name);
+      if (who && who.contact) fd.append('contact', who.contact);
+      fd.append('page', document.title);
+      const r = await fetch(endpoint + '/api/voice', { method: 'POST', body: fd });
+      const data = await r.json().catch(() => ({}));
+      delete local.pending;
+      if (!r.ok || !data.ok) {
+        local.failed = true;
+        // 404 — мост обновлён на сайте, но ещё не на воркере: это не вина гостя
+        say(r.status === 404
+          ? 'Голосовые пока не включены. Напишите текстом — ответим сразу.'
+          : (data.message || 'Запись не ушла. Попробуйте ещё раз или напишите текстом.'), true);
+      } else {
+        say('Отправили. Алена послушает и ответит сюда же.');
+      }
+    } catch (e) {
+      delete local.pending;
+      local.failed = true;
+      say('Нет связи. Проверьте интернет или напишите в WhatsApp.', true);
+    }
+    save(); render();
+  }
+
+  /* --- одна кнопка, два жеста --- */
+  const HOLD_MS = 350;
+  let holdTimer = 0, held = false;
+
+  function pressStart(e) {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    if (mediaRec) return;                 // уже пишем — отпускание остановит
+    held = false;
+    holdTimer = setTimeout(() => { held = true; startRecording(); }, HOLD_MS);
+  }
+  function pressEnd() {
+    clearTimeout(holdTimer); holdTimer = 0;
+    if (mediaRec) { stopRecording(); return; }
+    if (held) return;
+    if (Rec) dictate();
+    else startRecording();                // без распознавания короткое нажатие пишет голос
+  }
+
+  micBtn.addEventListener('pointerdown', pressStart);
+  micBtn.addEventListener('pointerup', pressEnd);
+  micBtn.addEventListener('pointercancel', () => { clearTimeout(holdTimer); stopRecording(true); });
+  micBtn.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (mediaRec) { stopRecording(true); e.stopPropagation(); }
+    else if (rec) { try { rec.stop(); } catch (err) {} }
+  }, true);
 
   render();
   schedule();

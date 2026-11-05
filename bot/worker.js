@@ -22,6 +22,7 @@ const RATE_LIMIT = 20;        // сообщений с одного IP в мин
 const MAX_MESSAGES = 200;     // потолок на сессию, чтобы KV не пух
 const AI_TURNS = 12;          // после этого передаём человеку в любом случае
 const RANGES_TTL = 60 * 60 * 6;
+const MAX_VOICE = 1500000;    // ~60 секунд opus; больше в чат никто не наговаривает
 
 /**
  * Таблица диапазонов цен. Лежит на сайте, собирается tools/price_ranges.py.
@@ -222,6 +223,91 @@ async function handleSend(request, env) {
 
   await saveSession(env, id, session);
   return json({ ok: true, id: msg.id, delivered: !!sent.ok });
+}
+
+/* ---------- посетитель наговаривает голосовое ----------
+   Claude звук не слышит, поэтому запись не идёт в ИИ: она уходит дежурному
+   в Telegram обычным голосовым, которое он слушает и отвечает реплаем.
+   Сессия после этого ведётся человеком — иначе на голосовое отвечал бы
+   дежурный, а на следующий текст снова ИИ, не зная, о чём была запись. */
+async function handleVoice(request, env) {
+  if (await rateLimited(env, request)) {
+    return json({ error: 'too_many_requests', message: 'Слишком много сообщений. Подождите минуту.' }, 429);
+  }
+
+  let form;
+  try { form = await request.formData(); } catch { return json({ error: 'bad_form' }, 400); }
+
+  const file = form.get('audio');
+  if (!file || typeof file === 'string') return json({ error: 'no_audio' }, 400);
+  if (file.size > MAX_VOICE) {
+    return json({ error: 'too_big', message: 'Запись длинновата. Попробуйте короче — до минуты.' }, 413);
+  }
+
+  const id = clean(form.get('sessionId'), 40).replace(/[^A-Za-z0-9_-]/g, '');
+  if (!id) return json({ error: 'empty' }, 400);
+
+  const name = clean(form.get('name'), MAX_NAME) || 'Гость';
+  const contact = clean(form.get('contact'), MAX_NAME);
+  const page = clean(form.get('page'), 200);
+  const secs = Math.min(parseInt(clean(form.get('seconds'), 6), 10) || 0, 600);
+
+  let session = await loadSession(env, id);
+  const first = !session;
+  if (!session) {
+    session = { created: new Date().toISOString(), name, contact, page, messages: [] };
+    session.manager = await assignManager(env, id);
+  }
+  if (!session.manager) session.manager = await assignManager(env, id);
+  if (name && name !== 'Гость') session.name = name;
+  if (contact) session.contact = contact;
+  session.handedOff = true;
+
+  const msg = {
+    id: session.messages.length + 1, from: 'user', kind: 'voice', seconds: secs,
+    text: secs ? `🎤 Голосовое сообщение, ${secs} с` : '🎤 Голосовое сообщение',
+    at: new Date().toISOString(),
+  };
+  session.messages.push(msg);
+
+  /* Telegram показывает кружок-голосовое только для ogg/opus. Safari пишет
+     в mp4, Chrome в webm — их отдаём как аудиофайл: он так же слушается
+     в один тап, просто выглядит вложением. */
+  const type = String(file.type || '');
+  const ogg = type.includes('ogg');
+  const method = ogg ? 'sendVoice' : 'sendAudio';
+  const field = ogg ? 'voice' : 'audio';
+  const ext = ogg ? 'ogg' : (type.includes('mp4') || type.includes('mpeg') ? 'm4a' : 'webm');
+
+  const caption =
+    (first
+      ? `🟢 <b>Новый диалог с сайта</b>\n<b>${esc(session.name)}</b>` +
+        (session.contact ? ` · ${esc(session.contact)}` : '') +
+        (page ? `\n<i>${esc(page)}</i>` : '')
+      : `<b>${esc(session.name)}</b>`) +
+    `\n\n🎤 Голосовое с сайта\n\n<code>#${id}</code>\n` +
+    `<i>Ответьте реплаем на это сообщение — ответ уйдёт на сайт.</i>`;
+
+  const assigned = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+  const body = new FormData();
+  body.append('chat_id', String(assigned));
+  body.append('caption', caption);
+  body.append('parse_mode', 'HTML');
+  if (secs) body.append('duration', String(secs));
+  body.append(field, file, `voice-${id}.${ext}`);
+
+  const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
+    method: 'POST', body,
+  });
+  const sent = await r.json().catch(() => ({}));
+  if (!sent.ok) console.error('telegram', method, JSON.stringify(sent).slice(0, 300));
+
+  if (sent.ok && sent.result && sent.result.message_id) {
+    await env.CHAT.put(mapKey(sent.result.message_id), id, { expirationTtl: SESSION_TTL });
+  }
+
+  await saveSession(env, id, session);
+  return json({ ok: !!sent.ok, id: msg.id, delivered: !!sent.ok });
 }
 
 /* ---------- виджет забирает новые сообщения ---------- */
@@ -506,6 +592,11 @@ export default {
 
       if (url.pathname === '/api/send' && request.method === 'POST') {
         const res = await handleSend(request, env);
+        Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
+        return res;
+      }
+      if (url.pathname === '/api/voice' && request.method === 'POST') {
+        const res = await handleVoice(request, env);
         Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
         return res;
       }
