@@ -1864,3 +1864,86 @@ body.has-compare.has-chat .floating { --lift: 10rem; }
   .preloader__logo span span { opacity: 1; transform: none; letter-spacing: .2em; }
   .preloader__meta { opacity: 1; }
 }
+
+/* ---------- ЯЗЫК: меню в шапке и флаги (js/langs.js) ---------- */
+.flag {
+  display: inline-block; flex: none; width: 20px; height: 14px; border-radius: 2px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(20,32,31,.14);
+}
+.flag svg { display: block; width: 100%; height: 100%; }
+
+@media (min-width: 941px) { .nav { margin-inline: auto; } }
+@media (max-width: 940px) { .header__lang { margin-inline-start: auto; } }
+.header__lang { flex: none; margin-inline-end: .75rem; }
+/* С меню языка шапка тесная: на средних экранах «Задать вопрос» уходит в иконку */
+@media (max-width: 1180px) {
+  .header .header__cta { display: none; }
+  .header .header__call { display: grid; }
+  .nav { gap: 1rem; }
+  .nav a { letter-spacing: .03em; }
+}
+@media (min-width: 941px) { .header__lang { margin-inline-start: 1.25rem; } }
+.lang-menu { position: relative; }
+.lang-menu__btn {
+  display: inline-flex; align-items: center; gap: .5rem; height: 44px; padding-inline: .85rem .7rem;
+  border: 1px solid rgba(255,255,255,.45); border-radius: var(--radius-sm); background: none;
+  font: inherit; font-size: var(--fs-sm); font-weight: 600; letter-spacing: .08em; color: #fff; cursor: pointer;
+  transition: background var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft);
+}
+.lang-menu__btn:hover, .lang-menu.is-open .lang-menu__btn { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.75); }
+.header.scrolled .lang-menu__btn { color: var(--teal); border-color: rgba(15,63,58,.28); }
+.header.scrolled .lang-menu__btn:hover, .header.scrolled .lang-menu.is-open .lang-menu__btn { background: rgba(15,63,58,.06); border-color: rgba(15,63,58,.5); }
+.lang-menu__chev { opacity: .7; transition: transform var(--t-quick) var(--ease-soft); }
+.lang-menu.is-open .lang-menu__chev { transform: rotate(180deg); }
+.lang-menu__list {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 120;
+  min-width: 230px; max-height: calc(100vh - 110px); overflow-y: auto;
+  margin: 0; padding: .4rem; list-style: none;
+  background: var(--cream); border: 1px solid var(--hairline); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: langMenuIn var(--t-quick) var(--ease-out);
+}
+@keyframes langMenuIn { from { opacity: 0; transform: translateY(-4px); } }
+.lang-menu__list [role=option] {
+  display: flex; align-items: center; gap: .75rem; padding: .62rem .8rem; border-radius: var(--radius-sm);
+  color: var(--ink); font-size: var(--fs-sm); cursor: pointer; outline: none;
+  transition: background var(--t-quick) var(--ease-soft);
+}
+.lang-menu__list [role=option]:hover, .lang-menu__list [role=option]:focus-visible { background: var(--sand); }
+.lang-menu__list [role=option]:focus-visible { box-shadow: inset 0 0 0 2px var(--gold); }
+.lang-menu__list [aria-selected=true] { background: var(--sand-deep); color: var(--teal); font-weight: 600; }
+.lang-menu__list [aria-selected=true]::after {
+  content: ''; margin-inline-start: auto; width: 7px; height: 12px;
+  border: solid var(--gold-ink); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-2px, -2px);
+}
+@media (max-width: 400px) {
+  .lang-menu__code { display: none; }
+  .lang-menu__btn { padding-inline: .7rem .55rem; gap: .35rem; }
+}
+@media (prefers-reduced-motion: reduce) { .lang-menu__list { animation: none; } }
+
+/* Переключатель в боковом меню: 8 языков — сеткой, а не в одну «таблетку» */
+.curr-switch.lang-switch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; border-radius: var(--radius-sm); }
+.lang-switch button { display: flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 8px; padding: .55rem .3rem; }
+
+/* Арабский: вёрстка справа налево */
+[dir=rtl] body { font-family: 'Manrope', 'Segoe UI', Tahoma, 'Geeza Pro', 'Noto Naskh Arabic', sans-serif; }
+/* Светлая шапка (блог): меню языка тёмным по светлому */
+.lang-menu--light .lang-menu__btn { color: var(--teal); border-color: rgba(15,63,58,.28); }
+.lang-menu--light .lang-menu__btn:hover, .lang-menu--light.is-open .lang-menu__btn { background: rgba(15,63,58,.06); border-color: rgba(15,63,58,.5); }
+.blog-lang { margin-inline: auto .75rem; }
+.nav a { white-space: nowrap; }
+/* Грузинский: text-transform: uppercase превращает буквы в мтаврули — они
+   вдвое шире и в интерфейсах не приняты. В арабском и китайском регистра нет. */
+html[lang=ka] * { text-transform: none !important; }
+.header .logo { white-space: nowrap; }
+@media (max-width: 420px) {
+  .header .logo { font-size: 1.28rem; letter-spacing: .15em; }
+  .header__lang { margin-inline-end: .5rem; }
+}
+@media (max-width: 359px) {
+  .header { padding-inline: 1rem; }
+  .header .logo { font-size: 1.1rem; letter-spacing: .12em; }
+  .lang-menu__chev { display: none; }
+  .lang-menu__btn { padding-inline: .7rem; }
+}

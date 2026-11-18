@@ -1,4 +1,4 @@
-/* Локализация блога Estate Art (RU/EN/TH). Язык синхронизирован с главной (ae_lang). */
+/* Локализация блога Estate Art. Тексты статей: RU/EN/TH, остальные языки читают EN. Язык общий с главной (js/langs.js). */
 (function () {
   'use strict';
   var DICT = {
@@ -103,44 +103,40 @@
     },
   };
 
-  var lang = 'ru';
-  try { var s = localStorage.getItem('ae_lang'); if (s === 'en' || s === 'th' || s === 'ru') lang = s; } catch (e) {}
+  /* Язык общий с главной (js/langs.js). Статьи переведены на EN и TH;
+     для остальных языков показываем английскую версию — она понятнее русской. */
+  var Langs = window.AELangs;
+  var lang = Langs ? Langs.initial() : 'ru';
 
-  function norm(t) { return t.replace(/ /g, ' ').replace(/\s+/g, ' ').trim(); }
+  function norm(t) { return t.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); }
   function walk(l) {
+    var dict = l === 'ru' ? null : (DICT[l] || DICT.en);
     var els = document.querySelectorAll('h1,h2,h3,h4,p,li,summary,a,span,td,th,b');
     els.forEach(function (el) {
       if (el.children.length) return;
-      if (el.closest('header,footer,script,style')) return;
+      if (el.closest('header,footer,script,style,.lang-menu')) return;
       if (el.dataset.bru == null) el.dataset.bru = el.textContent;
       if (!el.dataset.bru.trim()) return;
       var key = norm(el.dataset.bru);
-      var tr = (l !== 'ru' && DICT[l]) ? DICT[l][key] : null;
+      var tr = dict ? dict[key] : null;
       el.textContent = (tr != null) ? tr : el.dataset.bru;
     });
-    document.documentElement.lang = l;
+    if (Langs) Langs.setDocument(l); else document.documentElement.lang = l;
   }
-  function setLang(l) { lang = l; try { localStorage.setItem('ae_lang', l); } catch (e) {} walk(l); updateSw(); }
+  function setLang(l) {
+    lang = l;
+    if (Langs) { Langs.remember(l); Langs.syncMenus(l); }
+    walk(l);
+  }
 
-  var sw;
-  function updateSw() { if (sw) sw.querySelectorAll('button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.lang === lang); }); }
   function injectSwitch() {
-    var hdr = document.querySelector('.doc-header, .pp-header'); if (!hdr) return;
-    sw = document.createElement('div'); sw.className = 'curr-switch blog-lang';
-    sw.style.cssText = 'display:inline-flex;background:var(--sand-deep);border-radius:100px;padding:3px;margin-left:auto;margin-right:.8rem';
-    ['ru', 'en', 'th'].forEach(function (l) {
-      var b = document.createElement('button'); b.type = 'button'; b.dataset.lang = l; b.textContent = l.toUpperCase();
-      b.style.cssText = 'border:0;background:none;font:inherit;font-weight:700;font-size:.78rem;color:var(--ink-soft);padding:.4rem .7rem;border-radius:100px;cursor:pointer';
-      b.addEventListener('click', function () { setLang(l); });
-      sw.appendChild(b);
-    });
-    var cta = hdr.querySelector('.header__cta');
-    hdr.insertBefore(sw, cta || null);
-    var st = document.createElement('style');
-    st.textContent = '.blog-lang button.is-active{background:var(--teal);color:#fff}';
-    document.head.appendChild(st);
+    var hdr = document.querySelector('.doc-header, .pp-header'); if (!hdr || !Langs) return;
+    var host = document.createElement('div');
+    host.className = 'header__lang blog-lang';
+    hdr.insertBefore(host, hdr.querySelector('.header__cta') || null);
+    Langs.mount(host, { current: lang, className: 'lang-menu--light', onChange: setLang });
   }
 
-  function init() { injectSwitch(); walk(lang); updateSw(); }
+  function init() { injectSwitch(); walk(lang); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -475,11 +475,16 @@
   };
   function cityName(c) {
     const e = CITY_I18N[c];
-    return (e && lang !== 'ru' && e[lang]) ? e[lang] : c;
+    if (!e || lang === 'ru') return c;
+    return e[lang] || e.en || c;
   }
+  // Названия стран для языков из подгружаемых пакетов (js/i18n/*.js)
+  const COUNTRY_I18N = {};
   function countryName(c) {
     const e = COUNTRIES.find(x => x.code === c) || COUNTRIES[0];
-    return lang === 'en' ? e.nameEn : lang === 'th' ? e.nameTh : e.name;
+    if (lang === 'ru') return e.name;
+    if (lang === 'th') return e.nameTh;
+    return (COUNTRY_I18N[lang] && COUNTRY_I18N[lang][e.code]) || e.nameEn;
   }
 
   // Избранное — в localStorage
@@ -1271,7 +1276,14 @@
       cmp_title: 'เปรียบเทียบรายการ', cmp_type: 'ประเภท', cmp_price: 'ราคา', cmp_ppm: 'ราคาต่อ ตร.ม.', cmp_beds: 'ห้องนอน', cmp_baths: 'ห้องน้ำ', cmp_area: 'พื้นที่', cmp_loc: 'ทำเล', cmp_beach: 'ใกล้หาด', cmp_rent: 'ค่าเช่า/เดือน', cmp_yield: 'ผลตอบแทน (ก่อนหัก)', cmp_open: 'เปิด', cmp_inbar: 'ในการเปรียบเทียบ',
     },
   };
-  function t(key, ru) { return (lang !== 'ru' && I18N[lang] && I18N[lang][key] != null) ? I18N[lang][key] : ru; }
+  /* Чего нет в словаре языка — показываем по-английски, а не по-русски:
+     вьетнамцу английская строка понятнее русской. */
+  function trOf(dict, l, key) {
+    if (l === 'ru') return null;
+    if (dict[l] && dict[l][key] != null) return dict[l][key];
+    return (dict.en && dict.en[key] != null) ? dict.en[key] : null;
+  }
+  function t(key, ru) { const v = trOf(I18N, lang, key); return v != null ? v : ru; }
   // Глубокий словарь содержимого (ключ — нормализованный русский текст листового узла)
   const DEEP = { en: {
     'Лето круглый год': 'Year-round summer',
@@ -1465,31 +1477,43 @@
       if (el.dataset.dru == null) el.dataset.dru = el.textContent;
       if (!el.dataset.dru.trim()) return;
       const key = el.dataset.dru.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
-      const tr = (l !== 'ru' && DEEP[l]) ? DEEP[l][key] : null;
+      const tr = trOf(DEEP, l, key);
       el.textContent = (tr != null) ? tr : el.dataset.dru;
     });
   }
 
-  let lang = 'ru';
-  try { const l = localStorage.getItem('ae_lang'); if (l === 'en' || l === 'th' || l === 'ru') lang = l; } catch (e) {}
+  /* Язык: автоопределение, флаги и меню живут в js/langs.js.
+     RU/EN/TH встроены выше, остальные языки приходят пакетом из js/i18n/. */
+  const Langs = window.AELangs;
+  let lang = Langs ? Langs.initial() : 'ru';
   const langSwitch = document.getElementById('langSwitch');
+  function absorbPack(l, pack) {
+    if (!pack || I18N[l]) return;
+    I18N[l] = pack.ui || {};
+    DEEP[l] = pack.deep || {};
+    COUNTRY_I18N[l] = pack.countries || {};
+    Object.keys(pack.cities || {}).forEach(c => { if (CITY_I18N[c]) CITY_I18N[c][l] = pack.cities[c]; });
+  }
   function applyLang(l) {
     lang = l;
-    try { localStorage.setItem('ae_lang', l); } catch (e) {}
-    document.documentElement.lang = l;
+    if (Langs) { Langs.setDocument(l); Langs.syncMenus(l); } else document.documentElement.lang = l;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const k = el.getAttribute('data-i18n');
       if (el.dataset.ru == null) el.dataset.ru = el.innerHTML;
-      const tr = (l !== 'ru' && I18N[l]) ? I18N[l][k] : null;
+      const tr = trOf(I18N, l, k);
       el.innerHTML = (tr != null) ? tr : el.dataset.ru;
     });
     document.querySelectorAll('[data-i18n-ph]').forEach(el => {
       const k = el.getAttribute('data-i18n-ph');
       if (el.dataset.phru == null) el.dataset.phru = el.getAttribute('placeholder') || '';
-      const tr = (l !== 'ru' && I18N[l]) ? I18N[l][k] : null;
+      const tr = trOf(I18N, l, k);
       el.setAttribute('placeholder', (tr != null) ? tr : el.dataset.phru);
     });
-    if (langSwitch) langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+    if (langSwitch) langSwitch.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.lang === l;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
     deepTranslate(l);
     if (allItems.length) {
       renderGeoSwitch(); fillCities(); fillDistricts();
@@ -1497,8 +1521,25 @@
       if (typeof clampSliders === 'function') clampSliders();
     }
   }
-  langSwitch && langSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (b) applyLang(b.dataset.lang); });
-  applyLang(lang);
+  /* Сразу рисуем выбранный язык (пока пакет едет — по-английски),
+     затем, когда пакет пришёл, перерисовываем уже на нём. */
+  function setLang(l, byHand) {
+    if (byHand && Langs) Langs.remember(l);
+    applyLang(l);
+    if (Langs && Langs.get(l) && Langs.get(l).pack && !I18N[l]) {
+      Langs.loadPack(l).then(pack => { absorbPack(l, pack); if (lang === l && pack) applyLang(l); });
+    }
+  }
+  if (Langs) {
+    Langs.mount(document.getElementById('headerLang'), { current: lang, onChange: l => setLang(l, true) });
+    if (langSwitch) {
+      langSwitch.innerHTML = Langs.list.map(x =>
+        `<button type="button" data-lang="${x.code}" lang="${x.code}" title="${x.name}">${Langs.flag(x.code)}<span>${x.code.toUpperCase()}</span></button>`
+      ).join('');
+    }
+  }
+  langSwitch && langSwitch.addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (b) setLang(b.dataset.lang, true); });
+  setLang(lang);
 
   /* ---------- СРОЧНАЯ ПРОДАЖА (объекты со скидкой) ---------- */
   const urgentGrid = document.getElementById('urgentGrid');
@@ -1915,7 +1956,8 @@
          это видит каждый, кто листает не рывком, и на сайте про деньги
          такой кадр дороже самой анимации. */
       const label = el.parentElement && el.parentElement.querySelector('[data-plural]');
-      const forms = label ? label.dataset.plural.split('|') : null;
+      // Русские формы — только для русского: иначе подпись на другом языке затирается русской
+      const forms = (label && lang === 'ru') ? label.dataset.plural.split('|') : null;
       function tick(now) {
         const k = Math.min((now - t0) / dur, 1);
         const eased = 1 - Math.pow(1 - k, 3);

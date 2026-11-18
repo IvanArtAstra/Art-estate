@@ -317,8 +317,9 @@
   function dictate() {
     if (rec) { try { rec.stop(); } catch (e) {} return; }
     rec = new Rec();
-    rec.lang = (document.documentElement.lang || 'ru-RU').length > 2
-      ? document.documentElement.lang : 'ru-RU';
+    // Распознаём речь на языке страницы: ru → ru-RU, vi → vi-VN и т. д.
+    const pageLang = window.AELangs && window.AELangs.get(document.documentElement.lang);
+    rec.lang = pageLang ? pageLang.bcp : 'ru-RU';
     rec.interimResults = true;
     rec.continuous = false;
     const base = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
