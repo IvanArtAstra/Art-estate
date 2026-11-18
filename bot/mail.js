@@ -372,14 +372,32 @@ async function ensureCallbacks(env, deps) {
 
 /* ---------- входящее письмо ---------- */
 
-export async function handleEmail(message, env, deps) {
-  // 1. Копия в обычный ящик — прежде всего остального
-  if (env.MAIL_FORWARD_TO) {
-    try { await message.forward(env.MAIL_FORWARD_TO); }
-    catch (e) { console.error('mail forward', e && e.message); }
-  }
+/* Куда слать копии. MAIL_FORWARD_TO — общий список через запятую для всех
+   адресов, которые ведёт воркер. MAIL_FORWARD_MAP — необязательный JSON
+   с добавками для отдельных ящиков: {"alena": "a@x.ru"} или по полному адресу.
+   Каждый адрес должен быть подтверждён в Email Routing, иначе Cloudflare
+   его отклонит — остальные копии при этом всё равно уйдут. */
+export function forwardTargets(env, rcpt) {
+  let map = {};
+  try { map = JSON.parse(env.MAIL_FORWARD_MAP || '{}') || {}; } catch { map = {}; }
+  const box = String(rcpt).split('@')[0];
+  const extra = map[rcpt] || map[box] || '';
+  return [...new Set(
+    [...String(env.MAIL_FORWARD_TO || '').split(','), ...String(extra).split(',')]
+      .map(s => s.trim().toLowerCase()).filter(Boolean),
+  )];
+}
 
+export async function handleEmail(message, env, deps) {
   const rcpt = String(message.to || '').toLowerCase();
+
+  // 1. Копии в обычные ящики — прежде всего остального
+  const targets = forwardTargets(env, rcpt);
+  const results = await Promise.allSettled(targets.map(t => message.forward(t)));
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') console.error('mail forward', targets[i], r.reason && r.reason.message);
+  });
+
   const chat = mailChat(env, deps);
   if (!env.BOT_TOKEN || !chat) return;
 
@@ -412,7 +430,7 @@ export async function handleEmail(message, env, deps) {
     await deps.tg(env, 'sendMessage', {
       chat_id: chat,
       text: `✉️ Пришло письмо на ${rcpt} от ${message.from}, но разобрать его не вышло. ` +
-            `Копия ${env.MAIL_FORWARD_TO ? 'в почте' : 'не настроена — проверьте MAIL_FORWARD_TO'}.`,
+            `Копия ${targets.length ? 'в почте' : 'не настроена — проверьте MAIL_FORWARD_TO'}.`,
     });
   }
 }

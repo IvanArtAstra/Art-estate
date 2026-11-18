@@ -87,14 +87,20 @@ def build(idx, catalog):
         "image": f"{SITE}/assets/hero-phuket.jpg",
         "logo": f"{SITE}/assets/favicon.svg",
         "telephone": PHONE,
+        "email": "info@estateart.homes",
         "areaServed": cities,
         "knowsLanguage": ["ru", "en", "th"],
         "founder": {"@type": "Person", "name": AGENT, "jobTitle": "Персональный агент по недвижимости"},
         "employee": {"@type": "Person", "name": AGENT},
         "contactPoint": [{
             "@type": "ContactPoint", "telephone": PHONE, "contactType": "sales",
+            "email": "alena@estateart.homes",
             "availableLanguage": ["Russian", "English"],
             "areaServed": ["TH", "VN"],
+        }, {
+            "@type": "ContactPoint", "contactType": "partnerships",
+            "email": "partners@estateart.homes",
+            "availableLanguage": ["Russian", "English"],
         }],
         # Только каналы самого агентства: личные каналы студии и канал про ИИ
         # в sameAs организации по недвижимости сбивают и поисковик, и человека

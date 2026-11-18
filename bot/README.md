@@ -230,7 +230,8 @@ python3 tools/price_ranges.py
 Настройка:
 
 ```bash
-wrangler secret put MAIL_FORWARD_TO   # обычный ящик, подтверждённый в Email Routing
+wrangler secret put MAIL_FORWARD_TO   # обычные ящики через запятую, все подтверждены в Email Routing
+wrangler secret put MAIL_FORWARD_MAP  # необязательно: добавки по ящикам, JSON вида {"alena":"a@x.ru"}
 wrangler secret put MAIL_CHAT_ID      # необязательно: куда слать карточки писем
 wrangler deploy
 ```

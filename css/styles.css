@@ -838,6 +838,16 @@ select.filter { appearance: none; -webkit-appearance: none; padding-right: 2.2re
   transition: color var(--t-quick) var(--ease-soft);
 }
 .contacts__phone:hover { color: #fff; }
+/* Почта под телефоном: телефон остаётся главным, адрес — тихой второй строкой */
+.contacts__mail {
+  display: block; width: fit-content; margin: -1.2rem auto 2rem; position: relative;
+  font-size: var(--fs-md); letter-spacing: .03em; color: rgba(255,253,248,.78);
+  border-bottom: 1px solid rgba(227,195,120,.35); padding-bottom: 2px;
+  transition: color var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft);
+}
+.contacts__mail:hover { color: var(--gold-light); border-color: var(--gold-light); }
+.drawer__mail { display: block; margin-top: .3rem; font-size: var(--fs-sm); color: var(--ink-soft); }
+.drawer__mail:hover { color: var(--gold-ink); }
 .contacts__actions { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; position: relative; }
 .contacts__note { margin-top: 2rem; font-size: var(--fs-sm); color: rgba(255,253,248,.55); letter-spacing: .04em; position: relative; }
 
