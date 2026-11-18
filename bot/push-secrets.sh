@@ -92,7 +92,7 @@ WORKER_URL="$(printf '%s' "$deploy_out" | grep -oE 'https://[a-z0-9.-]+\.workers
 say "Подписываю бота на вебхук…"
 hook="$(curl -sS -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
   -H 'content-type: application/json' \
-  -d "{\"url\":\"${WORKER_URL}/api/telegram\",\"secret_token\":\"${WEBHOOK_SECRET}\",\"allowed_updates\":[\"message\"]}")"
+  -d "{\"url\":\"${WORKER_URL}/api/telegram\",\"secret_token\":\"${WEBHOOK_SECRET}\",\"allowed_updates\":[\"message\",\"callback_query\"]}")"
 printf '  %s\n' "$hook"
 printf '%s' "$hook" | grep -q '"ok":true' || die "вебхук не встал — смотрите ответ выше"
 me="$(curl -sS "https://api.telegram.org/bot${BOT_TOKEN}/getMe")"

@@ -193,8 +193,18 @@ function toMessages(session, userText) {
    Durable Object с locationHint закрепляет выполнение за регионом явно. */
 const RELAY_REGION = 'enam';   // восток Северной Америки
 
-async function callClaude(env, messages, system) {
-  const body = JSON.stringify({ model: MODEL, max_tokens: MAX_TOKENS, system, tools: TOOLS, messages });
+/* opts нужны почтовому разбору (bot/mail.js): свои инструменты, свой лимит
+   и принудительный вызов инструмента, чтобы ответ всегда был структурой. */
+export async function callClaude(env, messages, system, opts = {}) {
+  const payload = {
+    model: opts.model || MODEL,
+    max_tokens: opts.maxTokens || MAX_TOKENS,
+    system,
+    tools: opts.tools || TOOLS,
+    messages,
+  };
+  if (opts.toolChoice) payload.tool_choice = opts.toolChoice;
+  const body = JSON.stringify(payload);
 
   const id = env.AI_RELAY.idFromName('anthropic-' + RELAY_REGION);
   const stub = env.AI_RELAY.get(id, { locationHint: RELAY_REGION });

@@ -13,6 +13,7 @@
  * браузер не попадают. Настройка — в bot/README.md.
  */
 import { aiReply, leadCard } from './ai.js';
+import { handleEmail, handleMailCallback } from './mail.js';
 export { AnthropicRelay } from './relay.js';
 
 const MAX_TEXT = 2000;        // длиннее Telegram всё равно порежет
@@ -336,6 +337,14 @@ async function handleTelegram(request, env) {
   let update;
   try { update = await request.json(); } catch { return new Response('ok'); }
 
+  // Кнопки под карточками писем (bot/mail.js)
+  if (update.callback_query) {
+    if (String(update.callback_query.data || '').startsWith('ml:')) {
+      await handleMailCallback(update.callback_query, env, { tg, esc, managers });
+    }
+    return new Response('ok');
+  }
+
   const message = update.message || update.edited_message;
   if (!message || !message.text) return new Response('ok');
 
@@ -613,5 +622,10 @@ export default {
       console.error('worker', err && err.stack || err);
       return json({ error: 'internal' }, 500, cors);
     }
+  },
+
+  /* Письма на адреса @estateart.homes, которые Email Routing отдаёт воркеру */
+  async email(message, env) {
+    await handleEmail(message, env, { tg, esc, managers });
   },
 };
