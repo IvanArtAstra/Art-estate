@@ -42,6 +42,7 @@ schema.org Product.
 - [Как купить иностранцу](https://estateart.homes/blog/kak-kupit-nedvizhimost-na-phukete/)
 - [Freehold и leasehold](https://estateart.homes/blog/freehold-vs-leasehold/)
 - [Районы Пхукета](https://estateart.homes/blog/rayony-phuketa/)
+- [Путешественнику](https://estateart.homes/travel/): правила въезда для россиян, страховка, eSIM
 - [Политика конфиденциальности](https://estateart.homes/privacy/)
 - [Карта сайта](https://estateart.homes/sitemap.xml)
 

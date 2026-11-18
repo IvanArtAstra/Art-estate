@@ -29,6 +29,7 @@ STATIC_URLS = [
     "/blog/rayony-phuketa/",
     "/partners/",
     "/partners/en/",
+    "/travel/",
 ]
 
 TRANSLIT = {

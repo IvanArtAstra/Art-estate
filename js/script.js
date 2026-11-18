@@ -1171,7 +1171,7 @@
     en: {
       nav_districts: 'Districts', nav_objects: 'Listings', nav_map: 'Map', nav_finance: 'Financing',
       nav_journal: 'Journal', nav_about: 'About Alena', nav_steps: 'Process', nav_reviews: 'Reviews', nav_contacts: 'Contacts',
-      nav_relocation: 'Relocation', nav_partners: 'Partners',
+      nav_relocation: 'Relocation', nav_partners: 'Partners', nav_travel: 'Travel tips',
       partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
       d_allcities: 'All cities', d_alldistricts: 'All districts',
       cta_request: 'Request a call', header_ask: 'Ask a question', drawer_price: 'Currency', hero_hint: 'Scroll down',
@@ -1222,7 +1222,7 @@
     th: {
       nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
       nav_journal: 'บทความ', nav_about: 'เกี่ยวกับอาเลน่า', nav_steps: 'ขั้นตอน', nav_reviews: 'รีวิว', nav_contacts: 'ติดต่อ',
-      nav_relocation: 'ย้ายถิ่นฐาน', nav_partners: 'พันธมิตร',
+      nav_relocation: 'ย้ายถิ่นฐาน', nav_partners: 'พันธมิตร', nav_travel: 'เตรียมตัวเดินทาง',
       partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',
       d_allcities: 'ทุกเมือง', d_alldistricts: 'ทุกเขต',
       cta_request: 'ขอให้ติดต่อกลับ', header_ask: 'สอบถาม', drawer_price: 'สกุลเงิน', hero_hint: 'เลื่อนลง',

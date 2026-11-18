@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Путешественнику: визы, страховка и eSIM | Estate Art</title>
+<meta name="description" content="Правила въезда для россиян в Таиланд, Вьетнам и на Бали, страховка для поездки и eSIM с оплатой российской картой. Помогаем подготовиться к просмотру недвижимости." />
+<meta name="theme-color" content="#082825" />
+<link rel="canonical" href="https://estateart.homes/travel/" />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Путешественнику | Estate Art" />
+<meta property="og:description" content="Визы, страховка и связь для поездки в Таиланд, Вьетнам и на Бали." />
+<meta property="og:url" content="https://estateart.homes/travel/" />
+<meta property="og:image" content="https://estateart.homes/assets/hero-phuket.jpg" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+<style>
+  body { background: var(--sand); }
+  .doc-header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem clamp(1.2rem,4vw,3rem); background: rgba(246,241,231,.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(20,32,31,.08); }
+  .tr-wrap { max-width: 1040px; margin: 0 auto; padding: clamp(2rem,5vw,3.4rem) clamp(1rem,5vw,2.5rem) 4rem; }
+  .tr-hero h1 { font-size: var(--fs-title); color: var(--teal); margin-bottom: 1rem; }
+  .tr-hero p { font-size: var(--fs-lead); color: var(--ink-soft); font-weight: 300; max-width: 62ch; }
+  .tr-jump { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin-top: 1.6rem; }
+  .tr-sec { margin-top: clamp(2.6rem,6vw,4rem); scroll-margin-top: 5rem; }
+  .tr-sec > h2 { font-size: var(--fs-title-sm); color: var(--teal); margin-bottom: .7rem; }
+  .tr-sec > p { color: var(--ink-soft); max-width: 68ch; }
+  .tr-upd { margin-top: .5rem; font-size: var(--fs-sm); color: var(--ink-soft); }
+  .tr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px,1fr)); gap: clamp(1rem,2.5vw,1.6rem); margin-top: 1.6rem; }
+  .tr-card { display: flex; flex-direction: column; background: var(--cream); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 1.5rem 1.6rem 1.4rem; box-shadow: var(--shadow-sm); }
+  .tr-card h3 { font-size: var(--fs-h3); color: var(--teal); }
+  .tr-card__lead { margin-top: .5rem; font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 2rem; line-height: 1.05; color: var(--teal); font-variant-numeric: tabular-nums; }
+  .tr-card__sub { margin-top: .3rem; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+  .tr-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; margin: 1.1rem 0 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline); flex: 1; }
+  .tr-list li { display: flex; gap: .7rem; font-size: var(--fs-base); color: var(--ink-soft); }
+  .tr-list li::before { content: ''; flex: none; width: 16px; height: 1px; background: var(--gold-ink); margin-top: .75em; }
+  .tr-svc { display: grid; grid-template-columns: auto 1fr; gap: 1.2rem 1.4rem; align-items: start; margin-top: 1.6rem; background: var(--cream); border: 1px solid var(--hairline); border-radius: var(--radius); padding: clamp(1.4rem,3vw,2rem); box-shadow: var(--shadow-sm); }
+  .tr-svc__ico { display: grid; place-items: center; width: 52px; height: 52px; border: 1px solid var(--hairline); border-radius: var(--radius-sm); color: var(--gold); }
+  .tr-svc h3 { font-size: var(--fs-h3); color: var(--teal); margin-bottom: .5rem; }
+  .tr-svc p { color: var(--ink-soft); max-width: 62ch; }
+  .tr-svc .tr-list { border-top: 0; padding-top: 0; margin: .9rem 0 0; }
+  .tr-slot { grid-column: 1 / -1; padding-top: 1.3rem; border-top: 1px solid var(--hairline); }
+  .tr-slot__widget:empty { display: none; }
+  .tr-slot__widget { margin-bottom: 1.2rem; min-width: 0; overflow-x: auto; }
+  .tr-btns { display: flex; flex-wrap: wrap; gap: .8rem; }
+  .tr-note { margin-top: 1.6rem; padding: 1.2rem 1.4rem; border-left: 2px solid var(--gold); background: var(--cream); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: var(--fs-base); color: var(--ink-soft); max-width: 72ch; }
+  .tr-ad { margin-top: 2.4rem; font-size: var(--fs-sm); color: var(--ink-soft); max-width: 72ch; }
+  .tr-cta { margin-top: clamp(2.6rem,6vw,4rem); background: linear-gradient(150deg, var(--teal), var(--teal-deep)); color: var(--cream); border-radius: var(--radius); padding: clamp(1.8rem,4vw,2.6rem); }
+  .tr-cta h2 { color: var(--cream); font-size: var(--fs-title-sm); margin-bottom: .8rem; }
+  .tr-cta p { color: rgba(255,253,248,.82); max-width: 60ch; }
+  .tr-cta .tr-btns { margin-top: 1.4rem; }
+  @media (max-width: 560px) {
+    .tr-svc { grid-template-columns: 1fr; }
+    .tr-btns .btn { width: 100%; justify-content: center; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<header class="doc-header">
+  <a href="../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
+  <a href="https://t.me/EstateArtHomesBot" class="header__cta" style="color:var(--teal);border-color:rgba(15,63,58,.3)" target="_blank" rel="noopener">Задать вопрос</a>
+</header>
+
+<main class="tr-wrap">
+  <div class="tr-hero">
+    <p class="eyebrow">Путешественнику</p>
+    <h1>Что подготовить до вылета</h1>
+    <p>Летите смотреть объект или переезжаете надолго — здесь собрано главное: правила въезда для граждан России, страховка и мобильный интернет. Если останутся вопросы, Алена ответит лично.</p>
+    <nav class="tr-jump" aria-label="Разделы страницы">
+      <a class="card__link" href="#visa">Въезд и визы</a>
+      <a class="card__link" href="#insurance">Страховка</a>
+      <a class="card__link" href="#esim">eSIM</a>
+    </nav>
+  </div>
+
+  <section class="tr-sec" id="visa">
+    <h2>Въезд и визы</h2>
+    <p>Правила для граждан России при туристической поездке. Они меняются без предупреждения, поэтому перед покупкой билетов сверьтесь с официальным сайтом страны.</p>
+    <p class="tr-upd">Проверено 18 ноября 2026 года</p>
+
+    <div class="tr-grid">
+      <article class="tr-card">
+        <h3>Таиланд</h3>
+        <p class="tr-card__lead">30 дней</p>
+        <p class="tr-card__sub">без визы</p>
+        <ul class="tr-list">
+          <li>Срок сократили с 60 до 30 дней 15 сентября 2026 года</li>
+          <li>Один раз можно продлить ещё на 30 дней в иммиграционном офисе, сбор 1 900 бат</li>
+          <li>До вылета заполните цифровую карту прибытия TDAC — это бесплатно</li>
+        </ul>
+        <a class="card__link" href="https://tdac.immigration.go.th/" target="_blank" rel="noopener">Официальный сайт TDAC →</a>
+      </article>
+
+      <article class="tr-card">
+        <h3>Вьетнам</h3>
+        <p class="tr-card__lead">45 дней</p>
+        <p class="tr-card__sub">без визы</p>
+        <ul class="tr-list">
+          <li>Безвизовый срок на месте не продлевается</li>
+          <li>Для поездки дольше нужна электронная виза — до 90 дней</li>
+          <li>Сбор: 25 долларов за однократную визу, 50 — за многократную</li>
+        </ul>
+        <a class="card__link" href="https://evisa.gov.vn/" target="_blank" rel="noopener">Официальный портал e-visa →</a>
+      </article>
+
+      <article class="tr-card">
+        <h3>Бали, Индонезия</h3>
+        <p class="tr-card__lead">30 дней</p>
+        <p class="tr-card__sub">по электронной визе e-VOA</p>
+        <ul class="tr-list">
+          <li>Сбор 500 000 рупий, около 28 долларов; его планируют повысить</li>
+          <li>Один раз можно продлить ещё на 30 дней</li>
+          <li>До прилёта заполните форму прибытия All Indonesia</li>
+        </ul>
+        <a class="card__link" href="https://evisa.imigrasi.go.id/" target="_blank" rel="noopener">Официальный сайт e-VOA →</a>
+      </article>
+    </div>
+
+    <div class="tr-note">
+      <b>Едете надолго?</b> Долгосрочные визы, продление и статус для владельцев недвижимости подбираем под вашу ситуацию. Напишите Алене — расскажем, какой вариант подойдёт и сколько он стоит.
+      <div class="tr-btns" style="margin-top:1rem">
+        <a class="btn btn--ghost" href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A3%20%D0%BC%D0%B5%D0%BD%D1%8F%20%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D0%BF%D0%BE%20%D0%B2%D0%B8%D0%B7%D0%B5." target="_blank" rel="noopener">Спросить о визе</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="tr-sec" id="insurance">
+    <h2>Страховка</h2>
+    <p>Приём у врача в частной клинике на Пхукете легко обходится в несколько сотен долларов, а госпитализация — в тысячи. Полис стоит оформить до вылета: после начала поездки его продают не все страховые.</p>
+
+    <div class="tr-svc">
+      <span class="tr-svc__ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <div>
+        <h3>На что смотреть в полисе</h3>
+        <ul class="tr-list">
+          <li>Сумма покрытия — от 50 000 долларов для Юго-Восточной Азии</li>
+          <li>Аренда мопеда и активный отдых — отдельные опции, по умолчанию их нет</li>
+          <li>Ассистанс — компания, которая организует лечение на месте; от неё зависит скорость помощи</li>
+          <li>Для поездки дольше трёх месяцев нужен годовой или долгосрочный полис</li>
+        </ul>
+      </div>
+      <div class="tr-slot" data-partner="insurance">
+        <div class="tr-slot__widget"></div>
+        <div class="tr-btns">
+          <a class="btn btn--gold" data-partner-link hidden target="_blank" rel="sponsored nofollow noopener">Рассчитать полис</a>
+          <a class="btn btn--ghost" data-partner-fallback href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9F%D0%BE%D0%BC%D0%BE%D0%B3%D0%B8%D1%82%D0%B5%20%D0%BF%D0%BE%D0%B4%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D1%8C%20%D1%81%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%D0%BA%D1%83%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D0%BE%D0%B5%D0%B7%D0%B4%D0%BA%D0%B8." target="_blank" rel="noopener">Подобрать полис с Аленой</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tr-sec" id="esim">
+    <h2>eSIM и связь</h2>
+    <p>eSIM — это тариф, который устанавливается в телефон по QR-коду, без пластиковой карты. Интернет заработает сразу после посадки, а российский номер останется в телефоне для банковских кодов.</p>
+
+    <div class="tr-svc">
+      <span class="tr-svc__ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M9 10h6v6H9z"/><path d="M12 10v6M9 13h6"/></svg></span>
+      <div>
+        <h3>Как выбрать</h3>
+        <ul class="tr-list">
+          <li>Проверьте, что телефон поддерживает eSIM: iPhone — начиная с XR и XS, у Android зависит от модели</li>
+          <li>Покупайте до вылета: для установки нужен интернет</li>
+          <li>Зарубежные сервисы часто не принимают российские карты — выбирайте тот, где есть оплата «Миром» или через СБП</li>
+          <li>На месяц и дольше выгоднее местная сим-карта: её оформляют по паспорту в салоне связи</li>
+        </ul>
+      </div>
+      <div class="tr-slot" data-partner="esim">
+        <div class="tr-slot__widget"></div>
+        <div class="tr-btns">
+          <a class="btn btn--gold" data-partner-link hidden target="_blank" rel="sponsored nofollow noopener">Выбрать eSIM</a>
+          <a class="btn btn--ghost" data-partner-fallback href="https://wa.me/79124869508?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9F%D0%BE%D0%B4%D1%81%D0%BA%D0%B0%D0%B6%D0%B8%D1%82%D0%B5%20eSIM%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D0%BE%D0%B5%D0%B7%D0%B4%D0%BA%D0%B8." target="_blank" rel="noopener">Спросить, какую взять</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="tr-ad" id="trAd" hidden>На странице есть партнёрские ссылки. Если вы оформите полис или eSIM по ним, сервис выплатит нам вознаграждение. Цена для вас от этого не меняется.</p>
+
+  <section class="tr-cta">
+    <h2>Летите смотреть недвижимость?</h2>
+    <p>Встретим, покажем объекты и районы, подскажем с жильём на время поездки. Напишите даты — составим план просмотров.</p>
+    <div class="tr-btns">
+      <a class="btn btn--gold" href="../#contacts">Оставить заявку</a>
+      <a class="btn btn--tg" href="https://t.me/EstateArtHomesBot" target="_blank" rel="noopener">Telegram</a>
+      <a class="btn btn--wa" href="https://wa.me/79124869508" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </section>
+
+  <p style="margin-top:2.4rem"><a href="../" class="card__link">← На главную</a></p>
+</main>
+
+<footer class="footer" style="margin-top:2rem">
+  <div class="footer__bottom" style="border:0">
+    <span>© 2026 Estate Art · Недвижимость в Таиланде и Вьетнаме · <a href="../privacy/">Политика конфиденциальности</a></span>
+    <a href="tel:+79124869508">+7 912 486-95-08</a>
+  </div>
+</footer>
+
+<script>
+  /* Партнёрские сервисы. Пока поля пустые, посетитель видит только кнопку
+     «написать Алене». После регистрации в партнёрке впишите сюда:
+       link      — партнёрская ссылка (появится золотая кнопка);
+       widgetSrc — адрес скрипта виджета из кабинета партнёрки, то, что стоит
+                   в src="..." у выданного <script> (виджет встанет над кнопкой).
+     Можно заполнить только link. */
+  const PARTNERS = {
+    insurance: { link: '', widgetSrc: '' },
+    esim:      { link: '', widgetSrc: '' },
+  };
+
+  let active = false;
+  document.querySelectorAll('[data-partner]').forEach(slot => {
+    const cfg = PARTNERS[slot.dataset.partner] || {};
+    const isHttps = u => typeof u === 'string' && u.startsWith('https://');
+    if (isHttps(cfg.link)) {
+      const a = slot.querySelector('[data-partner-link]');
+      a.href = cfg.link;
+      a.hidden = false;
+      active = true;
+    }
+    if (isHttps(cfg.widgetSrc)) {
+      const s = document.createElement('script');
+      s.src = cfg.widgetSrc;
+      s.async = true;
+      slot.querySelector('.tr-slot__widget').appendChild(s);
+      active = true;
+    }
+  });
+  // Пометка о партнёрских ссылках нужна только когда они действительно есть
+  if (active) document.getElementById('trAd').hidden = false;
+</script>
+</body>
+</html>

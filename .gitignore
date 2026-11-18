@@ -43,3 +43,6 @@ data/developers.json
 data/outreach/
 _tiles-test.pmtiles
 tools/tiles/*.pmtiles
+
+# Переговорный материал: письмо-предложение вьетнамским брокерам (RU/VI/EN)
+docs/vietnam-brokers-letter.md
