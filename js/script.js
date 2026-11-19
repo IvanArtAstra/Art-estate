@@ -1174,7 +1174,7 @@
   /* ---------- ЯЗЫК ИНТЕРФЕЙСА (RU/EN/TH) ---------- */
   const I18N = {
     en: {
-      nav_districts: 'Districts', nav_objects: 'Listings', nav_map: 'Map', nav_finance: 'Financing',
+      nav_districts: 'Districts', nav_objects: 'Listings', nav_rent: 'Rentals', nav_map: 'Map', nav_finance: 'Financing',
       nav_journal: 'Journal', nav_about: 'About Alena', nav_steps: 'Process', nav_reviews: 'Reviews', nav_contacts: 'Contacts',
       nav_relocation: 'Relocation', nav_partners: 'Partners', nav_travel: 'Travel tips',
       partners_eyebrow: 'Vietnam from the inside', partners_title: 'Agencies, developers and channels',
@@ -1225,7 +1225,7 @@
       cmp_title: 'Compare listings', cmp_type: 'Type', cmp_price: 'Price', cmp_ppm: 'Price per m²', cmp_beds: 'Bedrooms', cmp_baths: 'Bathrooms', cmp_area: 'Area', cmp_loc: 'Location', cmp_beach: 'Near beach', cmp_rent: 'Rent/mo', cmp_yield: 'Yield, gross', cmp_open: 'Open', cmp_inbar: 'in compare',
     },
     th: {
-      nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_map: 'แผนที่', nav_finance: 'การเงิน',
+      nav_districts: 'ทำเล', nav_objects: 'รายการ', nav_rent: 'เช่า', nav_map: 'แผนที่', nav_finance: 'การเงิน',
       nav_journal: 'บทความ', nav_about: 'เกี่ยวกับอาเลน่า', nav_steps: 'ขั้นตอน', nav_reviews: 'รีวิว', nav_contacts: 'ติดต่อ',
       nav_relocation: 'ย้ายถิ่นฐาน', nav_partners: 'พันธมิตร', nav_travel: 'เตรียมตัวเดินทาง',
       partners_eyebrow: 'เวียดนามจากคนใน', partners_title: 'เอเจนซี ผู้พัฒนา และช่องทาง',

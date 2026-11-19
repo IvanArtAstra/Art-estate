@@ -579,6 +579,12 @@ def build():
     # sitemap.xml (объекты + статические контент-страницы)
     for s in STATIC_URLS:
         urls.append(SITE + s)
+    rentals_path = os.path.join(root, "data", "rentals.json")
+    if os.path.exists(rentals_path):
+        rentals = [r for r in json.load(open(rentals_path, encoding="utf-8")).get("items", []) if r.get("url")]
+        if rentals:
+            urls.append(SITE + "/arenda/")
+            urls.extend(f"{SITE}/{r['url']}" for r in rentals)
     today = dt.date.today().isoformat()
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

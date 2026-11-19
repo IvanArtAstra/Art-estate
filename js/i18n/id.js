@@ -3,6 +3,7 @@
   ui: {
     nav_districts: 'Kawasan',
     nav_objects: 'Properti',
+    nav_rent: 'Sewa',
     nav_map: 'Peta',
     nav_finance: 'Pembiayaan',
     nav_journal: 'Jurnal',

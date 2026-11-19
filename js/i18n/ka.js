@@ -3,6 +3,7 @@
   ui: {
     nav_districts: 'რაიონები',
     nav_objects: 'ობიექტები',
+    nav_rent: 'ქირავდება',
     nav_map: 'რუკა',
     nav_finance: 'დაფინანსება',
     nav_journal: 'ჟურნალი',

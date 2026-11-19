@@ -3,6 +3,7 @@
   ui: {
     nav_districts: 'Khu vực',
     nav_objects: 'Bất động sản',
+    nav_rent: 'Cho thuê',
     nav_map: 'Bản đồ',
     nav_finance: 'Tài chính',
     nav_journal: 'Tạp chí',

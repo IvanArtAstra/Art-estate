@@ -3,6 +3,7 @@
   ui: {
     nav_districts: 'المناطق',
     nav_objects: 'العقارات',
+    nav_rent: 'الإيجار',
     nav_map: 'الخريطة',
     nav_finance: 'التمويل',
     nav_journal: 'المجلة',

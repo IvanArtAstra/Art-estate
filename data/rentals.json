@@ -1,0 +1,83 @@
+{
+  "updated": "2026-11-19",
+  "note": "Аренда. Страницы собирает scraper/build_rentals.py. Цена в донгах — как в объявлении, доллары считаются по курсу 26 000 ₫.",
+  "usdVnd": 26000,
+  "items": [
+    {
+      "id": "gb24f37",
+      "deal": "rent",
+      "country": "vn",
+      "countryName": "Вьетнам",
+      "city": "Дананг",
+      "complex": "Golden Bay",
+      "title": "Апартаменты в Golden Bay, 24 этаж, 37 м²",
+      "type": "Апартаменты",
+      "area": 37,
+      "floor": 24,
+      "view": "гора Сон Тра",
+      "kitchen": false,
+      "washingMachine": true,
+      "location": "Golden Bay, Дананг",
+      "rentMonthVND": 13000000,
+      "rentMonthUSD": 500,
+      "availableFrom": "2026-11-27",
+      "mgmtVND": 340000,
+      "waterVND": 100000,
+      "cleaningVND": 250000,
+      "included": [
+        "Бассейн",
+        "Парковка",
+        "Вайфай отеля"
+      ],
+      "extras": [
+        {
+          "label": "Электричество",
+          "value": "3 500 ₫ за кВт·ч"
+        },
+        {
+          "label": "Вода",
+          "value": "100 000 ₫ с человека в месяц"
+        },
+        {
+          "label": "Управляющая компания",
+          "value": "340 000 ₫ в месяц"
+        },
+        {
+          "label": "Уборка с заменой постельного белья",
+          "value": "250 000 ₫ за раз, обязательна раз в две недели"
+        }
+      ],
+      "rules": [
+        "Курение запрещено",
+        "Животные не допускаются"
+      ],
+      "description": "Апартаменты 37 м² на 24 этаже комплекса Golden Bay в Дананге. Одна комната с большой кроватью, санузел с душем за стеклянной перегородкой, рабочий стол с телевизором, шкаф с сейфом и балкон с видом на гору Сон Тра. Кухни нет, стиральная машина входит. Бассейн, парковка и вайфай отеля включены в стоимость аренды.",
+      "lat": null,
+      "lng": null,
+      "images": [
+        "assets/rentals/golden-bay-24f-37m2/01.webp",
+        "assets/rentals/golden-bay-24f-37m2/02.webp",
+        "assets/rentals/golden-bay-24f-37m2/03.webp",
+        "assets/rentals/golden-bay-24f-37m2/04.webp",
+        "assets/rentals/golden-bay-24f-37m2/05.webp",
+        "assets/rentals/golden-bay-24f-37m2/06.webp",
+        "assets/rentals/golden-bay-24f-37m2/07.webp",
+        "assets/rentals/golden-bay-24f-37m2/08.webp",
+        "assets/rentals/golden-bay-24f-37m2/09.webp",
+        "assets/rentals/golden-bay-24f-37m2/10.webp",
+        "assets/rentals/golden-bay-24f-37m2/11.webp",
+        "assets/rentals/golden-bay-24f-37m2/12.webp",
+        "assets/rentals/golden-bay-24f-37m2/13.webp",
+        "assets/rentals/golden-bay-24f-37m2/14.webp",
+        "assets/rentals/golden-bay-24f-37m2/15.webp",
+        "assets/rentals/golden-bay-24f-37m2/16.webp",
+        "assets/rentals/golden-bay-24f-37m2/17.webp",
+        "assets/rentals/golden-bay-24f-37m2/18.webp",
+        "assets/rentals/golden-bay-24f-37m2/19.webp"
+      ],
+      "image": "assets/rentals/golden-bay-24f-37m2/01.webp",
+      "slug": "golden-bay-24-etazh-37-m2",
+      "url": "arenda/golden-bay-24-etazh-37-m2/"
+    }
+  ]
+}

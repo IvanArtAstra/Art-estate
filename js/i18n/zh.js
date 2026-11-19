@@ -3,6 +3,7 @@
   ui: {
     nav_districts: '区域',
     nav_objects: '房源',
+    nav_rent: '租赁',
     nav_map: '地图',
     nav_finance: '付款方式',
     nav_journal: '专栏',

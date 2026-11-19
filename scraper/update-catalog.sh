@@ -25,6 +25,7 @@ python3 scraper/enrich_gallery.py --max 6 --delay 0.6 || true
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Генерирую SEO-страницы объектов и районов…"
 python3 scraper/build_pages.py
+python3 scraper/build_rentals.py
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Пересобираю диапазоны цен для ИИ-менеджера…"
 python3 tools/price_ranges.py
