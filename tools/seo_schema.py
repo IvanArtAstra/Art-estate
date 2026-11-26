@@ -85,7 +85,7 @@ def build(idx, catalog):
                         "в Дананге и Нячанге. Юридическая проверка, безопасные расчёты, "
                         "сопровождение сделки удалённо."),
         "image": f"{SITE}/assets/hero-phuket.jpg",
-        "logo": f"{SITE}/assets/favicon.svg",
+        "logo": f"{SITE}/assets/icon-512.png",
         "telephone": PHONE,
         "email": "info@estateart.homes",
         "areaServed": cities,
