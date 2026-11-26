@@ -268,6 +268,7 @@ export async function sendOutbox(env, deps, rec) {
     rec.messageId = res && res.messageId;
     await putOutbox(env, rec);
     await bumpDay(env);
+    if (!(await env.CHAT.get('obfirst'))) await env.CHAT.put('obfirst', now);
 
     const partner = p || { email: rec.to, name: rec.name || rec.to, stage: 'sent', createdAt: now, history: [] };
     partner.stage = advance(partner.stage === 'queued' ? 'sent' : partner.stage, 'sent');
@@ -296,6 +297,18 @@ function vnNow() {
   return new Date(Date.now() + 7 * 3600 * 1000);   // Вьетнам: UTC+7, без перехода на летнее время
 }
 const dayKey = () => `obday:${vnNow().toISOString().slice(0, 10)}`;
+
+/* Дневной лимит разгоняется сам: OUTREACH_DAILY = "10,20,30,40" — по числу на
+   неделю, считая от первого отправленного письма (ключ obfirst). Репутация
+   домена растёт от истории отправок, а не от даты регистрации: первую неделю
+   рассылки почтовики смотрят на нас особенно придирчиво. Одно число — без разгона. */
+async function dailyLimit(env) {
+  const steps = String(env.OUTREACH_DAILY || '10').split(',').map(x => num(x, 0)).filter(Boolean);
+  if (steps.length < 2) return steps[0] || 10;
+  const first = Date.parse(await env.CHAT.get('obfirst') || '') || Date.now();
+  const week = Math.floor((Date.now() - first) / (7 * 86400 * 1000));
+  return steps[Math.min(week, steps.length - 1)];
+}
 
 async function sentToday(env) {
   return num(await env.CHAT.get(dayKey()), 0);
@@ -571,8 +584,12 @@ async function planReminders(env, deps) {
 
 async function sendDue(env, deps) {
   if (!workingHours(env)) return;
-  const daily = num(env.OUTREACH_DAILY, 10);
-  let left = Math.min(num(env.OUTREACH_PER_TICK, 1), daily - await sentToday(env));
+  const daily = await dailyLimit(env);
+  // Cron раз в полчаса: слотов в день — два на рабочий час. Если лимит больше
+  // числа слотов, за запуск уходит несколько писем, а не одно.
+  const slots = Math.max(1, (num(env.OUTREACH_TO_HOUR, 18) - num(env.OUTREACH_FROM_HOUR, 8)) * 2);
+  const perTick = Math.max(num(env.OUTREACH_PER_TICK, 1), Math.ceil(daily / slots));
+  let left = Math.min(perTick, daily - await sentToday(env));
   if (left <= 0) return;
   for (const k of await listAll(env, 'obq:')) {
     if (left <= 0) break;
@@ -639,7 +656,7 @@ export async function partnersReport(env, deps) {
     }
   }
   const q = (await listAll(env, 'obq:')).length, p = (await listAll(env, 'obp:')).length;
-  t += `\n\n<b>Очередь:</b> одобрено ${q}, ждут одобрения ${p}, отправлено сегодня ${await sentToday(env)} из ${num(env.OUTREACH_DAILY, 10)}`;
+  t += `\n\n<b>Очередь:</b> одобрено ${q}, ждут одобрения ${p}, отправлено сегодня ${await sentToday(env)} из ${await dailyLimit(env)}`;
   return t.slice(0, 4096);
 }
 
