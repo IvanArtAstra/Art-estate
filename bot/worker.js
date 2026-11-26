@@ -13,7 +13,8 @@
  * браузер не попадают. Настройка — в bot/README.md.
  */
 import { aiReply, leadCard } from './ai.js';
-import { handleEmail, handleMailCallback } from './mail.js';
+import { handleEmail, mailChats, handleMailCallback } from './mail.js';
+import { handleOutboxCallback, handleOutboxReply, runSchedule, partnersReport, queueKeyboard } from './partners.js';
 export { AnthropicRelay } from './relay.js';
 
 const MAX_TEXT = 2000;        // длиннее Telegram всё равно порежет
@@ -50,10 +51,23 @@ async function priceRanges(env) {
  * Новый диалог уходит следующему по кругу, дальше вся переписка держится за ним —
  * клиент не должен объяснять одно и то же разным людям. Отвечать при этом может
  * любой из списка: если дежурный занят, коллега просто подхватывает.
+ *
+ * Канал (CHANNEL_CHAT_ID) из списка вырезается, даже если его туда вписали:
+ * канал — витрина для подписчиков, а заявки и карточки писем содержат имена,
+ * контакты и переписку с партнёрами. Ответить реплаем в канале тоже нельзя.
  */
+function chatList(v) {
+  return String(v || '').split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/** Зависимости для модулей почты и партнёров: кто админ и как писать в Telegram. */
+function staffDeps() {
+  return { tg, esc, managers, chats: e => mailChats(e, { managers }) };
+}
+
 function managers(env) {
-  return String(env.AGENT_CHAT_ID || '')
-    .split(',').map(s => s.trim()).filter(Boolean);
+  const channels = new Set(chatList(env.CHANNEL_CHAT_ID));
+  return chatList(env.AGENT_CHAT_ID).filter(id => !channels.has(id));
 }
 
 async function assignManager(env, sessionId) {
@@ -170,7 +184,7 @@ async function handleSend(request, env) {
         session.handedOff = true;
         if (ai.lead.name) session.name = ai.lead.name;
         if (ai.lead.contact) session.contact = ai.lead.contact;
-        const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+        const to = session.manager || managers(env)[0];
         const card = await tg(env, 'sendMessage', {
           chat_id: to, parse_mode: 'HTML', text: leadCard(ai.lead, id, esc),
         });
@@ -192,7 +206,7 @@ async function handleSend(request, env) {
     : `<b>${esc(session.name)}</b>`;
 
   const list = managers(env);
-  const assigned = session.manager || list[0] || env.AGENT_CHAT_ID;
+  const assigned = session.manager || list[0];
   const sent = await tg(env, 'sendMessage', {
     chat_id: assigned,
     parse_mode: 'HTML',
@@ -289,7 +303,7 @@ async function handleVoice(request, env) {
     `\n\n🎤 Голосовое с сайта\n\n<code>#${id}</code>\n` +
     `<i>Ответьте реплаем на это сообщение — ответ уйдёт на сайт.</i>`;
 
-  const assigned = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+  const assigned = session.manager || managers(env)[0];
   const body = new FormData();
   body.append('chat_id', String(assigned));
   body.append('caption', caption);
@@ -341,6 +355,8 @@ async function handleTelegram(request, env) {
   if (update.callback_query) {
     if (String(update.callback_query.data || '').startsWith('ml:')) {
       await handleMailCallback(update.callback_query, env, { tg, esc, managers });
+    } else if (String(update.callback_query.data || '').startsWith('ob:')) {
+      await handleOutboxCallback(update.callback_query, env, staffDeps());
     }
     return new Response('ok');
   }
@@ -358,6 +374,22 @@ async function handleTelegram(request, env) {
     await tg(env, 'sendMessage', { chat_id: message.chat.id, text: `chat_id: ${message.chat.id}` });
     return new Response('ok');
   }
+  if (message.text.startsWith('/partners')) {
+    await tg(env, 'sendMessage', {
+      chat_id: message.chat.id, parse_mode: 'HTML', text: await partnersReport(env, staffDeps()),
+    });
+    return new Response('ok');
+  }
+  if (message.text.startsWith('/queue')) {
+    await tg(env, 'sendMessage', {
+      chat_id: message.chat.id, parse_mode: 'HTML', text: await partnersReport(env, staffDeps()),
+      reply_markup: await queueKeyboard(env),
+    });
+    return new Response('ok');
+  }
+  // Реплай на карточку исходящего письма — правка письма, а не ответ посетителю
+  if (await handleOutboxReply(message, env, staffDeps())) return new Response('ok');
+
   if (message.text.startsWith('/duty')) {
     const n = parseInt((await env.CHAT.get('rr:counter')) || '0', 10);
     const next = list.length ? list[n % list.length] : '—';
@@ -525,7 +557,7 @@ async function handleVisitorDM(message, env) {
 
   // Дежурный уже подхватил — пересылаем ему, помощник молчит
   if (session.handedOff) {
-    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const to = session.manager || managers(env)[0];
     const sent = await tg(env, 'sendMessage', {
       chat_id: to, parse_mode: 'HTML',
       text: `<b>${esc(session.name)}</b> (Telegram)\n\n${esc(text)}\n\n<code>#${id}</code>\n` +
@@ -547,7 +579,7 @@ async function handleVisitorDM(message, env) {
     // Помощник недоступен — не теряем человека, отдаём дежурному сразу
     session.aiTurns = -1;
     session.handedOff = true;
-    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const to = session.manager || managers(env)[0];
     const sent = await tg(env, 'sendMessage', {
       chat_id: to, parse_mode: 'HTML',
       text: `🟢 <b>Обращение в бот</b>\n<b>${esc(session.name)}</b>` +
@@ -575,7 +607,7 @@ async function handleVisitorDM(message, env) {
     session.handedOff = true;
     if (ai.lead.name) session.name = ai.lead.name;
     if (ai.lead.contact) session.contact = ai.lead.contact;
-    const to = session.manager || managers(env)[0] || env.AGENT_CHAT_ID;
+    const to = session.manager || managers(env)[0];
     const card = await tg(env, 'sendMessage', {
       chat_id: to, parse_mode: 'HTML',
       text: leadCard(ai.lead, id, esc).replace('Заявка с сайта', 'Заявка из бота'),
@@ -597,7 +629,13 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
 
     try {
-      if (url.pathname === '/api/health') return json({ ok: true }, 200, cors);
+      // Без самих id: только сколько дежурных осталось после вычета канала
+      // и сколько записей канала пришлось вырезать из AGENT_CHAT_ID.
+      if (url.pathname === '/api/health') {
+        const all = chatList(env.AGENT_CHAT_ID);
+        const staff = managers(env);
+        return json({ ok: true, managers: staff.length, channelInAgents: all.length - staff.length }, 200, cors);
+      }
 
       if (url.pathname === '/api/send' && request.method === 'POST') {
         const res = await handleSend(request, env);
@@ -627,5 +665,10 @@ export default {
   /* Письма на адреса @estateart.homes, которые Email Routing отдаёт воркеру */
   async email(message, env) {
     await handleEmail(message, env, { tg, esc, managers });
+  },
+
+  /* Cron раз в полчаса: очередь писем партнёрам, напоминания, уведомления */
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runSchedule(env, staffDeps()));
   },
 };

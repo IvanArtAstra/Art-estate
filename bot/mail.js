@@ -20,6 +20,7 @@
    ============================================================ */
 
 import { callClaude } from './ai.js';
+import { onIncomingMail, createOutbox, postOutbox } from './partners.js';
 
 const MAIL_TTL = 60 * 60 * 24 * 30;   // письма и разборы живут месяц
 const MAX_RAW = 2 * 1024 * 1024;      // больше не читаем: вложения нам не нужны
@@ -210,6 +211,22 @@ const DIGEST_TOOL = {
         description: 'До 6 конкретных фактов из письма: цифры комиссии, цены, сроки, ' +
           'названия объектов, контакты. Только то, что прямо написано.',
       },
+      company: { type: 'string', description: 'Название компании отправителя, если понятно из письма или подписи. Иначе пусто.' },
+      terms: {
+        type: 'string',
+        description: 'Если партнёр назвал условия сотрудничества — размер комиссии, когда и как платят, ' +
+          'как фиксируется клиент, кто ведёт сделку — перескажи их по-русски одним-тремя предложениями, ' +
+          'с цифрами и валютой как в письме. Если условий нет — пусто.',
+      },
+      objects: {
+        type: 'boolean',
+        description: 'true, если партнёр прислал объекты: ссылку на папку или таблицу, архив, ' +
+          'файлы с описаниями и ценами, фотографии объектов.',
+      },
+      optout: {
+        type: 'boolean',
+        description: 'true, если отправитель отказывается от сотрудничества или просит больше не писать.',
+      },
       language: { type: 'string', description: 'Язык письма по-русски: «английский», «вьетнамский».' },
       urgency: { type: 'string', enum: ['низкая', 'обычная', 'высокая'] },
       warning: {
@@ -308,8 +325,14 @@ function newId() {
   return Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 10);
 }
 
-function mailChat(env, deps) {
-  return env.MAIL_CHAT_ID || deps.managers(env)[0] || env.AGENT_CHAT_ID;
+/* Карточки писем — всем администраторам: MAIL_CHAT_ID (через запятую), а если
+   он не задан — всем дежурным из AGENT_CHAT_ID. Канал отсекается и здесь:
+   карточка содержит переписку с партнёрами, ей не место у подписчиков. */
+export function mailChats(env, deps) {
+  const list = v => String(v || '').split(',').map(s => s.trim()).filter(Boolean);
+  const channels = new Set(list(env.CHANNEL_CHAT_ID));
+  const own = list(env.MAIL_CHAT_ID).filter(id => !channels.has(id));
+  return [...new Set(own.length ? own : deps.managers(env))];
 }
 
 function card(mail, digest, id, esc) {
@@ -398,8 +421,8 @@ export async function handleEmail(message, env, deps) {
     if (r.status === 'rejected') console.error('mail forward', targets[i], r.reason && r.reason.message);
   });
 
-  const chat = mailChat(env, deps);
-  if (!env.BOT_TOKEN || !chat) return;
+  const chats = mailChats(env, deps);
+  if (!env.BOT_TOKEN || !chats.length) return;
 
   try {
     const buf = new Uint8Array(await new Response(message.raw).arrayBuffer());
@@ -418,20 +441,24 @@ export async function handleEmail(message, env, deps) {
       { expirationTtl: MAIL_TTL });
 
     const quiet = digest && ['спам', 'рассылка'].includes(digest.category);
-    await deps.tg(env, 'sendMessage', {
+    const text = card(mail, digest, id, deps.esc);
+    await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', {
       chat_id: chat, parse_mode: 'HTML', disable_web_page_preview: true,
       disable_notification: !!quiet,
-      text: card(mail, digest, id, deps.esc),
-      reply_markup: keyboard(id, digest),
-    });
+      text, reply_markup: keyboard(id, digest),
+    })));
     await ensureCallbacks(env, deps).catch(e => console.log('hook', e && e.message));
+
+    // Воронка партнёров: этап, условия, объекты — отдельными уведомлениями
+    if (!skipAi) {
+      await onIncomingMail(env, { ...deps, chats: e => mailChats(e, deps) }, mail, digest, id)
+        .catch(e => console.error('partners', e && e.stack || e));
+    }
   } catch (e) {
     console.error('mail', e && e.stack || e);
-    await deps.tg(env, 'sendMessage', {
-      chat_id: chat,
-      text: `✉️ Пришло письмо на ${rcpt} от ${message.from}, но разобрать его не вышло. ` +
-            `Копия ${targets.length ? 'в почте' : 'не настроена — проверьте MAIL_FORWARD_TO'}.`,
-    });
+    const text = `✉️ Пришло письмо на ${rcpt} от ${message.from}, но разобрать его не вышло. ` +
+      `Копия ${targets.length ? 'в почте' : 'не настроена — проверьте MAIL_FORWARD_TO'}.`;
+    await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', { chat_id: chat, text })));
   }
 }
 
@@ -439,7 +466,7 @@ export async function handleEmail(message, env, deps) {
 
 export async function handleMailCallback(cq, env, deps) {
   const chatId = cq.message && cq.message.chat && cq.message.chat.id;
-  const allowed = [...deps.managers(env), String(env.MAIL_CHAT_ID || '')].filter(Boolean);
+  const allowed = [...deps.managers(env), ...mailChats(env, deps)];
   if (!allowed.some(m => String(m) === String(chatId))) {
     await deps.tg(env, 'answerCallbackQuery', { callback_query_id: cq.id, text: 'Нет доступа' });
     return;
@@ -503,18 +530,12 @@ export async function handleMailCallback(cq, env, deps) {
       return;
     }
     const to = (mail.replyTo || mail.from).replace(/^.*<([^>]+)>.*$/, '$1');
-    const text =
-      `✍️ <b>Черновик ответа</b>` + (action ? ` · ${esc(action.label)}` : '') +
-      `\n<b>Кому:</b> <code>${esc(to)}</code>` +
-      `\n<b>Тема:</b> <code>${esc(d.subject)}</code>` +
-      `\n\n<pre>${esc(d.reply)}</pre>` +
-      `\n<b>Перевод:</b>\n<i>${esc(d.translation)}</i>` +
-      `\n\n<i>Бот письма не отправляет. Нажмите на текст, чтобы скопировать, и ответьте из почты.</i>`;
-    await deps.tg(env, 'sendMessage', {
-      chat_id: chatId, parse_mode: 'HTML', disable_web_page_preview: true,
-      reply_to_message_id: cq.message.message_id,
-      text: text.slice(0, 4096),
+    const rec = await createOutbox(env, {
+      to, subject: d.subject, text: d.reply, translation: d.translation, kind: 'reply',
+      inReplyTo: mail.messageId || '', status: 'draft',
     });
+    await postOutbox(env, { ...deps, chats: e => mailChats(e, deps) }, chatId, rec,
+      { reply_to_message_id: cq.message.message_id });
     return;
   }
 

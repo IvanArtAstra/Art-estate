@@ -24,6 +24,19 @@ mode = "smart"
 # Откуда виджету разрешено обращаться. Через запятую, без пробелов.
 ALLOWED_ORIGINS = "https://estateart.homes,https://www.estateart.homes,https://ivanartastra.github.io,http://localhost:8123"
 SITE_URL = "https://estateart.homes/"
+# Публичный канал @EstateArt — витрина для подписчиков. Заявки, карточки писем
+# и служебные уведомления туда не уходят, даже если id канала попал в
+# AGENT_CHAT_ID или MAIL_CHAT_ID. Через запятую, если каналов несколько.
+CHANNEL_CHAT_ID = "-1003863870018"
+# Очередь первых писем партнёрам. Домен молодой (с 30.10.2026): первую неделю
+# не больше 10 писем в день, по одному за запуск cron, в рабочие часы Вьетнама.
+OUTREACH_DAILY = "10"
+OUTREACH_PER_TICK = "1"
+OUTREACH_FROM_HOUR = "8"
+OUTREACH_TO_HOUR = "18"
+# Напоминание молчащему партнёру: через 5 дней, отменить можно в течение 6 часов
+REMIND_AFTER_DAYS = "5"
+REMIND_DELAY_HOURS = "6"
 
 [[kv_namespaces]]
 binding = "CHAT"
@@ -38,3 +51,15 @@ class_name = "AnthropicRelay"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["AnthropicRelay"]
+
+# ---------- переписка с партнёрами (bot/partners.js) ----------
+
+# Отправка писем с partners@estateart.homes через Cloudflare Email Sending.
+# На произвольные адреса — только после подключения домена к Email Sending
+# (тариф Workers Paid). До этого письма уходят лишь на подтверждённые адреса.
+[[send_email]]
+name = "EMAIL"
+
+# Раз в полчаса: очередь писем, напоминания молчащим, уведомление об одобрении
+[triggers]
+crons = ["*/30 * * * *"]
