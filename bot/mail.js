@@ -267,6 +267,21 @@ const DRAFT_TOOL = {
   },
 };
 
+const TRANSLATE_TOOL = {
+  name: 'mail_translation',
+  description: 'Полный перевод письма на русский.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      subject_ru: { type: 'string', description: 'Тема письма, переведённая на русский язык' },
+      text_ru: { type: 'string', description: 'Текст письма, переведённый на русский язык целиком. Не копия оригинала.' },
+    },
+    required: ['subject_ru', 'text_ru'],
+  },
+};
+
+const TRANSLATE_LIMIT = 8000;   // знаков оригинала; длиннее — в почте
+
 function mailPrompt(mail) {
   return `Письмо пришло на адрес ${mail.rcpt}.
 От: ${mail.from}${mail.replyTo ? `\nReply-To: ${mail.replyTo}` : ''}
@@ -294,6 +309,57 @@ export async function digestMail(env, mail) {
   } catch (e) {
     console.log('mail digest error:', e && e.message);
     return null;
+  }
+}
+
+/* Письмо не по-русски? Язык определяет разбор: «вьетнамский», «английский»… */
+export function isForeign(digest) {
+  return !!(digest && digest.language && digest.language !== '—' && !/рус/i.test(digest.language));
+}
+
+/* Полный перевод для владельцев — не пересказ: условия партнёра важны дословно */
+export async function translateMail(env, mail, language = '') {
+  if (!env.ANTHROPIC_API_KEY || !mail.text) return null;
+  const from = language ? `с языка «${language}» ` : '';
+  const sys = `${UNTRUSTED}\n\nПереведи письмо на русский инструментом mail_translation — полностью,
+ничего не сокращая и не пересказывая. Абзацы, списки, цифры, суммы с валютой, даты,
+названия объектов, имена, телефоны, адреса и ссылки — как в оригинале. Цитату прошлой
+переписки (после «On … wrote:», «Vào … đã viết:», строк с «>», «-----Original Message-----»)
+не переводи, замени одной строкой «[дальше цитата прошлой переписки]». Подпись переводи
+коротко. Без вступлений и своих комментариев.`;
+  const body = mail.text.slice(0, TRANSLATE_LIMIT);
+  try {
+    const res = await callClaude(env,
+      [{ role: 'user', content: `Тема: ${mail.subject}\n\n<email>\n${body}\n</email>\n\n` +
+        `Переведи это письмо ${from}на русский язык. В text_ru — только русский текст.` }],
+      sys,
+      { tools: [TRANSLATE_TOOL], toolChoice: { type: 'tool', name: 'mail_translation' }, maxTokens: 6000, model: MODEL });
+    const t = toolInput(res, 'mail_translation');
+    if (!t || !t.text_ru) return null;
+    return { subject: t.subject_ru || '', text: t.text_ru, cut: mail.text.length > TRANSLATE_LIMIT || !!mail.truncated };
+  } catch (e) {
+    console.log('mail translate error:', e && e.message);
+    return null;
+  }
+}
+
+async function sendTranslation(env, deps, chatId, replyTo, mail, tr, silent) {
+  const esc = deps.esc;
+  const head = `🇷🇺 <b>Перевод письма</b>\n<b>Тема:</b> ${esc(tr.subject || mail.subject)}\n<i>${esc(mail.from)}</i>\n\n`;
+  const body = tr.text;
+  for (let i = 0, part = 0; i < body.length && part < 4; i += 3500, part++) {
+    await deps.tg(env, 'sendMessage', {
+      chat_id: chatId, parse_mode: 'HTML', disable_web_page_preview: true,
+      disable_notification: !!silent,
+      reply_to_message_id: part === 0 && replyTo ? replyTo : undefined,
+      text: (part === 0 ? head : '') + esc(body.slice(i, i + 3500)),
+    });
+  }
+  if (tr.cut || body.length > 14000) {
+    await deps.tg(env, 'sendMessage', {
+      chat_id: chatId, disable_notification: true,
+      text: 'Письмо длинное — переведено начало, полностью оно в почте.',
+    });
   }
 }
 
@@ -371,12 +437,24 @@ function keyboard(id, digest) {
     });
     rows.push([{ text: '✍️ Свой ответ: черновик', callback_data: `ml:d:${id}` }]);
   }
-  rows.push([
-    { text: '📄 Письмо целиком', callback_data: `ml:t:${id}` },
-    { text: '✅ Разобрано', callback_data: `ml:x:${id}` },
-  ]);
+  if (isForeign(digest)) {
+    rows.push([
+      { text: '🇷🇺 Перевод', callback_data: `ml:r:${id}` },
+      { text: '📄 Оригинал', callback_data: `ml:t:${id}` },
+    ]);
+    rows.push([{ text: '✅ Разобрано', callback_data: `ml:x:${id}` }]);
+  } else {
+    rows.push([
+      { text: '📄 Письмо целиком', callback_data: `ml:t:${id}` },
+      { text: '✅ Разобрано', callback_data: `ml:x:${id}` },
+    ]);
+  }
   return { inline_keyboard: rows };
 }
+
+/* Перевод сам приходит под карточкой для писем, которые надо читать: от партнёров,
+   клиентов и непонятных. Служебные, рассылки и спам — только по кнопке. */
+const AUTO_TRANSLATE = ['партнёр', 'клиент', 'другое'];
 
 /* Вебхук бота исторически подписан только на message. Кнопкам нужны
    callback_query — досписываемся один раз сами, тем же адресом и секретом,
@@ -466,12 +544,25 @@ export async function handleEmail(message, env, deps) {
       { expirationTtl: MAIL_TTL });
 
     const text = card(mail, digest, id, deps.esc, dossier);
-    await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', {
+    const sent = await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', {
       chat_id: chat, parse_mode: 'HTML', disable_web_page_preview: true,
       disable_notification: !!quiet,
       text, reply_markup: keyboard(id, digest),
     })));
     await ensureCallbacks(env, deps).catch(e => console.log('hook', e && e.message));
+
+    // Письмо не по-русски — полный перевод следом, ответом на карточку, без звука
+    if (!skipAi && isForeign(digest) && AUTO_TRANSLATE.includes(digest.category)) {
+      const tr = await translateMail(env, mail, digest.language);
+      if (tr) {
+        await env.CHAT.put(mailKey(id), JSON.stringify({ ...mail, digest, identityAiText, translation: tr, at: new Date().toISOString() }),
+          { expirationTtl: MAIL_TTL });
+        await Promise.allSettled(chats.map((chat, i) => {
+          const r = sent[i].status === 'fulfilled' ? sent[i].value : null;
+          return sendTranslation(env, deps, chat, r && r.result && r.result.message_id, mail, tr, true);
+        }));
+      }
+    }
 
     // Воронка партнёров: этап, условия, объекты — отдельными уведомлениями
     if (!skipAi) {
@@ -517,9 +608,28 @@ export async function handleMailCallback(cq, env, deps) {
       chat_id: chatId, message_id: cq.message.message_id,
       reply_markup: { inline_keyboard: [[
         { text: '✅ Разобрано', callback_data: 'ml:n' },
-        { text: '📄 Письмо целиком', callback_data: `ml:t:${id}` },
+        ...(isForeign(mail.digest) ? [{ text: '🇷🇺 Перевод', callback_data: `ml:r:${id}` }] : []),
+        { text: isForeign(mail.digest) ? '📄 Оригинал' : '📄 Письмо целиком', callback_data: `ml:t:${id}` },
       ]] },
     });
+    return;
+  }
+
+  if (kind === 'r') {
+    let tr = mail.translation;
+    if (!tr) {
+      await deps.tg(env, 'answerCallbackQuery', { callback_query_id: cq.id, text: 'Перевожу…' });
+      await deps.tg(env, 'sendChatAction', { chat_id: chatId, action: 'typing' });
+      tr = await translateMail(env, mail, mail.digest && mail.digest.language);
+      if (!tr) {
+        await deps.tg(env, 'sendMessage', { chat_id: chatId, text: 'Не получилось перевести — попробуйте ещё раз через минуту.' });
+        return;
+      }
+      await env.CHAT.put(mailKey(id), JSON.stringify({ ...mail, translation: tr }), { expirationTtl: MAIL_TTL });
+    } else {
+      await deps.tg(env, 'answerCallbackQuery', { callback_query_id: cq.id });
+    }
+    await sendTranslation(env, deps, chatId, cq.message.message_id, mail, tr, false);
     return;
   }
 
