@@ -1,35 +1,57 @@
 /**
- * Estate Art — мост между чатом на сайте и Telegram.
+ * Estate Art — мост между сайтом, личным кабинетом, ИИ-консультантом и Telegram.
  *
- * Посетитель пишет в виджет на сайте → сообщение приходит агенту в Telegram
- * от имени бота → агент отвечает реплаем на это сообщение → ответ возвращается
- * в виджет на сайте.
- *
- * Первым в диалоге отвечает менеджер на Claude (bot/ai.js): доводит разговор до
- * контакта и передаёт живому агенту готовой карточкой. Если ключа Anthropic нет
- * или запрос упал — сообщение уходит дежурному напрямую, как раньше.
- *
- * Токен бота, chat_id агента и ключ Anthropic живут в секретах Cloudflare и в
- * браузер не попадают. Настройка — в bot/README.md.
+ * - Чат на сайте + ИИ-консультант с доступом к каталогу и объектам из кабинета
+ * - Эскалация живому менеджеру в Telegram (автоматически и по кнопке)
+ * - Личный кабинет: регистрация/вход, добавление объектов и фото, модерация в Telegram
+ * - Регионализация (/api/geo), быстрый онбординг (/api/onboarding), заявки с форм (/api/lead)
+ * - Почта домена и партнёрская воронка (bot/mail.js, bot/partners.js)
  */
 import { aiReply, leadCard } from './ai.js';
 import { handleEmail, mailChats, handleMailCallback } from './mail.js';
 import { handleOutboxCallback, handleOutboxReply, runSchedule, partnersReport, queueKeyboard } from './partners.js';
+import {
+  extractContacts,
+  resolveIdentity,
+  recordInquiry,
+  linkTelegramChatToUser,
+  formatIdentityForAdmin,
+} from './identity.js';
+import {
+  requireAuth,
+  handleGeo,
+  handlePublicListings,
+  handleMedia,
+  handleRegister,
+  handleLogin,
+  handleLogout,
+  handleMe,
+  handleUpdateProfile,
+  handleMyListings,
+  handleCreateListing,
+  handleUpdateListing,
+  handleDeleteListing,
+  handlePhotoUpload,
+  handleOnboarding,
+  handleSiteLead,
+  handleCabinetCallback,
+  getApprovedListings,
+  cabinetStatsReport,
+  sendPendingListings,
+} from './cabinet.js';
+
 export { AnthropicRelay } from './relay.js';
 
-const MAX_TEXT = 2000;        // длиннее Telegram всё равно порежет
+const MAX_TEXT = 2000;
 const MAX_NAME = 80;
-const SESSION_TTL = 60 * 60 * 24 * 14;   // переписка живёт две недели
-const RATE_LIMIT = 20;        // сообщений с одного IP в минуту
-const MAX_MESSAGES = 200;     // потолок на сессию, чтобы KV не пух
-const AI_TURNS = 12;          // после этого передаём человеку в любом случае
+const SESSION_TTL = 60 * 60 * 24 * 14;
+const RATE_LIMIT = 20;
+const MAX_MESSAGES = 200;
+const AI_TURNS = 12;
 const RANGES_TTL = 60 * 60 * 6;
-const MAX_VOICE = 1500000;    // ~60 секунд opus; больше в чат никто не наговаривает
+const CATALOG_TTL = 60 * 60;
+const MAX_VOICE = 1500000;
 
-/**
- * Таблица диапазонов цен. Лежит на сайте, собирается tools/price_ranges.py.
- * Держим в KV, чтобы не ходить за ней на каждое сообщение.
- */
 async function priceRanges(env) {
   try {
     const cached = await env.CHAT.get('ranges:v1');
@@ -42,25 +64,57 @@ async function priceRanges(env) {
     return data;
   } catch (e) {
     console.log('ranges error:', e && e.message);
-    return null;   // без таблицы ИИ просто не станет называть цифры
+    return null;
   }
 }
 
-/**
- * Дежурные менеджеры. AGENT_CHAT_ID принимает один id или несколько через запятую.
- * Новый диалог уходит следующему по кругу, дальше вся переписка держится за ним —
- * клиент не должен объяснять одно и то же разным людям. Отвечать при этом может
- * любой из списка: если дежурный занят, коллега просто подхватывает.
- *
- * Канал (CHANNEL_CHAT_ID) из списка вырезается, даже если его туда вписали:
- * канал — витрина для подписчиков, а заявки и карточки писем содержат имена,
- * контакты и переписку с партнёрами. Ответить реплаем в канале тоже нельзя.
- */
+async function staticListings(env) {
+  try {
+    const cached = await env.CHAT.get('catalog_merged:v1');
+    if (cached) return JSON.parse(cached);
+    const base = (env.SITE_URL || 'https://estateart.homes/').replace(/\/+$/, '');
+    const [catRes, rentRes] = await Promise.all([
+      fetch(base + '/data/catalog.json', { cf: { cacheTtl: 1800 } }).catch(() => null),
+      fetch(base + '/data/rentals.json', { cf: { cacheTtl: 1800 } }).catch(() => null),
+    ]);
+    const items = [];
+    if (catRes && catRes.ok) {
+      const d = await catRes.json().catch(() => null);
+      if (d && Array.isArray(d.items)) {
+        for (const it of d.items) {
+          if (!it.hidden) items.push(it);
+        }
+      }
+    }
+    if (rentRes && rentRes.ok) {
+      const d = await rentRes.json().catch(() => null);
+      if (d && Array.isArray(d.items)) {
+        for (const it of d.items) items.push(Object.assign({ deal: 'rent' }, it));
+      }
+    }
+    if (items.length) {
+      await env.CHAT.put('catalog_merged:v1', JSON.stringify(items), { expirationTtl: CATALOG_TTL });
+    }
+    return items;
+  } catch (e) {
+    console.log('staticListings err:', e && e.message);
+    return [];
+  }
+}
+
+async function loadAllListings(env, origin = '') {
+  const [ownerItems, siteItems] = await Promise.all([
+    getApprovedListings(env, origin).catch(() => []),
+    staticListings(env),
+  ]);
+  const seen = new Set(ownerItems.map(x => String(x.id)));
+  return ownerItems.concat(siteItems.filter(x => !seen.has(String(x.id))));
+}
+
 function chatList(v) {
   return String(v || '').split(',').map(s => s.trim()).filter(Boolean);
 }
 
-/** Зависимости для модулей почты и партнёров: кто админ и как писать в Telegram. */
 function staffDeps() {
   return { tg, esc, managers, chats: e => mailChats(e, { managers }) };
 }
@@ -90,12 +144,18 @@ function corsHeaders(request, env) {
   const origin = request.headers.get('Origin') || '';
   const ok = allowed.includes(origin) || (allowed.includes('*') && origin);
   return {
-    'Access-Control-Allow-Origin': ok ? origin : (allowed[0] || ''),
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'content-type',
+    'Access-Control-Allow-Origin': ok ? origin : (allowed[0] || '*'),
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'content-type, authorization',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
+}
+
+function withCors(res, cors) {
+  const out = new Response(res.body, res);
+  Object.entries(cors).forEach(([k, v]) => out.headers.set(k, v));
+  return out;
 }
 
 const clean = (v, max) =>
@@ -137,6 +197,68 @@ async function saveSession(env, id, session) {
   await env.CHAT.put(sessionKey(id), JSON.stringify(session), { expirationTtl: SESSION_TTL });
 }
 
+function applySessionContext(session, body) {
+  if (!body || typeof body !== 'object') return;
+  if (body.geo && typeof body.geo === 'object') {
+    session.geo = {
+      country: clean(body.geo.country, 8).toLowerCase(),
+      countryName: clean(body.geo.countryName, 60),
+      city: clean(body.geo.city, 60),
+    };
+  }
+  if (body.onboarding && typeof body.onboarding === 'object') {
+    session.onboarding = {
+      goal: clean(body.onboarding.goal, 40),
+      country: clean(body.onboarding.country, 20),
+      city: clean(body.onboarding.city, 60),
+      type: clean(body.onboarding.type, 40),
+      budget: clean(body.onboarding.budget, 40),
+    };
+  }
+  if (body.profile && typeof body.profile === 'object') {
+    session.profile = {
+      name: clean(body.profile.name, MAX_NAME),
+      contact: clean(body.profile.contact, MAX_NAME),
+      email: clean(body.profile.email, 120),
+      phone: clean(body.profile.phone, 40),
+      telegram: clean(body.profile.telegram, 60),
+      company: clean(body.profile.company, 120),
+      role: clean(body.profile.role, 30),
+    };
+    if (session.profile.name && (!session.name || session.name === 'Гость')) session.name = session.profile.name;
+    if (session.profile.contact && !session.contact) session.contact = session.profile.contact;
+  }
+  if (body.contextListing && typeof body.contextListing === 'object') {
+    session.contextListing = {
+      id: clean(body.contextListing.id, 40),
+      title: clean(body.contextListing.title, 120),
+      city: clean(body.contextListing.city, 60),
+      price: clean(body.contextListing.price, 40),
+      deal: clean(body.contextListing.deal, 16),
+      ownerListing: !!body.contextListing.ownerListing,
+    };
+  }
+  if (body.lang) session.lang = clean(body.lang, 10);
+}
+
+async function notifyOtherAdminsForSession(env, assigned, id, cardText) {
+  const deps = staffDeps();
+  const allAdmins = [...new Set(deps.chats(env).concat(managers(env)).map(String).filter(Boolean))];
+  for (const m of allAdmins) {
+    if (String(m) === String(assigned)) continue;
+    await tg(env, 'sendMessage', {
+      chat_id: m,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+      text: cardText,
+    }).then(r => {
+      if (r && r.ok && r.result) {
+        return env.CHAT.put(mapKey(r.result.message_id), id, { expirationTtl: SESSION_TTL });
+      }
+    }).catch(() => {});
+  }
+}
+
 /* ---------- посетитель пишет с сайта ---------- */
 async function handleSend(request, env) {
   if (await rateLimited(env, request)) {
@@ -162,47 +284,106 @@ async function handleSend(request, env) {
   if (!session.manager) session.manager = await assignManager(env, id);
   if (name && name !== 'Гость') session.name = name;
   if (contact) session.contact = contact;
+  if (page) session.page = page;
+  applySessionContext(session, body);
 
   const msg = { id: session.messages.length + 1, from: 'user', text, at: new Date().toISOString() };
   session.messages.push(msg);
 
-  /* ---------- первичный менеджер ----------
-     Пока он ведёт разговор, дежурным ничего не летит: иначе каждый уточняющий
-     вопрос был бы отдельным уведомлением. В Telegram уходит одна карточка —
-     когда контакт собран. Любой ответ дежурного реплаем снимает ИИ с диалога. */
+  const verifiedUser = await requireAuth(request, env);
+  if (verifiedUser) {
+    session.verifiedAccount = true;
+    session.linkedUserId = verifiedUser.id;
+  }
+  const ex = extractContacts(text, {
+    contact: session.contact,
+    email: verifiedUser && verifiedUser.email,
+    phone: verifiedUser && verifiedUser.phone,
+    telegram: verifiedUser && verifiedUser.telegram,
+    company: (verifiedUser && verifiedUser.company) || (session.profile && session.profile.company),
+  });
+  if (!session.contact) {
+    session.contact = ex.emails[0] || (ex.phones[0] ? '+' + ex.phones[0] : '') || ex.telegrams[0] || '';
+  }
+
+  const identity = await resolveIdentity(env, {
+    userId: (verifiedUser && verifiedUser.id) || session.linkedUserId,
+    text,
+    contact: session.contact,
+    email: verifiedUser && verifiedUser.email,
+    phone: verifiedUser && verifiedUser.phone,
+    telegram: verifiedUser && verifiedUser.telegram,
+    company: (verifiedUser && verifiedUser.company) || ex.company,
+    name: session.name,
+  }, { verified: !!verifiedUser });
+
+  if (identity.user && !session.linkedUserId) session.linkedUserId = identity.user.id;
+  if (ex.emails.length || ex.phones.length || ex.telegrams.length || session.linkedUserId) {
+    await recordInquiry(env, {
+      userId: session.linkedUserId,
+      name: session.name,
+      role: (identity.user && identity.user.role) || (session.profile && session.profile.role),
+      contacts: ex,
+      channel: 'site_chat',
+      summary: text.slice(0, 220),
+      listingId: session.contextListing && session.contextListing.id,
+      listingTitle: session.contextListing && session.contextListing.title,
+      region: session.geo && [session.geo.city, session.geo.countryName].filter(Boolean).join(', '),
+    });
+  }
+
   if (!session.handedOff && session.aiTurns !== -1 && (session.aiTurns || 0) < AI_TURNS) {
-    const ranges = await priceRanges(env);
-    const ai = await aiReply(env, session, null, ranges);   // текст уже в messages
+    const origin = new URL(request.url).origin;
+    const [ranges, listings] = await Promise.all([
+      priceRanges(env),
+      loadAllListings(env, origin),
+    ]);
+    const ai = await aiReply(env, session, null, ranges, listings, identity);
     if (ai && ai.text) {
       session.aiTurns = (session.aiTurns || 0) + 1;
-      session.messages.push({
+      const replyMsg = {
         id: session.messages.length + 1, from: 'agent', text: ai.text,
         at: new Date().toISOString(), by: 'ai',
-      });
+      };
+      session.messages.push(replyMsg);
       if (ai.lead) {
         session.lead = ai.lead;
         session.handedOff = true;
         if (ai.lead.name) session.name = ai.lead.name;
         if (ai.lead.contact) session.contact = ai.lead.contact;
         const to = session.manager || managers(env)[0];
+        const cardHtml = leadCard(ai.lead, id, esc, session, identity);
         const card = await tg(env, 'sendMessage', {
-          chat_id: to, parse_mode: 'HTML', text: leadCard(ai.lead, id, esc),
+          chat_id: to, parse_mode: 'HTML', text: cardHtml,
         });
         if (card.ok && card.result && card.result.message_id) {
           await env.CHAT.put(mapKey(card.result.message_id), id, { expirationTtl: SESSION_TTL });
         }
+        await notifyOtherAdminsForSession(
+          env, to, id,
+          `🔔 <b>Лид от ИИ-консультанта (копия руководству)</b>\n` +
+          `<b>${esc(session.name)}</b>${session.contact ? ' · ' + esc(session.contact) : ''}` +
+          (ai.lead.looking_for ? `\nЗапрос: ${esc(ai.lead.looking_for)}` : '') +
+          `\n<code>#${id}</code>`
+        );
       }
       await saveSession(env, id, session);
       return json({ ok: true, id: msg.id, delivered: true, reply: ai.text, handedOff: !!ai.lead });
     }
-    // Помощник недоступен — дальше по-старому, и больше его не дёргаем в этой сессии
     session.aiTurns = -1;
   }
+
+  const dossier = formatIdentityForAdmin(identity, esc);
+  const geoTag = session.geo && (session.geo.city || session.geo.countryName)
+    ? `\n📍 ${esc([session.geo.city, session.geo.countryName].filter(Boolean).join(', '))}` : '';
+  const objTag = session.contextListing && session.contextListing.title
+    ? `\n🏠 Объект: ${esc(session.contextListing.title)}` : '';
 
   const header = first
     ? `🟢 <b>Новый диалог с сайта</b>\n<b>${esc(session.name)}</b>` +
       (session.contact ? ` · ${esc(session.contact)}` : '') +
-      (page ? `\n<i>${esc(page)}</i>` : '')
+      (page ? `\n<i>${esc(page)}</i>` : '') + geoTag + objTag +
+      (dossier ? `\n\n${dossier}` : '')
     : `<b>${esc(session.name)}</b>`;
 
   const list = managers(env);
@@ -213,25 +394,16 @@ async function handleSend(request, env) {
     text: `${header}\n\n${esc(text)}\n\n<code>#${id}</code>\n<i>Ответьте реплаем на это сообщение — ответ уйдёт на сайт.</i>`,
   });
 
-  // Остальным дежурным — короткое уведомление, чтобы заявка не потерялась,
-  // если назначенный не на связи. Отвечать по-прежнему можно реплаем у себя.
-  if (first && list.length > 1) {
-    for (const m of list) {
-      if (String(m) === String(assigned)) continue;
-      await tg(env, 'sendMessage', {
-        chat_id: m, parse_mode: 'HTML',
-        text: `🔔 Новая заявка с сайта от <b>${esc(session.name)}</b> — ` +
-              `назначена дежурному.\n<code>#${id}</code>\n` +
-              `<i>Если нужно перехватить, ответьте реплаем на это сообщение.</i>`,
-      }).then(r => {
-        if (r && r.ok && r.result) {
-          return env.CHAT.put(mapKey(r.result.message_id), id, { expirationTtl: SESSION_TTL });
-        }
-      }).catch(() => {});
-    }
+  if (first) {
+    await notifyOtherAdminsForSession(
+      env, assigned, id,
+      `🔔 Новая заявка с сайта от <b>${esc(session.name)}</b>` +
+      (session.contact ? ` (${esc(session.contact)})` : '') +
+      geoTag + objTag +
+      `\n<code>#${id}</code>\n<i>Чтобы перехватить диалог, ответьте реплаем на это сообщение.</i>`
+    );
   }
 
-  // Связываем сообщение в Telegram с сессией: по нему найдём адресата ответа
   if (sent.ok && sent.result && sent.result.message_id) {
     await env.CHAT.put(mapKey(sent.result.message_id), id, { expirationTtl: SESSION_TTL });
   }
@@ -240,11 +412,95 @@ async function handleSend(request, env) {
   return json({ ok: true, id: msg.id, delivered: !!sent.ok });
 }
 
-/* ---------- посетитель наговаривает голосовое ----------
-   Claude звук не слышит, поэтому запись не идёт в ИИ: она уходит дежурному
-   в Telegram обычным голосовым, которое он слушает и отвечает реплаем.
-   Сессия после этого ведётся человеком — иначе на голосовое отвечал бы
-   дежурный, а на следующий текст снова ИИ, не зная, о чём была запись. */
+/* ---------- явный вызов менеджера из чата на сайте ---------- */
+async function handleHandoff(request, env) {
+  if (await rateLimited(env, request)) {
+    return json({ error: 'too_many_requests', message: 'Подождите минуту.' }, 429);
+  }
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+
+  const id = clean(body.sessionId, 40).replace(/[^A-Za-z0-9_-]/g, '');
+  if (!id) return json({ error: 'empty' }, 400);
+
+  const name = clean(body.name, MAX_NAME) || 'Гость';
+  const contact = clean(body.contact, MAX_NAME);
+  const note = clean(body.note, 500);
+  const page = clean(body.page, 200);
+
+  let session = await loadSession(env, id);
+  if (!session) {
+    session = { created: new Date().toISOString(), name, contact, page, messages: [] };
+    session.manager = await assignManager(env, id);
+  }
+  if (!session.manager) session.manager = await assignManager(env, id);
+  if (name && name !== 'Гость') session.name = name;
+  if (contact) session.contact = contact;
+  if (page) session.page = page;
+  applySessionContext(session, body);
+  session.handedOff = true;
+
+  const verifiedUser = await requireAuth(request, env);
+  const identity = await resolveIdentity(env, {
+    userId: (verifiedUser && verifiedUser.id) || session.linkedUserId,
+    contact: session.contact,
+    email: verifiedUser && verifiedUser.email,
+    phone: verifiedUser && verifiedUser.phone,
+    telegram: verifiedUser && verifiedUser.telegram,
+    company: (verifiedUser && verifiedUser.company) || (session.profile && session.profile.company),
+    name: session.name,
+  }, { verified: true });
+  const dossier = formatIdentityForAdmin(identity, esc);
+
+  const historySnippet = (session.messages || [])
+    .filter(m => m.from === 'user' && m.text)
+    .slice(-4)
+    .map(m => `• ${esc(m.text.slice(0, 180))}`)
+    .join('\n');
+
+  const geoTxt = session.geo && (session.geo.city || session.geo.countryName)
+    ? `\n<b>Регион входа:</b> ${esc([session.geo.city, session.geo.countryName].filter(Boolean).join(', '))}` : '';
+  const objTxt = session.contextListing && session.contextListing.title
+    ? `\n<b>Объект:</b> ${esc(session.contextListing.title)}` : '';
+  const obTxt = session.onboarding
+    ? `\n<b>Онбординг:</b> ${esc([session.onboarding.goal, session.onboarding.country, session.onboarding.type, session.onboarding.budget].filter(Boolean).join(' · '))}` : '';
+
+  const text =
+    `🙋 <b>Клиент позвал менеджера из чата</b>\n` +
+    `<b>Имя:</b> ${esc(session.name)}\n` +
+    `<b>Контакт:</b> ${esc(session.contact || 'не указан (ждёт ответа на сайте)')}` +
+    geoTxt + objTxt + obTxt +
+    (note ? `\n<b>Комментарий:</b> ${esc(note)}` : '') +
+    (dossier ? `\n\n${dossier}` : '') +
+    (historySnippet ? `\n\n<b>Последние сообщения:</b>\n${historySnippet}` : '') +
+    `\n\n<code>#${id}</code>\n<i>Ответьте реплаем — ответ сразу появится у клиента в чате.</i>`;
+
+  const assigned = session.manager || managers(env)[0];
+  const sent = await tg(env, 'sendMessage', {
+    chat_id: assigned,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    text,
+  });
+  if (sent.ok && sent.result && sent.result.message_id) {
+    await env.CHAT.put(mapKey(sent.result.message_id), id, { expirationTtl: SESSION_TTL });
+  }
+  await notifyOtherAdminsForSession(env, assigned, id, text);
+
+  const notice = {
+    id: session.messages.length + 1,
+    from: 'agent',
+    text: 'Передал диалог живому менеджеру в Telegram — он уже видит вашу переписку и скоро ответит здесь.',
+    at: new Date().toISOString(),
+    by: 'system',
+  };
+  session.messages.push(notice);
+  await saveSession(env, id, session);
+
+  return json({ ok: true, id: notice.id, reply: notice.text, handedOff: true });
+}
+
+/* ---------- посетитель наговаривает голосовое ---------- */
 async function handleVoice(request, env) {
   if (await rateLimited(env, request)) {
     return json({ error: 'too_many_requests', message: 'Слишком много сообщений. Подождите минуту.' }, 429);
@@ -285,9 +541,6 @@ async function handleVoice(request, env) {
   };
   session.messages.push(msg);
 
-  /* Telegram показывает кружок-голосовое только для ogg/opus. Safari пишет
-     в mp4, Chrome в webm — их отдаём как аудиофайл: он так же слушается
-     в один тап, просто выглядит вложением. */
   const type = String(file.type || '');
   const ogg = type.includes('ogg');
   const method = ogg ? 'sendVoice' : 'sendAudio';
@@ -351,27 +604,61 @@ async function handleTelegram(request, env) {
   let update;
   try { update = await request.json(); } catch { return new Response('ok'); }
 
-  // Кнопки под карточками писем (bot/mail.js)
   if (update.callback_query) {
-    if (String(update.callback_query.data || '').startsWith('ml:')) {
+    const data = String(update.callback_query.data || '');
+    if (data.startsWith('ml:')) {
       await handleMailCallback(update.callback_query, env, { tg, esc, managers });
-    } else if (String(update.callback_query.data || '').startsWith('ob:')) {
+    } else if (data.startsWith('ob:')) {
       await handleOutboxCallback(update.callback_query, env, staffDeps());
+    } else if (data.startsWith('cab:')) {
+      await handleCabinetCallback(update.callback_query, env, staffDeps());
     }
     return new Response('ok');
   }
 
   const message = update.message || update.edited_message;
-  if (!message || !message.text) return new Response('ok');
+  if (!message || (!message.text && !message.contact)) return new Response('ok');
 
-  // Отвечать может любой из дежурных — chat_id сверяем со списком
   const list = managers(env);
-  if (!list.some(m => String(m) === String(message.chat.id))) {
+  const adminSet = new Set(staffDeps().chats(env).concat(list).map(String));
+  if (!adminSet.has(String(message.chat.id))) {
     return handleVisitorDM(message, env);
   }
+  if (!message.text) return new Response('ok');
 
   if (message.text.startsWith('/chatid')) {
     await tg(env, 'sendMessage', { chat_id: message.chat.id, text: `chat_id: ${message.chat.id}` });
+    return new Response('ok');
+  }
+  if (message.text.startsWith('/client')) {
+    const query = clean(message.text.replace(/^\/client(?:@\S+)?\s*/i, ''), 120);
+    if (!query) {
+      await tg(env, 'sendMessage', {
+        chat_id: message.chat.id,
+        text: 'Укажите email, телефон, @telegram или компанию. Например:\n/client +79124869508\n/client partner@agency.com',
+      });
+      return new Response('ok');
+    }
+    const idn = await resolveIdentity(env, { text: query, company: query }, { verified: true });
+    const dossier = formatIdentityForAdmin(idn, esc);
+    await tg(env, 'sendMessage', {
+      chat_id: message.chat.id,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+      text: dossier || `По запросу <code>${esc(query)}</code> аккаунтов, объектов и обращений не найдено.`,
+    });
+    return new Response('ok');
+  }
+  if (message.text.startsWith('/cabinet') || message.text.startsWith('/stats')) {
+    await tg(env, 'sendMessage', {
+      chat_id: message.chat.id,
+      parse_mode: 'HTML',
+      text: await cabinetStatsReport(env, staffDeps()),
+    });
+    return new Response('ok');
+  }
+  if (message.text.startsWith('/pending')) {
+    await sendPendingListings(message.chat.id, env, staffDeps());
     return new Response('ok');
   }
   if (message.text.startsWith('/partners')) {
@@ -387,7 +674,6 @@ async function handleTelegram(request, env) {
     });
     return new Response('ok');
   }
-  // Реплай на карточку исходящего письма — правка письма, а не ответ посетителю
   if (await handleOutboxReply(message, env, staffDeps())) return new Response('ok');
 
   if (message.text.startsWith('/duty')) {
@@ -406,15 +692,14 @@ async function handleTelegram(request, env) {
   if (!replyTo) {
     await tg(env, 'sendMessage', {
       chat_id: message.chat.id,
-      text: 'Чтобы ответить посетителю, сделайте реплай на его сообщение — иначе я не знаю, кому адресовать.',
+      text: 'Чтобы ответить посетителю, сделайте реплай на его сообщение. Команды: /cabinet, /pending, /client, /duty, /partners.',
     });
     return new Response('ok');
   }
 
-  // Ищем сессию: сначала по карте message_id, потом по метке #id в тексте
   let sessionId = await env.CHAT.get(mapKey(replyTo.message_id));
   if (!sessionId) {
-    const m = (replyTo.text || '').match(/#([A-Za-z0-9_-]{6,40})/);
+    const m = (replyTo.text || replyTo.caption || '').match(/#([A-Za-z0-9_-]{6,40})/);
     sessionId = m ? m[1] : null;
   }
   if (!sessionId) {
@@ -439,7 +724,6 @@ async function handleTelegram(request, env) {
     at: new Date().toISOString(),
   });
 
-  // Диалог из бота: виджета на сайте нет, опрашивать некому — досылаем сами
   if (sessionId.startsWith('tg')) {
     const to = sessionId.slice(2);
     const ok = await tg(env, 'sendMessage', { chat_id: to, text: answer });
@@ -451,10 +735,7 @@ async function handleTelegram(request, env) {
     }
   }
 
-  // Кто фактически ответил — тот и ведёт диалог дальше
   session.manager = String(message.chat.id);
-  // И с этого момента говорит он, а не помощник: два голоса в одном чате
-  // клиент читает как неразбериху, а не как заботу
   session.handedOff = true;
   await saveSession(env, sessionId, session);
   await tg(env, 'setMessageReaction', {
@@ -463,21 +744,55 @@ async function handleTelegram(request, env) {
   return new Response('ok');
 }
 
-/* ---------- посетитель пишет боту напрямую ----------
-   Тот же первичный менеджер, что и в чате на сайте, и та же карточка дежурному.
-   Разговор, начатый в Telegram, и разговор с сайта не должны вести себя
-   по-разному — иначе у клиента два разных агентства. */
+/* ---------- посетитель пишет боту напрямую ---------- */
 async function handleVisitorDM(message, env) {
   const chatId = String(message.chat.id);
   const id = 'tg' + chatId;
-  const text = clean(message.text, MAX_TEXT);
-
   const site = (env.SITE_URL || 'https://estateart.homes/').replace(/\/+$/, '') + '/';
 
-  /* /chatid доступна всем, а не только дежурным: без неё новый менеджер не
-     может узнать свой id, чтобы его вписали в AGENT_CHAT_ID, — а узнать его
-     больше негде, потому что getUpdates молчит, пока стоит вебхук. Id чата
-     не секрет: он бесполезен без токена бота. */
+  // Пользователь поделился контактом (номером телефона) в Telegram
+  if (message.contact && message.contact.phone_number) {
+    const phoneRaw = '+' + String(message.contact.phone_number).replace(/^\+/, '');
+    const tgHandle = message.from && message.from.username ? '@' + message.from.username : '';
+    const identity = await resolveIdentity(env, {
+      telegramChatId: chatId,
+      phone: phoneRaw,
+      telegram: tgHandle,
+      name: [message.contact.first_name, message.contact.last_name].filter(Boolean).join(' '),
+    }, { verified: true });
+
+    if (identity.user) {
+      await linkTelegramChatToUser(env, chatId, identity.user.id);
+    }
+    await recordInquiry(env, {
+      userId: identity.user && identity.user.id,
+      name: (identity.user && identity.user.name) || message.contact.first_name || 'Гость',
+      phone: phoneRaw,
+      telegram: tgHandle,
+      telegramChatId: chatId,
+      channel: 'telegram_contact',
+      summary: 'Поделился номером телефона в Telegram',
+    });
+
+    let replyText = `Спасибо, контакт <b>${esc(phoneRaw)}</b> сохранён.`;
+    if (identity.user) {
+      replyText = `Узнал ваш аккаунт: <b>${esc(identity.user.name)}</b>` +
+        (identity.user.company ? ` (${esc(identity.user.company)})` : '') + `.`;
+      if (identity.userListings && identity.userListings.length) {
+        replyText += `\n\nВаши объекты в кабинете (${identity.userListings.length}):\n` +
+          identity.userListings.slice(0, 5).map(p => `• ${esc(p.title)} (${esc(p.status)})`).join('\n');
+      }
+      replyText += `\n\nМожете спрашивать о своих объектах, статусах или новых запросах — отвечу здесь.`;
+    } else {
+      replyText += ` Можете написать, что ищете или какой объект хотите разместить — я помогу.`;
+    }
+    await tg(env, 'sendMessage', { chat_id: chatId, parse_mode: 'HTML', text: replyText });
+    return new Response('ok');
+  }
+
+  const text = clean(message.text, MAX_TEXT);
+  if (!text) return new Response('ok');
+
   if (text.startsWith('/chatid')) {
     const kind = message.chat.type === 'private' ? 'личный чат' : 'группа';
     await tg(env, 'sendMessage', {
@@ -490,8 +805,8 @@ async function handleVisitorDM(message, env) {
   if (text.startsWith('/catalog')) {
     await tg(env, 'sendMessage', {
       chat_id: chatId, parse_mode: 'HTML',
-      text: 'Каталог: виллы и квартиры на Пхукете, в Дананге и Нячанге.',
-      reply_markup: { inline_keyboard: [[{ text: 'Открыть каталог', url: site + '#catalog' }]] },
+      text: 'Каталог: виллы и квартиры на Пхукете, в Дананге, Нячанге и в вашем регионе.',
+      reply_markup: { inline_keyboard: [[{ text: 'Открыть каталог', url: site + '#catalog' }, { text: 'Личный кабинет', url: site + 'cabinet/' }]] },
     });
     return new Response('ok');
   }
@@ -526,26 +841,66 @@ async function handleVisitorDM(message, env) {
     session.manager = await assignManager(env, id);
   }
 
+  const tgHandle = message.from && message.from.username ? '@' + message.from.username : '';
+  const ex = extractContacts(text, { telegram: tgHandle, telegramChatId: chatId, contact: session.contact });
+  const identity = await resolveIdentity(env, {
+    userId: session.linkedUserId,
+    telegramChatId: chatId,
+    telegram: tgHandle,
+    text,
+    contact: session.contact,
+    name: session.name,
+  }, { verified: true });
+
+  if (identity.user) {
+    session.linkedUserId = identity.user.id;
+    session.verifiedAccount = true;
+    await linkTelegramChatToUser(env, chatId, identity.user.id);
+    if (!session.name || session.name === 'Гость') session.name = identity.user.name;
+  }
+
+  if (text.startsWith('/my')) {
+    const dossier = formatIdentityForAdmin(identity, esc);
+    if (!identity.matched) {
+      await tg(env, 'sendMessage', {
+        chat_id: chatId, parse_mode: 'HTML',
+        text: 'Пока не вижу вашего профиля. Напишите сюда ваш <b>email</b> или <b>номер телефона</b> (или поделитесь контактом), либо войдите в личный кабинет.',
+        reply_markup: { inline_keyboard: [[{ text: 'Открыть личный кабинет', url: site + 'cabinet/' }]] },
+      });
+    } else {
+      await tg(env, 'sendMessage', {
+        chat_id: chatId, parse_mode: 'HTML', disable_web_page_preview: true,
+        text: `<b>Ваш профиль в Estate Art</b>\n\n${dossier}`,
+        reply_markup: { inline_keyboard: [[{ text: 'Управление в кабинете', url: site + 'cabinet/#my-objects' }]] },
+      });
+    }
+    return new Response('ok');
+  }
+
   if (text.startsWith('/start')) {
     session.messages = [];
     delete session.handedOff;
     delete session.aiTurns;
     await saveSession(env, id, session);
+    const greetOwn = identity.user
+      ? `\n\nУзнал ваш аккаунт: <b>${esc(identity.user.name)}</b>` +
+        (identity.userListings.length ? ` · объектов в кабинете: <b>${identity.userListings.length}</b>` : '') +
+        `. Команда /my покажет ваши объекты и запросы.`
+      : '';
     await tg(env, 'sendMessage', {
       chat_id: chatId, parse_mode: 'HTML',
       disable_web_page_preview: true,
       text:
         `<b>ESTATE ART</b>\n` +
-        `<i>Недвижимость на Пхукете и во Вьетнаме</i>\n\n` +
-        `Виллы и квартиры в Таиланде и Вьетнаме: Пхукет, Дананг, Нячанг. ` +
-        `Подбираем объект под задачу — жить, сдавать или держать, — проверяем ` +
-        `документы и ведём сделку от первого показа до ключей.\n\n` +
-        `Работаем удалённо: онлайн-показы, видео-туры, сопровождение переводов.\n\n` +
-        `<b>Расскажите, что ищете</b> — город, тип жилья, примерный бюджет. ` +
-        `Отвечу по рынку и передам агенту.`,
+        `<i>Недвижимость у моря и в вашем регионе</i>\n\n` +
+        `Виллы и квартиры в Таиланде, Вьетнаме и других странах. ` +
+        `Подбираем объект под задачу — жить, сдавать или держать, — и помогаем ` +
+        `разместить собственные объекты через личный кабинет.\n\n` +
+        `<b>Расскажите, что ищете</b> — город, тип жилья, бюджет — или напишите свой email/телефон, чтобы я подтянул ваши объекты и запросы.` +
+        greetOwn,
       reply_markup: { inline_keyboard: [
-        [{ text: 'Смотреть каталог', url: site + '#catalog' }],
-        [{ text: 'Районы', url: site + '#districts' }, { text: 'Вопросы и ответы', url: site + '#faq' }],
+        [{ text: 'Смотреть каталог', url: site + '#catalog' }, { text: 'Личный кабинет', url: site + 'cabinet/' }],
+        [{ text: 'Районы', url: site + '#districts' }, { text: 'Добавить объект', url: site + 'cabinet/#add' }],
       ] },
     });
     return new Response('ok');
@@ -555,7 +910,17 @@ async function handleVisitorDM(message, env) {
     id: session.messages.length + 1, from: 'user', text, at: new Date().toISOString(),
   });
 
-  // Дежурный уже подхватил — пересылаем ему, помощник молчит
+  if (ex.emails.length || ex.phones.length || ex.telegrams.length || session.linkedUserId) {
+    await recordInquiry(env, {
+      userId: session.linkedUserId,
+      name: session.name,
+      role: identity.user && identity.user.role,
+      contacts: ex,
+      channel: 'telegram_dm',
+      summary: text.slice(0, 220),
+    });
+  }
+
   if (session.handedOff) {
     const to = session.manager || managers(env)[0];
     const sent = await tg(env, 'sendMessage', {
@@ -571,20 +936,25 @@ async function handleVisitorDM(message, env) {
   }
 
   await tg(env, 'sendChatAction', { chat_id: chatId, action: 'typing' });
-  const ranges = await priceRanges(env);
+  const [ranges, listings] = await Promise.all([
+    priceRanges(env),
+    loadAllListings(env, site.replace(/\/+$/, '')),
+  ]);
   const ai = (session.aiTurns === -1 || (session.aiTurns || 0) >= AI_TURNS)
-    ? null : await aiReply(env, session, null, ranges);
+    ? null : await aiReply(env, session, null, ranges, listings, identity);
 
   if (!ai || !ai.text) {
-    // Помощник недоступен — не теряем человека, отдаём дежурному сразу
     session.aiTurns = -1;
     session.handedOff = true;
+    const dossier = formatIdentityForAdmin(identity, esc);
     const to = session.manager || managers(env)[0];
     const sent = await tg(env, 'sendMessage', {
       chat_id: to, parse_mode: 'HTML',
       text: `🟢 <b>Обращение в бот</b>\n<b>${esc(session.name)}</b>` +
             (session.contact ? ` · ${esc(session.contact)}` : '') +
-            `\n\n${esc(text)}\n\n<code>#${id}</code>\n` +
+            `\n\n${esc(text)}` +
+            (dossier ? `\n\n${dossier}` : '') +
+            `\n\n<code>#${id}</code>\n` +
             `<i>Ответьте реплаем — ответ уйдёт клиенту в Telegram.</i>`,
     });
     if (sent.ok && sent.result && sent.result.message_id) {
@@ -610,7 +980,7 @@ async function handleVisitorDM(message, env) {
     const to = session.manager || managers(env)[0];
     const card = await tg(env, 'sendMessage', {
       chat_id: to, parse_mode: 'HTML',
-      text: leadCard(ai.lead, id, esc).replace('Заявка с сайта', 'Заявка из бота'),
+      text: leadCard(ai.lead, id, esc, session, identity).replace('Заявка с сайта', 'Заявка из бота'),
     });
     if (card.ok && card.result && card.result.message_id) {
       await env.CHAT.put(mapKey(card.result.message_id), id, { expirationTtl: SESSION_TTL });
@@ -629,45 +999,73 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
 
     try {
-      // Без самих id: только сколько дежурных осталось после вычета канала
-      // и сколько записей канала пришлось вырезать из AGENT_CHAT_ID.
-      if (url.pathname === '/api/health') {
-        const all = chatList(env.AGENT_CHAT_ID);
-        const staff = managers(env);
-        return json({ ok: true, managers: staff.length, channelInAgents: all.length - staff.length }, 200, cors);
-      }
-
-      if (url.pathname === '/api/send' && request.method === 'POST') {
-        const res = await handleSend(request, env);
-        Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
-        return res;
-      }
-      if (url.pathname === '/api/voice' && request.method === 'POST') {
-        const res = await handleVoice(request, env);
-        Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
-        return res;
-      }
-      if (url.pathname === '/api/poll' && request.method === 'GET') {
-        const res = await handlePoll(request, env);
-        Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
-        return res;
-      }
       if (url.pathname === '/api/telegram' && request.method === 'POST') {
         return await handleTelegram(request, env);
       }
-      return new Response('not found', { status: 404 });
+
+      const deps = staffDeps();
+      let res = null;
+
+      if (url.pathname === '/api/health') {
+        const all = chatList(env.AGENT_CHAT_ID);
+        const staff = managers(env);
+        res = json({ ok: true, managers: staff.length, channelInAgents: all.length - staff.length });
+      } else if (url.pathname === '/api/geo' && request.method === 'GET') {
+        res = await handleGeo(request, env);
+      } else if (url.pathname === '/api/listings' && request.method === 'GET') {
+        res = await handlePublicListings(request, env);
+      } else if (url.pathname.startsWith('/api/media/') && request.method === 'GET') {
+        const photoId = url.pathname.slice('/api/media/'.length).replace(/\/+$/, '');
+        res = await handleMedia(request, env, photoId);
+      } else if (url.pathname === '/api/auth/register' && request.method === 'POST') {
+        res = await handleRegister(request, env, deps);
+      } else if (url.pathname === '/api/auth/login' && request.method === 'POST') {
+        res = await handleLogin(request, env);
+      } else if (url.pathname === '/api/auth/logout' && request.method === 'POST') {
+        res = await handleLogout(request, env);
+      } else if (url.pathname === '/api/cabinet/me' && request.method === 'GET') {
+        res = await handleMe(request, env);
+      } else if (url.pathname === '/api/cabinet/profile' && (request.method === 'PUT' || request.method === 'POST')) {
+        res = await handleUpdateProfile(request, env);
+      } else if (url.pathname === '/api/cabinet/listings' && request.method === 'GET') {
+        res = await handleMyListings(request, env);
+      } else if (url.pathname === '/api/cabinet/listings' && request.method === 'POST') {
+        res = await handleCreateListing(request, env, deps);
+      } else if (url.pathname.startsWith('/api/cabinet/listings/')) {
+        const propId = url.pathname.slice('/api/cabinet/listings/'.length).replace(/\/+$/, '');
+        if (request.method === 'PUT' || request.method === 'PATCH') {
+          res = await handleUpdateListing(request, env, deps, propId);
+        } else if (request.method === 'DELETE') {
+          res = await handleDeleteListing(request, env, propId);
+        }
+      } else if (url.pathname === '/api/cabinet/photos' && request.method === 'POST') {
+        res = await handlePhotoUpload(request, env);
+      } else if (url.pathname === '/api/onboarding' && request.method === 'POST') {
+        res = await handleOnboarding(request, env, deps);
+      } else if (url.pathname === '/api/lead' && request.method === 'POST') {
+        res = await handleSiteLead(request, env, deps);
+      } else if (url.pathname === '/api/handoff' && request.method === 'POST') {
+        res = await handleHandoff(request, env);
+      } else if (url.pathname === '/api/send' && request.method === 'POST') {
+        res = await handleSend(request, env);
+      } else if (url.pathname === '/api/voice' && request.method === 'POST') {
+        res = await handleVoice(request, env);
+      } else if (url.pathname === '/api/poll' && request.method === 'GET') {
+        res = await handlePoll(request, env);
+      }
+
+      if (res) return withCors(res, cors);
+      return withCors(new Response('not found', { status: 404 }), cors);
     } catch (err) {
       console.error('worker', err && err.stack || err);
-      return json({ error: 'internal' }, 500, cors);
+      return withCors(json({ error: 'internal' }, 500), cors);
     }
   },
 
-  /* Письма на адреса @estateart.homes, которые Email Routing отдаёт воркеру */
   async email(message, env) {
     await handleEmail(message, env, { tg, esc, managers });
   },
 
-  /* Cron раз в полчаса: очередь писем партнёрам, напоминания, уведомления */
   async scheduled(event, env, ctx) {
     ctx.waitUntil(runSchedule(env, staffDeps()));
   },

@@ -26,7 +26,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAGES = ["index.html"]
+PAGES = ["index.html", "cabinet/index.html"]
 # href/src на свой файл: без схемы, без //, с нужным расширением
 REF = re.compile(r'(?P<attr>href|src)="(?P<path>(?!https?:|//|data:)[^"?#]+\.(?:css|js))(?:\?v=[0-9a-f]+)?"')
 

@@ -22,7 +22,7 @@ mode = "smart"
 
 [vars]
 # Откуда виджету разрешено обращаться. Через запятую, без пробелов.
-ALLOWED_ORIGINS = "https://estateart.homes,https://www.estateart.homes,https://ivanartastra.github.io,http://localhost:8123"
+ALLOWED_ORIGINS = "https://estateart.homes,https://www.estateart.homes,https://ivanartastra.github.io,http://localhost:8123,http://127.0.0.1:8123"
 SITE_URL = "https://estateart.homes/"
 # Публичный канал @EstateArt — витрина для подписчиков. Заявки, карточки писем
 # и служебные уведомления туда не уходят, даже если id канала попал в

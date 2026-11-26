@@ -1957,3 +1957,135 @@ html[lang=ka] * { text-transform: none !important; }
   .lang-menu__chev { display: none; }
   .lang-menu__btn { padding-inline: .7rem; }
 }
+
+/* ============================================================
+   ЛИЧНЫЙ КАБИНЕТ, РЕГИОНАЛИСТИКА, ОНБОРДИНГ И ИИ-КНОПКИ
+   ============================================================ */
+.header__cab {
+  display: inline-flex; align-items: center; gap: .4rem;
+  min-height: 44px; padding: .5rem .95rem; margin-inline-end: .5rem;
+  border: 1px solid rgba(255,255,255,.45); border-radius: var(--radius-sm);
+  color: #fff; font-size: var(--fs-sm); font-weight: 600; white-space: nowrap;
+  transition: background var(--t-quick) var(--ease-soft), border-color var(--t-quick) var(--ease-soft), color var(--t-quick) var(--ease-soft);
+}
+.header__cab:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.78); }
+.header.scrolled .header__cab { color: var(--teal); border-color: rgba(15,63,58,.28); }
+.header.scrolled .header__cab:hover { background: rgba(15,63,58,.06); border-color: var(--teal); }
+.cab-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-light); flex: none; }
+.header.scrolled .cab-dot { background: var(--emerald); }
+@media (max-width: 640px) { .header__cab { display: none; } }
+
+.drawer__cab {
+  display: block; text-align: center; margin-top: .6rem; padding: .7rem 1rem;
+  border: 1px solid rgba(15,63,58,.24); border-radius: var(--radius-sm);
+  color: var(--teal); font-size: var(--fs-sm); font-weight: 700;
+}
+.drawer__cab:hover { background: var(--sand-deep); }
+
+.searchband__subactions {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem 1.2rem; margin-top: 1rem;
+}
+.searchband__onboard, .searchband__addobj {
+  display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; padding: .45rem 1rem;
+  border-radius: 100px; border: 1px solid rgba(15,63,58,.22); background: var(--cream);
+  color: var(--teal); font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+  transition: border-color var(--t-quick), background var(--t-quick);
+}
+.searchband__onboard:hover, .searchband__addobj:hover { border-color: var(--gold-fill); background: #fff9eb; }
+
+.personal-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.2rem;
+  max-width: var(--maxw); margin: 0 auto 1.4rem; padding: .85rem 1.2rem;
+  background: var(--cream); border: 1px solid rgba(143,114,61,.32); border-radius: var(--radius-sm);
+}
+.personal-bar__txt { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; font-size: var(--fs-sm); color: var(--ink); }
+.personal-bar__badge {
+  padding: .2rem .55rem; border-radius: 100px; background: var(--teal); color: var(--cream);
+  font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+}
+.personal-bar__actions { display: flex; flex-wrap: wrap; gap: .45rem; }
+.personal-bar__btn {
+  display: inline-flex; align-items: center; min-height: 38px; padding: .35rem .85rem;
+  border-radius: 100px; border: 1px solid var(--hairline); background: var(--sand);
+  color: var(--teal); font-size: var(--fs-xs); font-weight: 700; cursor: pointer;
+}
+.personal-bar__btn:hover { border-color: var(--teal); }
+.personal-bar__btn--accent { background: var(--gold-fill); border-color: var(--gold-fill); color: #fff; }
+.personal-bar__btn--accent:hover { background: var(--teal); border-color: var(--teal); }
+
+.catalog__cta-btns { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; }
+.catalog__cta-add { color: var(--teal); border-color: rgba(15,63,58,.3); background: var(--cream); }
+.catalog__cta-add:hover { background: var(--sand-deep); }
+
+.badge--owner { background: var(--teal); color: var(--cream); }
+.badge--rent { background: var(--ocean-fill); color: #fff; }
+
+.card__actions-r { display: inline-flex; align-items: center; gap: .55rem; }
+.card__ai {
+  min-height: 32px; padding: .2rem .6rem; border-radius: 100px;
+  border: 1px solid rgba(15,63,58,.24); background: var(--sand);
+  color: var(--teal); font-size: var(--fs-2xs); font-weight: 700; cursor: pointer;
+  transition: background var(--t-quick), color var(--t-quick), border-color var(--t-quick);
+}
+.card__ai:hover { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+.detail__thumbs { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .55rem; }
+.detail__thumb {
+  width: 58px; height: 44px; padding: 0; border-radius: 6px; overflow: hidden;
+  border: 2px solid transparent; cursor: pointer; background: var(--sand-deep);
+}
+.detail__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.detail__thumb.is-active { border-color: var(--gold-fill); }
+.detail__feats { display: flex; flex-wrap: wrap; gap: .4rem; margin: .7rem 0; }
+
+/* ---------- ЧАТ: КНОПКА МЕНЕДЖЕРА И КОНТЕКСТ ОБЪЕКТА ---------- */
+.chat__head-actions { display: flex; align-items: center; gap: .45rem; }
+.chat__mgr {
+  min-height: 34px; padding: .25rem .7rem; border-radius: 100px;
+  border: 1px solid rgba(227,195,120,.55); background: rgba(227,195,120,.14);
+  color: var(--gold-light); font-size: var(--fs-2xs); font-weight: 700; cursor: pointer;
+}
+.chat__mgr:hover { background: var(--gold-fill); border-color: var(--gold-fill); color: #fff; }
+.chat__ctx {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  padding: .5rem 1rem; background: var(--cream); border-bottom: 1px solid var(--hairline);
+  font-size: var(--fs-2xs); color: var(--ink-soft);
+}
+.chat__ctx b { color: var(--teal); }
+.chat__ctx-clear {
+  width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--sand-deep);
+  color: var(--ink); cursor: pointer; font-weight: 700; flex: none;
+}
+
+/* ---------- МОДАЛКА ОНБОРДИНГА ---------- */
+.onboard__progress { height: 3px; background: var(--sand-deep); border-radius: 2px; overflow: hidden; margin-bottom: 1.2rem; }
+.onboard__progress span { display: block; height: 100%; background: var(--gold-fill); transition: width var(--t-hover) var(--ease-out); }
+.onboard__sub { font-size: var(--fs-base); color: var(--ink-soft); margin-bottom: 1.2rem; }
+.onboard__grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.onboard__card {
+  display: flex; flex-direction: column; gap: .25rem; text-align: left; padding: .95rem 1rem;
+  background: var(--cream); border: 1px solid var(--hairline); border-radius: var(--radius-sm); cursor: pointer;
+  transition: border-color var(--t-quick), background var(--t-quick);
+}
+.onboard__card:hover, .onboard__card.is-active { border-color: var(--gold-fill); background: #fff9eb; }
+.onboard__card b { font-size: var(--fs-base); color: var(--teal); }
+.onboard__card span { font-size: var(--fs-xs); color: var(--ink-soft); line-height: 1.35; }
+.onboard__sec { margin-bottom: 1rem; }
+.onboard__label { display: block; font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .45rem; }
+.onboard__chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.onboard__chip {
+  min-height: 40px; padding: .4rem .85rem; border-radius: 100px;
+  border: 1px solid var(--hairline); background: var(--cream); color: var(--ink);
+  font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+}
+.onboard__chip.is-active { background: var(--teal); border-color: var(--teal); color: var(--cream); }
+.onboard__contact { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--hairline); }
+.onboard__row { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.onboard__row input {
+  font: inherit; font-size: var(--fs-base); padding: .6rem .8rem; border-radius: var(--radius-sm);
+  border: 1px solid rgba(15,63,58,.2); background: var(--cream); color: var(--ink);
+}
+.onboard__nav { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1.3rem; }
+@media (max-width: 560px) {
+  .onboard__grid, .onboard__row { grid-template-columns: 1fr; }
+}

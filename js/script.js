@@ -459,15 +459,47 @@
   let shown = PAGE_SIZE;
   let favOnly = false;
   let beachOnly = false;
+  let dealOnly = '';
   let priceCeil = 0; // верхняя граница слайдера цены
-  let country = ''; // '' | 'th' | 'vn' — выбранная страна
-  try { const c = localStorage.getItem('ae_country'); if (c === 'th' || c === 'vn') country = c; } catch (e) {}
+  let country = ''; // '' | 'th' | 'vn' | ... — выбранная страна
+  try { const c = localStorage.getItem('ae_country'); if (c && /^[a-z]{2,8}$/i.test(c)) country = c.toLowerCase(); } catch (e) {}
+
+  function resolveApiEndpoint() {
+    let ep = (document.body.dataset.chatEndpoint || '').replace(/\/+$/, '');
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isLocal) {
+      try {
+        const q = new URLSearchParams(location.search).get('api');
+        if (q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(q)) {
+          ep = q.replace(/\/+$/, '');
+          sessionStorage.setItem('ae_api_override', ep);
+        } else {
+          const saved = sessionStorage.getItem('ae_api_override');
+          if (saved) ep = saved;
+        }
+      } catch (e) {}
+    }
+    return ep;
+  }
+  const API_ENDPOINT = resolveApiEndpoint();
 
   const COUNTRIES = [
     { code: '', name: 'Все страны', nameEn: 'All countries', nameTh: 'ทุกประเทศ' },
     { code: 'th', name: 'Таиланд', nameEn: 'Thailand', nameTh: 'ไทย' },
     { code: 'vn', name: 'Вьетнам', nameEn: 'Vietnam', nameTh: 'เวียดนาม' },
   ];
+  const EXTRA_COUNTRY_NAMES = {
+    tr: { ru: 'Турция', en: 'Turkey' },
+    id: { ru: 'Индонезия', en: 'Indonesia' },
+    ae: { ru: 'ОАЭ', en: 'UAE' },
+    ge: { ru: 'Грузия', en: 'Georgia' },
+    ru: { ru: 'Россия', en: 'Russia' },
+    kz: { ru: 'Казахстан', en: 'Kazakhstan' },
+    cy: { ru: 'Кипр', en: 'Cyprus' },
+    es: { ru: 'Испания', en: 'Spain' },
+    me: { ru: 'Черногория', en: 'Montenegro' },
+    other: { ru: 'Другие страны', en: 'Other countries' },
+  };
   const CITY_I18N = {
     'Пхукет': { en: 'Phuket', th: 'ภูเก็ต' },
     'Дананг': { en: 'Da Nang', th: 'ดานัง' },
@@ -481,10 +513,17 @@
   // Названия стран для языков из подгружаемых пакетов (js/i18n/*.js)
   const COUNTRY_I18N = {};
   function countryName(c) {
-    const e = COUNTRIES.find(x => x.code === c) || COUNTRIES[0];
-    if (lang === 'ru') return e.name;
-    if (lang === 'th') return e.nameTh;
-    return (COUNTRY_I18N[lang] && COUNTRY_I18N[lang][e.code]) || e.nameEn;
+    const e = COUNTRIES.find(x => x.code === c);
+    if (e) {
+      if (lang === 'ru') return e.name;
+      if (lang === 'th') return e.nameTh;
+      return (COUNTRY_I18N[lang] && COUNTRY_I18N[lang][e.code]) || e.nameEn;
+    }
+    const found = allItems.find(x => x.country === c && x.countryName);
+    if (found && lang === 'ru') return found.countryName;
+    const ex = EXTRA_COUNTRY_NAMES[c];
+    if (ex) return lang === 'ru' ? ex.ru : ex.en;
+    return found ? found.countryName : String(c || '').toUpperCase();
   }
 
   // Избранное — в localStorage
@@ -497,7 +536,12 @@
   function grossYield(it) { const r = rentOf(it); return (r && it.priceUSD) ? (r * 12 / it.priceUSD * 100) : null; }
 
   // Валюта отображения (USD-база, приблизительные курсы — правятся здесь)
-  const CURRENCIES = { USD: { sym: '$', rate: 1, after: false }, RUB: { sym: '₽', rate: 92, after: true }, THB: { sym: '฿', rate: 36.5, after: false } };
+  const CURRENCIES = {
+    USD: { sym: '$', rate: 1, after: false },
+    RUB: { sym: '₽', rate: 92, after: true },
+    THB: { sym: '฿', rate: 36.5, after: false },
+    VND: { sym: '₫', rate: 26000, after: true },
+  };
   let currency = 'USD';
   try { const c = localStorage.getItem('ae_currency'); if (c && CURRENCIES[c]) currency = c; } catch (e) {}
   function money(u) {
@@ -543,15 +587,21 @@
     const onCmp = compare.has(String(it.id)) ? ' is-active' : '';
     const onFav = favorites.has(String(it.id)) ? ' is-active' : '';
     const badges = [];
+    if (it.ownerListing) badges.push(`<span class="badge badge--owner">От собственника</span>`);
+    if (it.deal === 'rent') badges.push(`<span class="badge badge--rent">Аренда</span>`);
     // Доходность показываем только там, где аренда взята из объявления.
     // Раньше бейдж рисовался и по оценке rentOf(), из-за чего у всех объектов
     // без данных выходили одинаковые «6%» — плашка ничего не сообщала.
-    if (it.rentMonthUSD) {
+    if (it.rentMonthUSD && it.deal !== 'rent') {
       const yld = grossYield(it);
       if (yld) badges.push(`<span class="badge badge--yield">${yld.toFixed(0)}% ${t('d_yieldbadge', 'доходность')}</span>`);
     }
     if (it.discountPct) badges.push(`<span class="badge badge--disc">−${it.discountPct}%</span>`);
     const oldPrice = it.oldPriceUSD ? `<s>${money(it.oldPriceUSD)}</s>` : '';
+    const priceHtml = it.deal === 'rent'
+      ? (it.rentMonthUSD ? `${money(it.rentMonthUSD)} <small>/ мес</small>` : esc(it.priceOriginal || it.priceLabel || t('d_price_req', 'Цена по запросу')))
+      : `${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || t('d_price_req', 'Цена по запросу'))}`;
+    const aiBtn = API_ENDPOINT ? `<button class="card__ai" data-action="ask-ai" data-id="${esc(it.id)}" type="button" title="Спросить ИИ-консультанта об этом объекте">ИИ</button>` : '';
     return `<article class="card reveal" data-id="${esc(it.id)}">
       <div class="card__media">
         <img src="${esc(img)}" alt="${esc(it.title || 'Объект на Пхукете')}" loading="lazy" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>
@@ -564,13 +614,16 @@
         </button>
       </div>
       <div class="card__body">
-        <span class="card__price">${oldPrice}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || t('d_price_req', 'Цена по запросу'))}</span>
+        <span class="card__price">${priceHtml}</span>
         <h3>${esc(it.title || 'Объект на Пхукете')}</h3>
         <p class="card__meta">${metaLine(it)}</p>
         ${beach}
         <div class="card__bottom">
           <span class="card__ppm">${per ? `${ico('tag')}≈ ${money(per)}/м²` : ''}</span>
-          ${it.url ? `<a class="card__link" href="${esc(it.url)}">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></button>`}
+          <span class="card__actions-r">
+            ${aiBtn}
+            ${it.url ? `<a class="card__link" href="${esc(it.url)}">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></a>` : `<button class="card__link" data-action="detail" data-id="${esc(it.id)}" type="button">${t('d_more', 'Подробнее')} <span class="card__arrow">→</span></button>`}
+          </span>
         </div>
       </div>
     </article>`;
@@ -592,6 +645,7 @@
   function matches(it, f) {
     if (favOnly && !favorites.has(String(it.id))) return false;
     if (beachOnly && !it.beach) return false;
+    if (dealOnly && (it.deal || 'sale') !== dealOnly) return false;
     if (f.q) { const hay = ((it.title || '') + ' ' + (it.location || '') + ' ' + (it.type || '') + ' ' + (it.city || '') + ' ' + (it.countryName || '')).toLowerCase(); if (!hay.includes(f.q)) return false; }
     if (country && it.country !== country) return false;
     if (f.type && it.type !== f.type) return false;
@@ -644,7 +698,16 @@
 
   function renderGeoSwitch() {
     if (!geoSwitch) return;
-    const list = COUNTRIES.filter(c => !c.code || allItems.some(it => it.country === c.code));
+    const known = COUNTRIES.filter(c => !c.code || allItems.some(it => it.country === c.code));
+    const seen = new Set(known.map(c => c.code));
+    const extras = [];
+    allItems.forEach(it => {
+      if (it.country && !seen.has(it.country)) {
+        seen.add(it.country);
+        extras.push({ code: it.country, name: it.countryName || it.country.toUpperCase() });
+      }
+    });
+    const list = known.concat(extras);
     const have = Array.from(geoSwitch.querySelectorAll('[data-country]'));
     const same = have.length === list.length &&
       have.every((b, i) => b.dataset.country === list[i].code);
@@ -652,8 +715,8 @@
        меняем состояние у существующих: innerHTML сбрасывал фокус на body и
        отменял объявленный в CSS переход фона — кнопка просто перекрашивалась. */
     if (!same) {
-      geoSwitch.innerHTML = list.map(c => `<button type="button" data-country="${c.code}">
-        ${c.code ? `<i class="flag flag--${c.code}" aria-hidden="true"></i>` : ''}${esc(countryName(c.code))}
+      geoSwitch.innerHTML = list.map(c => `<button type="button" data-country="${esc(c.code)}">
+        ${c.code ? `<i class="flag flag--${esc(c.code)}" aria-hidden="true"></i>` : ''}${esc(countryName(c.code))}
         <span class="geo-switch__count"></span>
       </button>`).join('');
     }
@@ -686,9 +749,11 @@
       ds.map(d => `<option value="${esc(d)}"${d === cur ? ' selected' : ''}>${esc(d)}</option>`).join('');
     if (cur && !ds.includes(cur)) fDistrict.value = '';
   }
-  function setCountry(code) {
-    country = code;
-    try { localStorage.setItem('ae_country', code); } catch (e) {}
+  function setCountry(code, opts) {
+    country = code || '';
+    if (!opts || !opts.auto) {
+      try { localStorage.setItem('ae_country', country); } catch (e) {}
+    }
     renderGeoSwitch();
     fillCities();
     fillDistricts();
@@ -836,27 +901,42 @@
     const per = ppm(it);
     const beds = (typeof it.beds === 'number' && it.beds > 0) ? it.beds + ' ' + plural(it.beds, 'спальня', 'спальни', 'спален') : (it.beds ? esc(it.beds) : '');
     const wa = 'https://wa.me/79124869508?text=' + encodeURIComponent('Здравствуйте! Интересует объект «' + (it.title || '') + '» с сайта Estate Art.');
-    const tg = 'https://t.me/+79124869508';
+    const tg = 'https://t.me/EstateArtHomesBot';
     const src = (it.source_url && /^https?:/.test(it.source_url)) ? `<a class="detail__source" href="${esc(it.source_url)}" target="_blank" rel="noopener">Источник: fazwaz.ru ↗</a>` : '';
-    const price = it.priceUSD || 200000;
+    const price = it.priceUSD || it.rentMonthUSD || 200000;
     const rent = rentOf(it);
+    const detailPriceHtml = it.deal === 'rent'
+      ? `${it.rentMonthUSD ? money(it.rentMonthUSD) + ' <small>/ мес</small>' : esc(it.priceOriginal || it.priceLabel || '')}`
+      : `${it.oldPriceUSD ? `<s>${money(it.oldPriceUSD)}</s> ` : ''}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || '')}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}`;
+    const thumbs = (Array.isArray(it.images) && it.images.length > 1)
+      ? `<div class="detail__thumbs">${it.images.slice(0, 8).map((u, i) => `<button type="button" class="detail__thumb${i === 0 ? ' is-active' : ''}" data-detail-img="${esc(u)}"><img src="${esc(u)}" alt="" loading="lazy"/></button>`).join('')}</div>`
+      : '';
+    const feats = (Array.isArray(it.features) && it.features.length)
+      ? `<p class="detail__feats">${it.features.map(f => `<span class="chip">${esc(f)}</span>`).join('')}</p>`
+      : '';
     return `
       <button class="modal__close" data-close aria-label="Закрыть">×</button>
       <div class="detail">
-        <div class="detail__media"><img src="${esc(img)}" alt="${esc(it.title || '')}" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>${it.type ? `<span class="card__tag">${esc(it.type)}</span>` : ''}</div>
+        <div class="detail__media">
+          <img id="detailMainImg" src="${esc(img)}" alt="${esc(it.title || '')}" onerror="this.onerror=null;this.src='assets/hero-phuket.jpg'"/>
+          ${it.type ? `<span class="card__tag">${esc(it.type)}</span>` : ''}
+          ${thumbs}
+        </div>
         <div class="detail__main">
           <h3 class="detail__title">${esc(it.title || 'Объект на Пхукете')}</h3>
-          <p class="detail__loc">${esc(it.location || 'Пхукет')}${it.beach ? ' · ' + esc(it.beach) : ''}</p>
-          <div class="detail__price">${it.oldPriceUSD ? `<s>${money(it.oldPriceUSD)}</s> ` : ''}${it.priceUSD ? money(it.priceUSD) : esc(it.priceLabel || '')}${per ? `<small>≈ ${money(per)}/м²</small>` : ''}</div>
+          <p class="detail__loc">${esc(it.location || 'Пхукет')}${it.countryName ? ' · ' + esc(it.countryName) : ''}${it.beach ? ' · ' + esc(it.beach) : ''}</p>
+          <div class="detail__price">${detailPriceHtml}</div>
           <div class="detail__specs">
             ${specRow('Тип', esc(it.type || ''))}
             ${specRow('Спальни', beds)}
             ${specRow('Санузлы', it.baths != null ? it.baths : '')}
             ${specRow('Площадь', it.area ? esc(it.area) + ' м²' : '')}
           </div>
+          ${feats}
           ${it.description ? `<p class="detail__desc">${esc(it.description)}</p>` : ''}
           <div class="detail__actions">
-            <a class="btn btn--wa" href="${wa}" target="_blank" rel="noopener">Узнать об объекте · WhatsApp</a>
+            ${API_ENDPOINT ? `<button type="button" class="btn btn--gold" data-action="ask-ai" data-id="${esc(it.id)}">Спросить ИИ-консультанта</button>` : ''}
+            <a class="btn btn--wa" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>
             <a class="btn btn--tg" href="${tg}" target="_blank" rel="noopener">Telegram</a>
           </div>
           ${src}
@@ -865,7 +945,7 @@
 
       ${(it.lat && it.lng) ? `<div class="detail__mapwrap"><h4 class="detail__maptitle">Расположение на карте</h4><div class="detail__map" id="detailMap"></div></div>` : ''}
 
-      ${calcGridHTML(price, rent, !!it.rentMonthUSD)}
+      ${it.deal === 'rent' ? '' : calcGridHTML(price, rent, !!it.rentMonthUSD)}
     `;
   }
   function openCalculator() {
@@ -992,6 +1072,13 @@
 
   /* ---------- СОБЫТИЯ ---------- */
   function cardClick(e) {
+    const ai = e.target.closest('[data-action="ask-ai"]');
+    if (ai) {
+      e.stopPropagation();
+      const it = itemById(ai.dataset.id);
+      if (it && window.EstateChat && window.EstateChat.askAbout) window.EstateChat.askAbout(it);
+      return;
+    }
     const cmp = e.target.closest('[data-action="compare"]');
     if (cmp) { e.stopPropagation(); toggleCompare(cmp.dataset.id, cmp); return; }
     const fav = e.target.closest('[data-action="fav"]');
@@ -1047,7 +1134,7 @@
     fillDistricts();
     if (fSort) fSort.value = 'default';
     if (pMin) pMin.value = 0; if (pMax) pMax.value = priceCeil; clampSliders();
-    favOnly = false; beachOnly = false;
+    favOnly = false; beachOnly = false; dealOnly = '';
     if (fFav) { fFav.classList.remove('is-active'); fFav.setAttribute('aria-pressed', 'false'); }
     if (fBeach) { fBeach.classList.remove('is-active'); fBeach.setAttribute('aria-pressed', 'false'); }
     render(true); refreshAllMap();
@@ -1074,6 +1161,20 @@
   });
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) closeModal();
+    const thumb = e.target.closest('[data-detail-img]');
+    if (thumb) {
+      const main = document.getElementById('detailMainImg');
+      if (main) main.src = thumb.dataset.detailImg;
+      document.querySelectorAll('.detail__thumb').forEach(b => b.classList.toggle('is-active', b === thumb));
+      return;
+    }
+    const aiModal = e.target.closest('#detailBox [data-action="ask-ai"]');
+    if (aiModal) {
+      const it = itemById(aiModal.dataset.id);
+      closeModal();
+      if (it && window.EstateChat && window.EstateChat.askAbout) window.EstateChat.askAbout(it);
+      return;
+    }
     const det = e.target.closest('#compareBox [data-action="detail"]');
     if (det) { closeModal(); setTimeout(() => openDetail(det.dataset.id), 280); }
   });
@@ -1159,10 +1260,12 @@
 
   /* ---------- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТЫ ---------- */
   const currSwitch = document.getElementById('currSwitch');
-  function setCurrency(c) {
+  function setCurrency(c, opts) {
     if (!CURRENCIES[c]) return;
     currency = c;
-    try { localStorage.setItem('ae_currency', c); } catch (e) {}
+    if (!opts || !opts.auto) {
+      try { localStorage.setItem('ae_currency', c); } catch (e) {}
+    }
     if (currSwitch) currSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b.dataset.curr === c));
     if (typeof clampSliders === 'function') clampSliders();
     render();
@@ -1587,14 +1690,26 @@
   });
 
   /* ---------- ИНИЦИАЛИЗАЦИЯ КАТАЛОГА ---------- */
-  function initCatalog(data) {
-    const items = (data && data.items && data.items.length) ? data.items : FALLBACK_CATALOG.items;
-    allItems = items.filter(it => !it.hidden).map((it, i) => Object.assign({}, it, { id: it.id != null ? String(it.id) : 'demo' + i }));
+  let catalogReady = false;
+  const readyCallbacks = [];
+
+  function initCatalog(data, ownerData) {
+    const baseItems = (data && data.items && data.items.length) ? data.items : FALLBACK_CATALOG.items;
+    const ownerItems = (ownerData && Array.isArray(ownerData.items)) ? ownerData.items : [];
+    const seen = new Set();
+    allItems = ownerItems.concat(baseItems.filter(it => !it.hidden))
+      .map((it, i) => Object.assign({}, it, { id: it.id != null ? String(it.id) : 'demo' + i }))
+      .filter(it => {
+        if (seen.has(it.id)) return false;
+        seen.add(it.id);
+        return true;
+      });
     districtPages = (data && data.districts && data.districts.length) ? data.districts : null;
     // типы для фильтра
     if (fType) {
+      fType.innerHTML = `<option value="">${esc(t('d_alltypes', 'Все типы'))}</option>`;
       const types = Array.from(new Set(allItems.map(it => it.type).filter(Boolean))).sort();
-      fType.insertAdjacentHTML('beforeend', types.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
+      fType.insertAdjacentHTML('beforeend', types.map(tp => `<option value="${esc(tp)}">${esc(tp)}</option>`).join(''));
     }
     renderGeoSwitch();
     fillCities();
@@ -1610,18 +1725,80 @@
     if (typeof renderMarquee === 'function') renderMarquee();
     const upd = document.getElementById('catalogUpdated');
     if (upd && data && data.updated) upd.textContent = 'Каталог обновлён ' + data.updated + ' · источник: ' + (data.source || '—');
+
+    catalogReady = true;
+    while (readyCallbacks.length) {
+      const fn = readyCallbacks.shift();
+      try { fn(allItems); } catch (e) {}
+    }
   }
+
+  function applyOnboarding(ob) {
+    if (!ob) return;
+    dealOnly = ob.goal === 'rent' ? 'rent' : '';
+    if (ob.country) setCountry(ob.country, { auto: true });
+    else setCountry('', { auto: true });
+    if (fType) {
+      fType.value = '';
+      if (ob.type) {
+        const match = Array.from(fType.options).find(o => o.value.toLowerCase() === ob.type.toLowerCase());
+        if (match) fType.value = match.value;
+      }
+    }
+    if (pMin && pMax) {
+      const b = Number(ob.budget) || 0;
+      if (b > 0 && b <= 500000) {
+        pMin.value = 0;
+        pMax.value = Math.min(priceCeil, b);
+      } else if (b > 500000) {
+        pMin.value = Math.min(priceCeil, 500000);
+        pMax.value = priceCeil;
+      } else {
+        pMin.value = 0;
+        pMax.value = priceCeil;
+      }
+      clampSliders();
+    }
+    render(true);
+    refreshAllMap();
+  }
+
+  function resetAllFilters() {
+    dealOnly = '';
+    setCountry('', { auto: true });
+    if (fReset) fReset.click();
+  }
+
+  window.EstateCatalog = {
+    getItems: () => allItems.slice(),
+    getCountry: () => country,
+    setCountry,
+    setCurrency,
+    applyOnboarding,
+    resetFilters: resetAllFilters,
+    openDetail,
+    openModal,
+    closeModal,
+    onReady: (fn) => {
+      if (catalogReady) { try { fn(allItems); } catch (e) {} }
+      else readyCallbacks.push(fn);
+    },
+  };
+
   if (grid) {
     // Скелетоны на время загрузки: иначе главная секция сайта стоит пустой
     grid.innerHTML = '<article class="card card--skeleton"></article>'.repeat(PAGE_SIZE);
     const src = grid.getAttribute('data-src') || 'data/catalog.json';
-    fetch(src, { cache: 'no-cache' })
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(initCatalog)
-      .catch(() => initCatalog(FALLBACK_CATALOG));
+    const fetchOwnerListings = API_ENDPOINT
+      ? fetch(API_ENDPOINT + '/api/listings', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
+      : Promise.resolve(null);
+    Promise.all([
+      fetch(src, { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject()).catch(() => FALLBACK_CATALOG),
+      fetchOwnerListings,
+    ]).then(([catData, ownerData]) => initCatalog(catData, ownerData));
   }
 
-  /* ---------- ФОРМА ЗАЯВКИ → WhatsApp ---------- */
+  /* ---------- ФОРМА ЗАЯВКИ → Telegram (админам) + WhatsApp ---------- */
   const leadForm = document.getElementById('leadForm');
   if (leadForm) {
     const nameEl = document.getElementById('leadName');
@@ -1639,10 +1816,24 @@
         if (hintEl) { hintEl.textContent = 'Отметьте согласие на обработку персональных данных.'; hintEl.className = 'lead__hint lead__hint--err'; }
         return;
       }
-      const text = 'Заявка с сайта Estate Art\nИмя: ' + nameEl.value.trim() +
-        '\nКонтакт: ' + phoneEl.value.trim() +
-        (msgEl && msgEl.value.trim() ? '\nЗапрос: ' + msgEl.value.trim() : '');
-      if (hintEl) { hintEl.textContent = 'Открываем WhatsApp с вашей заявкой…'; hintEl.className = 'lead__hint lead__hint--ok'; }
+      const nameVal = nameEl.value.trim();
+      const contactVal = phoneEl.value.trim();
+      const msgVal = msgEl && msgEl.value.trim();
+      if (API_ENDPOINT) {
+        let ob = null, geo = null;
+        try { ob = JSON.parse(localStorage.getItem('ae_onboarding') || 'null'); } catch (err) {}
+        try { geo = window.EstateGeo || JSON.parse(sessionStorage.getItem('ae_geo') || 'null'); } catch (err) {}
+        fetch(API_ENDPOINT + '/api/lead', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: nameVal, contact: contactVal, message: msgVal, source: 'site_form', geo, onboarding: ob }),
+          keepalive: true,
+        }).catch(() => {});
+      }
+      const text = 'Заявка с сайта Estate Art\nИмя: ' + nameVal +
+        '\nКонтакт: ' + contactVal +
+        (msgVal ? '\nЗапрос: ' + msgVal : '');
+      if (hintEl) { hintEl.textContent = 'Заявка отправлена! Открываем WhatsApp…'; hintEl.className = 'lead__hint lead__hint--ok'; }
       Sound.play('success');
       window.open('https://wa.me/79124869508?text=' + encodeURIComponent(text), '_blank', 'noopener');
     });
@@ -1671,7 +1862,13 @@
   let contacts = null;
 
   function regInfo() {
-    try { return JSON.parse(localStorage.getItem(REG_KEY) || 'null'); } catch (e) { return null; }
+    try {
+      const reg = JSON.parse(localStorage.getItem(REG_KEY) || 'null');
+      if (reg && reg.name) return reg;
+      const usr = JSON.parse(localStorage.getItem('ae_auth_user') || 'null');
+      if (usr && usr.name) return { name: usr.name, contact: usr.contact || usr.login };
+      return null;
+    } catch (e) { return null; }
   }
   function isRegistered() { return !!(regInfo() && regInfo().name); }
 
@@ -1877,11 +2074,21 @@
         hintEl.className = 'lead__hint lead__hint--err';
         return;
       }
+      const nameVal = nameEl.value.trim();
+      const contactVal = contactEl.value.trim();
       try {
         localStorage.setItem(REG_KEY, JSON.stringify({
-          name: nameEl.value.trim(), contact: contactEl.value.trim(), at: new Date().toISOString().slice(0, 10),
+          name: nameVal, contact: contactVal, at: new Date().toISOString().slice(0, 10),
         }));
       } catch (err) {}
+      if (API_ENDPOINT) {
+        fetch(API_ENDPOINT + '/api/lead', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: nameVal, contact: contactVal, source: 'partner_contacts' }),
+          keepalive: true,
+        }).catch(() => {});
+      }
       loadContacts().then(() => { closeModal(); renderPartners(); });
     });
   }

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — Estate Art</title>
+  <meta name="description" content="Личный кабинет Estate Art: регистрация, быстрая загрузка своих объектов недвижимости с фото, персональная подборка по вашему региону, избранное и ИИ-консультант." />
+  <meta name="theme-color" content="#082825" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="../css/styles.css?v=21191320" />
+  <link rel="stylesheet" href="../css/cabinet.css?v=c85cc754" />
+</head>
+<body data-chat-endpoint="https://estate-art-chat.ivan-art-astra-888.workers.dev" data-root="../">
+
+  <header class="pp-header cab-header">
+    <a href="../" class="logo" style="color:var(--teal)">ESTATE <span style="color:var(--gold)">ART</span></a>
+    <nav class="cab-nav">
+      <a href="../#catalog">Каталог</a>
+      <a href="../arenda/">Аренда</a>
+      <a href="../partners/">Партнёрам</a>
+    </nav>
+    <div class="cab-header__right">
+      <span class="cab-geopill" id="cabGeoPill" hidden></span>
+      <a href="https://t.me/EstateArtHomesBot" class="cab-ask" data-chat-open target="_blank" rel="noopener">Консультант ИИ</a>
+      <button type="button" class="cab-logout" id="cabLogoutBtn" hidden>Выйти</button>
+    </div>
+  </header>
+
+  <main class="cab-wrap">
+    <!-- ============ ЭКРАН ВХОДА / РЕГИСТРАЦИИ ============ -->
+    <section class="cab-auth" id="authView">
+      <div class="cab-auth__editorial">
+        <p class="eyebrow">Личный кабинет</p>
+        <h1>Управляйте объектами и подбором из одной точки</h1>
+        <p class="cab-auth__lead">Зарегистрируйтесь за 30 секунд: добавляйте свои виллы, квартиры и апартаменты с фотографиями, получайте персональные рекомендации по вашему региону и общайтесь с нашим ИИ-консультантом и менеджером в Telegram.</p>
+        <ul class="cab-benefits">
+          <li>
+            <b>Загрузка своих объектов за 2 минуты</b>
+            <span>Удобный пошаговый редактор, сжатие и загрузка фото прямо с телефона или компьютера, мгновенная отправка на публикацию.</span>
+          </li>
+          <li>
+            <b>Регионалистика и персональный подбор</b>
+            <span>Покажем объекты в вашем регионе или под выбранный бюджет, а ваши объявления сразу увидят покупатели из этого региона.</span>
+          </li>
+          <li>
+            <b>Единый ИИ-консультант + менеджер в Telegram</b>
+            <span>Наш ИИ-ассистент консультирует клиентов по вашим объектам 24/7 и при запросе переводит диалог живому менеджеру.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cab-auth__card">
+        <div class="cab-tabs" role="tablist">
+          <button type="button" class="cab-tab is-active" data-auth-mode="register" role="tab" aria-selected="true">Регистрация</button>
+          <button type="button" class="cab-tab" data-auth-mode="login" role="tab" aria-selected="false">Вход</button>
+        </div>
+
+        <form class="cab-form" id="registerForm" novalidate>
+          <label class="cab-field">
+            <span>Как вас зовут *</span>
+            <input type="text" id="regName" autocomplete="name" placeholder="Например: Алексей" required />
+          </label>
+          <label class="cab-field">
+            <span>Email, телефон или @telegram *</span>
+            <input type="text" id="regLogin" autocomplete="username" placeholder="name@mail.ru или @username" required />
+          </label>
+          <label class="cab-field">
+            <span>Пароль (от 6 символов) *</span>
+            <input type="password" id="regPass" autocomplete="new-password" placeholder="Минимум 6 символов" required />
+          </label>
+          <label class="cab-field">
+            <span>Компания / агентство (если представляете компанию)</span>
+            <input type="text" id="regCompany" autocomplete="organization" placeholder="Необязательно" />
+          </label>
+
+          <div class="cab-field">
+            <span>Ваша роль на платформе</span>
+            <div class="cab-roles" id="regRoles">
+              <label class="cab-role">
+                <input type="radio" name="regRole" value="buyer" checked />
+                <span><b>Покупатель</b><small>Ищу жильё или инвестиции</small></span>
+              </label>
+              <label class="cab-role">
+                <input type="radio" name="regRole" value="renter" />
+                <span><b>Арендатор</b><small>Ищу аренду</small></span>
+              </label>
+              <label class="cab-role">
+                <input type="radio" name="regRole" value="owner" />
+                <span><b>Собственник</b><small>Хочу разместить свой объект</small></span>
+              </label>
+              <label class="cab-role">
+                <input type="radio" name="regRole" value="partner" />
+                <span><b>Агент / Застройщик</b><small>Размещаю объекты клиентов</small></span>
+              </label>
+            </div>
+          </div>
+
+          <label class="lead__consent cab-consent">
+            <input type="checkbox" id="regConsent" />
+            <span>Согласен на обработку персональных данных и принимаю <a href="../privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+          </label>
+
+          <button type="submit" class="btn btn--gold btn--lg cab-submit" id="regSubmitBtn">Создать кабинет</button>
+          <p class="cab-hint" id="regFormHint" aria-live="polite"></p>
+        </form>
+
+        <form class="cab-form" id="loginForm" hidden novalidate>
+          <label class="cab-field">
+            <span>Email, телефон или @telegram *</span>
+            <input type="text" id="loginLogin" autocomplete="username" placeholder="name@mail.ru или @username" required />
+          </label>
+          <label class="cab-field">
+            <span>Пароль *</span>
+            <input type="password" id="loginPass" autocomplete="current-password" placeholder="Ваш пароль" required />
+          </label>
+          <button type="submit" class="btn btn--gold btn--lg cab-submit" id="loginSubmitBtn">Войти в кабинет</button>
+          <p class="cab-hint" id="loginFormHint" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ ЛИЧНЫЙ КАБИНЕТ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ ============ -->
+    <section class="cab-dash" id="dashView" hidden>
+      <div class="cab-welcome">
+        <div>
+          <p class="eyebrow" id="dashRoleLabel">Личный кабинет</p>
+          <h1 id="dashGreeting">Здравствуйте</h1>
+          <p class="cab-welcome__meta" id="dashMeta"></p>
+        </div>
+        <div class="cab-welcome__actions">
+          <button type="button" class="btn btn--gold" id="dashAddBtn">+ Добавить объект</button>
+          <button type="button" class="btn btn--ghost cab-btn-dark" id="dashAskAiBtn">Спросить ИИ-консультанта</button>
+        </div>
+      </div>
+
+      <nav class="cab-dash-tabs" id="dashTabs" role="tablist">
+        <button type="button" class="cab-dash-tab is-active" data-tab="for-you">Для вас</button>
+        <button type="button" class="cab-dash-tab" data-tab="my-objects">Мои объекты <span class="cab-pill-count" id="myObjectsCount">0</span></button>
+        <button type="button" class="cab-dash-tab" data-tab="add" id="tabAddBtn">+ Добавить объект</button>
+        <button type="button" class="cab-dash-tab" data-tab="favorites">Избранное <span class="cab-pill-count" id="favCount">0</span></button>
+        <button type="button" class="cab-dash-tab" data-tab="profile">Профиль и подбор</button>
+      </nav>
+
+      <!-- TAB 1: ДЛЯ ВАС -->
+      <div class="cab-panel" data-panel="for-you">
+        <div class="cab-panel__head">
+          <div>
+            <h2>Персональная подборка</h2>
+            <p id="forYouSubtitle">Объекты с учётом вашего региона входа и интересов.</p>
+          </div>
+          <div class="cab-panel__actions">
+            <button type="button" class="btn btn--ghost cab-btn-dark btn--sm" data-goto-tab="profile">Настроить предпочтения</button>
+            <button type="button" class="btn btn--gold btn--sm" id="forYouAskAi">Обсудить подборку с ИИ</button>
+          </div>
+        </div>
+        <div class="catalog__grid" id="forYouGrid"></div>
+        <p class="cab-empty" id="forYouEmpty" hidden>По вашим точным параметрам пока нет совпадений. <a href="../#catalog">Смотреть весь каталог</a> или измените регион в профиле.</p>
+      </div>
+
+      <!-- TAB 2: МОИ ОБЪЕКТЫ -->
+      <div class="cab-panel" data-panel="my-objects" hidden>
+        <div class="cab-stats" id="myStats"></div>
+        <div class="cab-my-list" id="myObjectsList"></div>
+        <div class="cab-empty-box" id="myObjectsEmpty" hidden>
+          <h3>У вас пока нет загруженных объектов</h3>
+          <p>Добавьте виллу, квартиру или апартаменты на продажу или в аренду — после быстрой модерации объект появится в общем каталоге, в вашем регионе и в базе нашего ИИ-консультанта.</p>
+          <button type="button" class="btn btn--gold" data-goto-tab="add">+ Добавить первый объект</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: ДОБАВИТЬ / РЕДАКТИРОВАТЬ ОБЪЕКТ -->
+      <div class="cab-panel" data-panel="add" hidden>
+        <div class="cab-editor-grid">
+          <form class="cab-prop-form" id="propForm" novalidate>
+            <input type="hidden" id="propEditId" value="" />
+            <div class="cab-prop-form__head">
+              <h2 id="propFormTitle">Новый объект недвижимости</h2>
+              <button type="button" class="cab-link-btn" id="propCancelEdit" hidden>Отменить редактирование</button>
+            </div>
+
+            <div class="cab-deal-switch" role="group" aria-label="Тип сделки">
+              <button type="button" class="is-active" data-deal="sale">Продажа</button>
+              <button type="button" data-deal="rent">Аренда</button>
+            </div>
+
+            <div class="cab-row-2">
+              <label class="cab-field">
+                <span>Название объекта или ЖК *</span>
+                <input type="text" id="pTitle" placeholder="Например: Вилла у пляжа Банг Тао" required />
+              </label>
+              <label class="cab-field">
+                <span>Тип недвижимости *</span>
+                <select id="pType">
+                  <option value="Квартира">Квартира</option>
+                  <option value="Кондо">Кондо</option>
+                  <option value="Апартаменты">Апартаменты</option>
+                  <option value="Вилла">Вилла</option>
+                  <option value="Пентхаус">Пентхаус</option>
+                  <option value="Таунхаус">Таунхаус</option>
+                  <option value="Дом">Дом</option>
+                  <option value="Коммерция">Коммерция</option>
+                  <option value="Земля">Земля</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="cab-row-3">
+              <label class="cab-field">
+                <span>Страна / Регион *</span>
+                <select id="pCountry">
+                  <option value="th">Таиланд</option>
+                  <option value="vn">Вьетнам</option>
+                  <option value="tr">Турция</option>
+                  <option value="id">Индонезия (Бали)</option>
+                  <option value="ae">ОАЭ</option>
+                  <option value="ge">Грузия</option>
+                  <option value="ru">Россия</option>
+                  <option value="kz">Казахстан</option>
+                  <option value="cy">Кипр</option>
+                  <option value="es">Испания</option>
+                  <option value="me">Черногория</option>
+                  <option value="other">Другая страна</option>
+                </select>
+              </label>
+              <label class="cab-field" id="pCountryCustomWrap" hidden>
+                <span>Укажите страну *</span>
+                <input type="text" id="pCountryCustom" placeholder="Например: Португалия" />
+              </label>
+              <label class="cab-field">
+                <span>Город *</span>
+                <input type="text" id="pCity" list="cityHints" placeholder="Пхукет, Дананг, Москва…" required />
+                <datalist id="cityHints">
+                  <option value="Пхукет"></option>
+                  <option value="Дананг"></option>
+                  <option value="Нячанг"></option>
+                  <option value="Бангкок"></option>
+                  <option value="Паттайя"></option>
+                  <option value="Аланья"></option>
+                  <option value="Анталья"></option>
+                  <option value="Дубай"></option>
+                  <option value="Чангу"></option>
+                  <option value="Батуми"></option>
+                  <option value="Тбилиси"></option>
+                  <option value="Сочи"></option>
+                  <option value="Москва"></option>
+                  <option value="Санкт-Петербург"></option>
+                </datalist>
+              </label>
+              <label class="cab-field">
+                <span>Район / локация</span>
+                <input type="text" id="pDistrict" placeholder="Банг Тао, My Khe, Центр…" />
+              </label>
+            </div>
+
+            <div class="cab-row-3">
+              <label class="cab-field">
+                <span id="pPriceLabel">Цена *</span>
+                <input type="number" id="pPrice" min="1" step="100" placeholder="250000" required />
+              </label>
+              <label class="cab-field">
+                <span>Валюта</span>
+                <select id="pCurrency">
+                  <option value="USD">$ USD</option>
+                  <option value="THB">฿ THB</option>
+                  <option value="VND">₫ VND</option>
+                  <option value="RUB">₽ RUB</option>
+                  <option value="EUR">€ EUR</option>
+                  <option value="AED">AED</option>
+                </select>
+              </label>
+              <label class="cab-field">
+                <span>Площадь (м²)</span>
+                <input type="number" id="pArea" min="1" step="0.5" placeholder="85" />
+              </label>
+            </div>
+
+            <div class="cab-row-4">
+              <label class="cab-field">
+                <span>Спальни</span>
+                <select id="pBeds">
+                  <option value="Студия">Студия</option>
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5+</option>
+                </select>
+              </label>
+              <label class="cab-field">
+                <span>Санузлы</span>
+                <input type="number" id="pBaths" min="1" max="20" value="2" />
+              </label>
+              <label class="cab-field">
+                <span>Этаж</span>
+                <input type="number" id="pFloor" min="0" max="150" placeholder="Например: 5" />
+              </label>
+              <label class="cab-field">
+                <span>До пляжа / моря</span>
+                <input type="text" id="pBeach" placeholder="400 м до пляжа" />
+              </label>
+            </div>
+
+            <div class="cab-field">
+              <span>Особенности и условия</span>
+              <div class="cab-chips" id="pFeatureChips">
+                <button type="button" class="chip" data-feat="Бассейн">Бассейн</button>
+                <button type="button" class="chip" data-feat="Вид на море">Вид на море</button>
+                <button type="button" class="chip" data-feat="У пляжа">У пляжа</button>
+                <button type="button" class="chip" data-feat="Freehold">Freehold</button>
+                <button type="button" class="chip" data-feat="Рассрочка">Рассрочка</button>
+                <button type="button" class="chip" data-feat="С мебелью">С мебелью</button>
+                <button type="button" class="chip" data-feat="Охрана 24/7">Охрана 24/7</button>
+                <button type="button" class="chip" data-feat="Парковка">Парковка</button>
+                <button type="button" class="chip" data-feat="Терраса">Терраса</button>
+              </div>
+            </div>
+
+            <label class="cab-field">
+              <span>Описание объекта</span>
+              <textarea id="pDesc" rows="4" placeholder="Расскажите о планировке, ремонте, инфраструктуре, документах, условиях аренды или торга…"></textarea>
+            </label>
+
+            <!-- Загрузка фотографий -->
+            <div class="cab-field">
+              <span>Фотографии (до 8 шт. — сжимаются автоматически)</span>
+              <div class="cab-dropzone" id="pDropzone">
+                <input type="file" id="pPhotoInput" accept="image/jpeg,image/png,image/webp" multiple hidden />
+                <p>Перетащите фото сюда или <button type="button" class="cab-link-btn" id="pPhotoPickBtn">выберите файлы</button></p>
+                <small>JPEG, PNG, WebP · первое фото станет обложкой</small>
+              </div>
+              <div class="cab-url-add">
+                <input type="url" id="pPhotoUrl" placeholder="Или вставьте прямую ссылку https://… на фото" />
+                <button type="button" class="btn btn--ghost cab-btn-dark btn--sm" id="pPhotoUrlBtn">Добавить</button>
+              </div>
+              <div class="cab-photos-grid" id="pPhotosGrid"></div>
+              <p class="cab-hint" id="pPhotoHint"></p>
+            </div>
+
+            <!-- Карта для точных координат -->
+            <details class="cab-map-acc" id="pMapDetails">
+              <summary>Указать точку на карте (необязательно)</summary>
+              <p class="cab-map-note">Кликните по карте, чтобы поставить метку — объект появится на общей карте сайта.</p>
+              <div class="cab-mini-map" id="pMiniMap"></div>
+              <div class="cab-row-2" style="margin-top:.6rem">
+                <label class="cab-field"><span>Широта (lat)</span><input type="text" id="pLat" placeholder="7.997" /></label>
+                <label class="cab-field"><span>Долгота (lng)</span><input type="text" id="pLng" placeholder="98.297" /></label>
+              </div>
+            </details>
+
+            <label class="cab-field">
+              <span>Контакт для связи по этому объекту</span>
+              <input type="text" id="pOwnerContact" placeholder="Оставьте пустым, чтобы использовать контакт профиля" />
+            </label>
+
+            <div class="cab-form-actions">
+              <button type="submit" class="btn btn--gold btn--lg" id="pSubmitPublish">Отправить на публикацию</button>
+              <button type="button" class="btn btn--ghost cab-btn-dark" id="pSaveDraft">Сохранить черновик</button>
+            </div>
+            <p class="cab-hint" id="pFormHint" aria-live="polite"></p>
+          </form>
+
+          <!-- Живой предпросмотр карточки -->
+          <aside class="cab-preview">
+            <p class="eyebrow">Предпросмотр карточки</p>
+            <div id="pLivePreview"></div>
+            <p class="cab-preview__note">После отправки на публикацию карточка уходит команде Estate Art в Telegram. Как только администратор нажмёт «Опубликовать», объект появится в каталоге, попадёт в подбор по вашему региону и станет доступен ИИ-консультанту.</p>
+          </aside>
+        </div>
+      </div>
+
+      <!-- TAB 4: ИЗБРАННОЕ -->
+      <div class="cab-panel" data-panel="favorites" hidden>
+        <div class="cab-panel__head">
+          <div>
+            <h2>Избранные объекты</h2>
+            <p>Синхронизируются с вашим аккаунтом и каталогом на главной странице.</p>
+          </div>
+        </div>
+        <div class="catalog__grid" id="favGrid"></div>
+        <p class="cab-empty" id="favEmpty" hidden>Вы пока не добавили объекты в избранное. Нажимайте сердечко на карточках в <a href="../#catalog">каталоге</a>.</p>
+      </div>
+
+      <!-- TAB 5: ПРОФИЛЬ И ОНБОРДИНГ -->
+      <div class="cab-panel" data-panel="profile" hidden>
+        <form class="cab-profile-form" id="profileForm" novalidate>
+          <h2>Профиль и персональный подбор</h2>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>Имя *</span>
+              <input type="text" id="profName" required />
+            </label>
+            <label class="cab-field">
+              <span>Основной контакт *</span>
+              <input type="text" id="profContact" required />
+            </label>
+          </div>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>Email</span>
+              <input type="email" id="profEmail" placeholder="name@mail.ru" />
+            </label>
+            <label class="cab-field">
+              <span>Телефон</span>
+              <input type="tel" id="profPhone" placeholder="+7 912 486-95-08" />
+            </label>
+          </div>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>@telegram</span>
+              <input type="text" id="profTelegram" placeholder="@username" />
+            </label>
+            <label class="cab-field">
+              <span>Компания / агентство</span>
+              <input type="text" id="profCompany" placeholder="Если представляете компанию" />
+            </label>
+          </div>
+          <p class="cab-preview__note" style="margin-top:0">Укажите email, телефон, @telegram и компанию — бот на сайте, в Telegram и по почте автоматически узнает вас и будет вести переписку именно по вашим объектам и запросам.</p>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>Роль</span>
+              <select id="profRole">
+                <option value="buyer">Покупатель / Инвестор</option>
+                <option value="renter">Арендатор</option>
+                <option value="owner">Собственник</option>
+                <option value="partner">Агент / Застройщик</option>
+              </select>
+            </label>
+            <label class="cab-field">
+              <span>Валюта отображения</span>
+              <select id="profCurrency">
+                <option value="USD">$ USD</option>
+                <option value="RUB">₽ RUB</option>
+                <option value="THB">฿ THB</option>
+                <option value="VND">₫ VND</option>
+              </select>
+            </label>
+          </div>
+
+          <hr class="cab-sep" />
+          <h3>Настройки быстрого подбора (онбординг)</h3>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>Цель</span>
+              <select id="profGoal">
+                <option value="">Любая</option>
+                <option value="live">Жить / переезд</option>
+                <option value="invest">Инвестиции и доход</option>
+                <option value="rent">Аренда</option>
+                <option value="sell">Разместить свой объект</option>
+              </select>
+            </label>
+            <label class="cab-field">
+              <span>Интересующий регион</span>
+              <select id="profRegion">
+                <option value="">Мой регион / все направления</option>
+                <option value="th">Таиланд (Пхукет)</option>
+                <option value="vn">Вьетнам (Дананг, Нячанг)</option>
+                <option value="tr">Турция</option>
+                <option value="id">Индонезия (Бали)</option>
+                <option value="ae">ОАЭ</option>
+                <option value="ge">Грузия</option>
+                <option value="ru">Россия</option>
+              </select>
+            </label>
+          </div>
+          <div class="cab-row-2">
+            <label class="cab-field">
+              <span>Предпочитаемый тип</span>
+              <select id="profType">
+                <option value="">Любой тип</option>
+                <option value="Вилла">Вилла</option>
+                <option value="Квартира">Квартира</option>
+                <option value="Кондо">Кондо</option>
+                <option value="Апартаменты">Апартаменты</option>
+                <option value="Пентхаус">Пентхаус</option>
+              </select>
+            </label>
+            <label class="cab-field">
+              <span>Бюджет</span>
+              <select id="profBudget">
+                <option value="">Любой</option>
+                <option value="100000">до $100 000</option>
+                <option value="250000">до $250 000</option>
+                <option value="500000">до $500 000</option>
+                <option value="500001">$500 000+</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn--gold" id="profSaveBtn">Сохранить настройки</button>
+          <p class="cab-hint" id="profHint" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" style="margin-top:3rem">
+    <div class="footer__bottom" style="border:0">
+      <span>© 2026 Estate Art · <a href="../">Главная</a> · <a href="../partners/">Партнёрам</a> · <a href="../privacy/">Политика конфиденциальности</a></span>
+      <span class="footer__contacts"><a href="mailto:info@estateart.homes">info@estateart.homes</a> · <a href="tel:+79124869508">+7 912 486-95-08</a></span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="../js/basemap.js?v=b2897b64"></script>
+  <script src="../js/cabinet.js?v=73e7cc4b"></script>
+  <script src="../js/chat.js?v=fe39cd86" defer></script>
+</body>
+</html>

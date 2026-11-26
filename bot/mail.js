@@ -21,6 +21,7 @@
 
 import { callClaude } from './ai.js';
 import { onIncomingMail, createOutbox, postOutbox } from './partners.js';
+import { resolveIdentity, formatIdentityForAdmin, formatIdentityForAI, recordInquiry } from './identity.js';
 
 const MAIL_TTL = 60 * 60 * 24 * 30;   // письма и разборы живут месяц
 const MAX_RAW = 2 * 1024 * 1024;      // больше не читаем: вложения нам не нужны
@@ -296,13 +297,14 @@ export async function digestMail(env, mail) {
   }
 }
 
-export async function draftReply(env, mail, intent) {
+export async function draftReply(env, mail, intent, identityContext = '') {
   if (!env.ANTHROPIC_API_KEY) return null;
   const sys = `${CONTEXT}\n\n${UNTRUSTED}\n\nНапиши черновик ответа от агентства инструментом mail_draft.
 Язык ответа — язык письма. Тон деловой и тёплый, коротко. Не обещай конкретных цифр
 комиссии, сроков и объёмов, которых нет в письме, и не выдумывай факты об агентстве.
 Если нужно что-то уточнить — задай вопрос. Подпись: «Estate Art» и строкой ниже
-partners@estateart.homes. Никаких плейсхолдеров в квадратных скобках.`;
+partners@estateart.homes. Никаких плейсхолдеров в квадратных скобках.` +
+    (identityContext ? `\n\nДАННЫЕ ПО ОТПРАВИТЕЛЮ ИЗ БАЗЫ (используй, если отвечает наш клиент, собственник или партнёр):${identityContext}` : '');
   try {
     const res = await callClaude(env,
       [{ role: 'user', content: `${mailPrompt(mail)}\n\nЧто ответить: ${intent}` }],
@@ -335,7 +337,7 @@ export function mailChats(env, deps) {
   return [...new Set(own.length ? own : deps.managers(env))];
 }
 
-function card(mail, digest, id, esc) {
+function card(mail, digest, id, esc, dossier = '') {
   const box = mail.rcpt.split('@')[0];
   const cat = digest ? digest.category : '';
   let t = `${ICON[cat] || '✉️'} <b>Письмо на ${esc(box)}@</b>` + (cat ? ` · ${esc(cat)}` : '') +
@@ -354,6 +356,7 @@ function card(mail, digest, id, esc) {
     t += `\n\n${esc(preview)}${mail.text.length > 700 ? '…' : ''}` +
       `\n\n<i>Разбор недоступен — показываю начало письма.</i>`;
   }
+  if (dossier) t += `\n\n${dossier}`;
   if (mail.attachments.length) t += `\n<i>Вложения: ${esc(mail.attachments.join(', '))}</i>`;
   t += `\n<code>#${id}</code>`;
   return t.slice(0, 4000);
@@ -436,12 +439,33 @@ export async function handleEmail(message, env, deps) {
       ? { category: 'рассылка', summary: 'Автоматическое письмо или рассылка.', language: '—', urgency: 'низкая', actions: [] }
       : await digestMail(env, mail);
 
+    const quiet = digest && ['спам', 'рассылка'].includes(digest.category);
+    const identity = await resolveIdentity(env, {
+      text: mail.text,
+      email: mail.replyTo || mail.from,
+      company: digest && digest.company,
+    }, { verified: true });
+
+    if (!skipAi && !quiet) {
+      await recordInquiry(env, {
+        userId: identity.user && identity.user.id,
+        name: (identity.user && identity.user.name) || mail.from.replace(/<[^>]+>/g, '').trim().slice(0, 60),
+        email: mail.replyTo || mail.from,
+        company: digest && digest.company,
+        text: mail.text,
+        channel: 'email:' + rcpt.split('@')[0],
+        summary: (digest && digest.summary) || mail.subject,
+      });
+    }
+
+    const identityAiText = formatIdentityForAI(identity);
+    const dossier = formatIdentityForAdmin(identity, deps.esc);
+
     const id = newId();
-    await env.CHAT.put(mailKey(id), JSON.stringify({ ...mail, digest, at: new Date().toISOString() }),
+    await env.CHAT.put(mailKey(id), JSON.stringify({ ...mail, digest, identityAiText, at: new Date().toISOString() }),
       { expirationTtl: MAIL_TTL });
 
-    const quiet = digest && ['спам', 'рассылка'].includes(digest.category);
-    const text = card(mail, digest, id, deps.esc);
+    const text = card(mail, digest, id, deps.esc, dossier);
     await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', {
       chat_id: chat, parse_mode: 'HTML', disable_web_page_preview: true,
       disable_notification: !!quiet,
@@ -524,7 +548,7 @@ export async function handleMailCallback(cq, env, deps) {
     await deps.tg(env, 'answerCallbackQuery', { callback_query_id: cq.id, text: 'Пишу черновик…' });
     await deps.tg(env, 'sendChatAction', { chat_id: chatId, action: 'typing' });
 
-    const d = await draftReply(env, mail, intent);
+    const d = await draftReply(env, mail, intent, mail.identityAiText || '');
     if (!d) {
       await deps.tg(env, 'sendMessage', { chat_id: chatId, text: 'Не получилось написать черновик — попробуйте ещё раз через минуту.' });
       return;

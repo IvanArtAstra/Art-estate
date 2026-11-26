@@ -1,18 +1,33 @@
 /* ============================================================
-   Estate Art — чат на сайте, связанный с Telegram через воркер.
-
-   Виджет появляется только если в <body> задан data-chat-endpoint.
-   Пока адрес не прописан, сайт работает ровно как раньше.
-   Настройка моста — в bot/README.md.
+   Estate Art — чат на сайте, связанный с ИИ-консультантом и Telegram.
    ============================================================ */
 (function () {
   'use strict';
 
-  const endpoint = (document.body.dataset.chatEndpoint || '').replace(/\/+$/, '');
+  function resolveEndpoint() {
+    let ep = (document.body.dataset.chatEndpoint || '').replace(/\/+$/, '');
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isLocal) {
+      try {
+        const q = new URLSearchParams(location.search).get('api');
+        if (q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(q)) {
+          ep = q.replace(/\/+$/, '');
+          sessionStorage.setItem('ae_api_override', ep);
+        } else {
+          const saved = sessionStorage.getItem('ae_api_override');
+          if (saved) ep = saved;
+        }
+      } catch (e) {}
+    }
+    return ep;
+  }
+
+  const endpoint = resolveEndpoint();
   if (!endpoint) return;
 
-  const POLL_OPEN = 4000;       // как часто спрашиваем воркер при открытом чате
-  const POLL_IDLE = 20000;      // и в фоне, чтобы показать непрочитанное
+  const siteRoot = document.body.dataset.root || '';
+  const POLL_OPEN = 4000;
+  const POLL_IDLE = 20000;
   const KEY_SESSION = 'ae_chat_session';
   const KEY_LOG = 'ae_chat_log';
   const KEY_WHO = 'ae_chat_who';
@@ -36,8 +51,41 @@
     return id;
   }
 
+  function currentAuthUser() {
+    return store.get('ae_auth_user', null);
+  }
+  function authToken() {
+    try { return localStorage.getItem('ae_auth_token') || ''; } catch { return ''; }
+  }
+  function profilePayload(authUser) {
+    if (!authUser) return null;
+    return {
+      name: authUser.name,
+      contact: authUser.contact || authUser.login,
+      email: authUser.email || '',
+      phone: authUser.phone || '',
+      telegram: authUser.telegram || '',
+      company: authUser.company || '',
+      role: authUser.role,
+    };
+  }
+  function currentGeo() {
+    if (window.EstateGeo) return window.EstateGeo;
+    try { return JSON.parse(sessionStorage.getItem('ae_geo') || 'null'); } catch { return null; }
+  }
+  function currentOnboarding() {
+    return store.get('ae_onboarding', null);
+  }
+
   let log = store.get(KEY_LOG, []);
-  let who = store.get(KEY_WHO, null);   // {name, contact} — спрашиваем один раз
+  let who = store.get(KEY_WHO, null);
+  if (!who) {
+    const authUser = currentAuthUser();
+    if (authUser && authUser.name) {
+      who = { name: authUser.name, contact: authUser.contact || authUser.login || '' };
+    }
+  }
+  let contextListing = null;
   let lastId = log.reduce((m, x) => Math.max(m, x.id || 0), 0);
   let open = false;
   let timer = null;
@@ -56,23 +104,27 @@
     <button class="chat__fab" type="button" aria-label="Открыть чат" aria-expanded="false">
       ${ICON_CHAT}<span class="chat__badge" hidden>0</span>
     </button>
-    <section class="chat__panel" hidden aria-label="Чат с агентом">
+    <section class="chat__panel" hidden aria-label="Чат с консультантом">
       <header class="chat__head">
-        <span class="chat__who"><b>Estate Art</b><span>Отвечаем в рабочее время Пхукета</span></span>
-        <button class="chat__close" type="button" aria-label="Свернуть чат">${ICON_CLOSE}</button>
+        <span class="chat__who"><b>Estate Art</b><span>ИИ-консультант 24/7 · менеджер в Telegram</span></span>
+        <div class="chat__head-actions">
+          <button class="chat__mgr" type="button" title="Связать с живым менеджером в Telegram">Менеджер</button>
+          <button class="chat__close" type="button" aria-label="Свернуть чат">${ICON_CLOSE}</button>
+        </div>
       </header>
+      <div class="chat__ctx" hidden></div>
       <div class="chat__log" role="log" aria-live="polite"></div>
       <form class="chat__form" novalidate>
         <div class="chat__intro" hidden>
           <label><span>Как вас зовут</span><input type="text" class="chat__name" autocomplete="name" /></label>
-          <label><span>Телефон или @telegram, если ответить не сюда</span><input type="text" class="chat__contact" autocomplete="tel" /></label>
+          <label><span>Телефон или @telegram для ответа менеджера</span><input type="text" class="chat__contact" autocomplete="tel" /></label>
           <label class="chat__consent">
             <input type="checkbox" class="chat__agree" />
-            <span>Согласен на обработку персональных данных и принимаю <a href="privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+            <span>Согласен на обработку персональных данных и принимаю <a href="${esc(siteRoot)}privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
           </label>
         </div>
         <div class="chat__row">
-          <textarea class="chat__input" rows="1" placeholder="Напишите вопрос…" maxlength="2000"></textarea>
+          <textarea class="chat__input" rows="1" placeholder="Спросите про объект, район или размещение…" maxlength="2000"></textarea>
           <button class="chat__mic" type="button" hidden aria-label="Нажмите, чтобы продиктовать; удерживайте, чтобы записать голосовое">${ICON_MIC}</button>
           <button class="chat__send" type="submit" aria-label="Отправить">${ICON_SEND}</button>
         </div>
@@ -84,6 +136,8 @@
 
   const fab = $('.chat__fab', root);
   const panel = $('.chat__panel', root);
+  const ctxEl = $('.chat__ctx', root);
+  const mgrBtn = $('.chat__mgr', root);
   const logEl = $('.chat__log', root);
   const form = $('.chat__form', root);
   const intro = $('.chat__intro', root);
@@ -91,10 +145,28 @@
   const contactEl = $('.chat__contact', root);
   const agreeEl = $('.chat__agree', root);
   const input = $('.chat__input', root);
-  const sendBtn = $('.chat__send', root);
   const hint = $('.chat__hint', root);
   const badge = $('.chat__badge', root);
   const micBtn = $('.chat__mic', root);
+
+  function renderCtx() {
+    if (!ctxEl) return;
+    if (!contextListing || !contextListing.title) {
+      ctxEl.hidden = true;
+      ctxEl.innerHTML = '';
+      return;
+    }
+    ctxEl.hidden = false;
+    ctxEl.innerHTML = `<span>Объект: <b>${esc(contextListing.title)}</b>${contextListing.price ? ' · ' + esc(contextListing.price) : ''}</span>
+      <button type="button" class="chat__ctx-clear" aria-label="Убрать объект">×</button>`;
+  }
+
+  ctxEl.addEventListener('click', (e) => {
+    if (e.target.closest('.chat__ctx-clear')) {
+      contextListing = null;
+      renderCtx();
+    }
+  });
 
   /* ---------- отрисовка ---------- */
   function time(iso) {
@@ -103,8 +175,7 @@
   }
   function render() {
     if (!log.length) {
-      logEl.innerHTML = `<p class="chat__empty">Здравствуйте! Спросите про объект, район или переезд —
-        отвечаем лично, без ботов-автоответчиков.</p>`;
+      logEl.innerHTML = `<p class="chat__empty">Здравствуйте! Я ИИ-консультант Estate Art: расскажу про объекты каталога и от собственников, подберу вариант под ваш регион и бюджет или позову живого менеджера в Telegram.</p>`;
       return;
     }
     logEl.innerHTML = log.map(m => `
@@ -137,7 +208,7 @@
         if (!open) setUnread(unread + fresh.length);
       }
       if (data.last) lastId = Math.max(lastId, data.last);
-    } catch (e) { /* сеть моргнула — попробуем на следующем круге */ }
+    } catch (e) {}
   }
 
   function schedule() {
@@ -148,14 +219,25 @@
   async function send(text) {
     const local = { id: ++lastId, from: 'user', text, at: new Date().toISOString(), pending: true };
     log.push(local); save(); render();
+    const authUser = currentAuthUser();
+    const tok = authToken();
+    const headers = { 'content-type': 'application/json' };
+    if (tok) headers['Authorization'] = 'Bearer ' + tok;
     try {
       const r = await fetch(`${endpoint}/api/send`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers,
         body: JSON.stringify({
-          sessionId: sessionId(), text,
-          name: who && who.name, contact: who && who.contact,
+          sessionId: sessionId(),
+          text,
+          name: (who && who.name) || (authUser && authUser.name) || 'Гость',
+          contact: (who && who.contact) || (authUser && (authUser.contact || authUser.login)) || '',
           page: document.title,
+          lang: document.documentElement.lang || 'ru',
+          geo: currentGeo(),
+          onboarding: currentOnboarding(),
+          profile: profilePayload(authUser),
+          contextListing,
         }),
       });
       const data = await r.json().catch(() => ({}));
@@ -166,13 +248,8 @@
         hint.className = 'chat__hint chat__hint--err';
       } else {
         hint.textContent = '';
-        // Первичный менеджер отвечает в том же запросе — показываем сразу,
-        // не дожидаясь следующего опроса: четыре секунды тишины после
-        // отправленного сообщения читаются как «не дошло»
         if (data.id) lastId = Math.max(lastId, data.id);
         if (data.reply) {
-          // Ответ помощника лежит в сессии следующим номером — забираем его
-          // здесь и двигаем счётчик, иначе опрос принесёт то же самое второй раз
           lastId = Math.max(lastId, data.id + 1);
           log.push({ id: data.id + 1, from: 'agent', text: data.reply, at: new Date().toISOString() });
           save(); render();
@@ -187,7 +264,47 @@
     save(); render();
   }
 
-  /* Длительность ухода читаем из того же токена, что и остальные слои */
+  async function requestHandoff() {
+    if (!ensureWho()) {
+      say('Укажите имя и контакт ниже, чтобы менеджер мог ответить вам в Telegram или здесь.', true);
+      return;
+    }
+    mgrBtn.disabled = true;
+    say('Подключаем живого менеджера в Telegram…');
+    const authUser = currentAuthUser();
+    const tok = authToken();
+    const headers = { 'content-type': 'application/json' };
+    if (tok) headers['Authorization'] = 'Bearer ' + tok;
+    try {
+      const r = await fetch(`${endpoint}/api/handoff`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          sessionId: sessionId(),
+          name: (who && who.name) || (authUser && authUser.name) || 'Гость',
+          contact: (who && who.contact) || (authUser && (authUser.contact || authUser.login)) || '',
+          page: document.title,
+          geo: currentGeo(),
+          onboarding: currentOnboarding(),
+          profile: profilePayload(authUser),
+          contextListing,
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.ok && data.reply) {
+        lastId = Math.max(lastId, data.id || lastId + 1);
+        log.push({ id: data.id || lastId, from: 'agent', text: data.reply, at: new Date().toISOString() });
+        save(); render();
+        say('Менеджер получил уведомление в Telegram.');
+      } else {
+        say('Не удалось вызвать менеджера. Напишите сообщение или перейдите в Telegram.', true);
+      }
+    } catch {
+      say('Нет связи с сервером.', true);
+    }
+    mgrBtn.disabled = false;
+  }
+
   function exitMs() {
     const v = (getComputedStyle(document.documentElement).getPropertyValue('--t-exit') || '').trim();
     if (/ms$/.test(v)) return parseFloat(v);
@@ -199,11 +316,15 @@
   let closeTimer = 0;
   function toggle(next) {
     open = next;
-    /* Открытие и закрытие теперь одно движение в обе стороны. До этого панель
-       входила анимацией, а исчезала установкой hidden в один кадр. */
     if (closeTimer) { clearTimeout(closeTimer); closeTimer = 0; }
     const S = window.Sound;
     if (open) {
+      if (!who) {
+        const authUser = currentAuthUser();
+        if (authUser && authUser.name) {
+          who = { name: authUser.name, contact: authUser.contact || authUser.login || '' };
+        }
+      }
       panel.classList.remove('is-closing');
       panel.hidden = false;
       if (S) S.play('open');
@@ -221,6 +342,7 @@
     if (open) {
       setUnread(0);
       intro.hidden = !!who;
+      renderCtx();
       render();
       panel.addEventListener('animationend', () => { try { (who ? input : nameEl).focus(); } catch (e) {} }, { once: true });
       poll();
@@ -228,19 +350,52 @@
     schedule();
   }
 
+  function askAbout(listing) {
+    if (!listing) return toggle(true);
+    const price = listing.deal === 'rent'
+      ? (listing.rentMonthUSD ? `$${listing.rentMonthUSD}/мес` : (listing.priceOriginal || ''))
+      : (listing.priceUSD ? `$${listing.priceUSD}` : (listing.priceLabel || ''));
+    contextListing = {
+      id: String(listing.id || ''),
+      title: listing.title || 'Объект',
+      city: listing.city || listing.location || '',
+      price,
+      deal: listing.deal || 'sale',
+      ownerListing: !!listing.ownerListing,
+    };
+    toggle(true);
+    if (!input.value.trim()) {
+      input.value = `Расскажите подробнее об объекте «${contextListing.title}»${contextListing.city ? ` (${contextListing.city})` : ''}.`;
+      input.dispatchEvent(new Event('input'));
+    }
+    setTimeout(() => { try { (who ? input : nameEl).focus(); } catch {} }, 180);
+  }
+
+  function openWithPrompt(promptText) {
+    toggle(true);
+    if (promptText && !input.value.trim()) {
+      input.value = promptText;
+      input.dispatchEvent(new Event('input'));
+    }
+    setTimeout(() => { try { (who ? input : nameEl).focus(); } catch {} }, 180);
+  }
+
   fab.addEventListener('click', () => toggle(!open));
   $('.chat__close', root).addEventListener('click', () => toggle(false));
+  mgrBtn.addEventListener('click', requestHandoff);
 
-  /* Кнопка в шапке ведёт в бота ссылкой — это рабочий путь на страницах, где
-     виджета нет. Там, где он есть, перехватываем клик и открываем чат здесь:
-     разговор начинается на той же странице, без ухода в мессенджер. */
   document.querySelectorAll('[data-chat-open]').forEach(el => {
     el.addEventListener('click', e => { e.preventDefault(); toggle(true); });
   });
-  window.EstateChat = { open: () => toggle(true), close: () => toggle(false) };
+  window.EstateChat = {
+    open: () => toggle(true),
+    close: () => toggle(false),
+    askAbout,
+    openWithPrompt,
+    handoff: requestHandoff,
+  };
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && open) toggle(false); });
 
-  // Enter отправляет, Shift+Enter переносит строку
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
   });
@@ -249,52 +404,14 @@
     input.style.height = Math.min(input.scrollHeight, 120) + 'px';
   });
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
-
-    if (!who) {
-      if (!agreeEl.checked) {
-        hint.textContent = 'Отметьте согласие на обработку персональных данных.';
-        hint.className = 'chat__hint chat__hint--err';
-        agreeEl.closest('.chat__consent').classList.add('err');
-        return;
-      }
-      who = { name: nameEl.value.trim() || 'Гость', contact: contactEl.value.trim() };
-      store.set(KEY_WHO, who);
-      intro.hidden = true;
-    }
-    input.value = '';
-    input.style.height = 'auto';
-    hint.textContent = '';
-    hint.className = 'chat__hint';
-    send(text);
-  });
-
-  agreeEl.addEventListener('change', () => agreeEl.closest('.chat__consent').classList.remove('err'));
-
-  /* ---------- голос ----------
-     Одна кнопка на два действия. Короткое нажатие — диктовка: браузер сам
-     распознаёт речь, текст попадает в поле, и дальше это обычное сообщение,
-     на которое ИИ отвечает сразу. Удержание — настоящее голосовое: запись
-     уходит Алене в Telegram, потому что звук ИИ не слышит.
-
-     Второе работает везде, где есть микрофон. Первое — только там, где есть
-     распознавание речи (Safari и Chrome); иначе короткое нажатие тоже
-     начинает запись, и кнопка об этом честно говорит. */
-  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia &&
-                       window.MediaRecorder);
-  if (Rec || canRecord) {
-    micBtn.hidden = false;
-    micBtn.setAttribute('aria-label', Rec
-      ? 'Нажмите, чтобы продиктовать; удерживайте, чтобы записать голосовое'
-      : 'Удерживайте, чтобы записать голосовое');
-  }
-
   function ensureWho() {
     if (who) return true;
+    const authUser = currentAuthUser();
+    if (authUser && authUser.name) {
+      who = { name: authUser.name, contact: authUser.contact || authUser.login || '' };
+      intro.hidden = true;
+      return true;
+    }
     if (!agreeEl.checked) {
       hint.textContent = 'Отметьте согласие на обработку персональных данных.';
       hint.className = 'chat__hint chat__hint--err';
@@ -307,17 +424,39 @@
     return true;
   }
 
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    if (!ensureWho()) return;
+    input.value = '';
+    input.style.height = 'auto';
+    hint.textContent = '';
+    hint.className = 'chat__hint';
+    send(text);
+  });
+
+  agreeEl.addEventListener('change', () => agreeEl.closest('.chat__consent').classList.remove('err'));
+
+  /* ---------- голос ---------- */
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  if (Rec || canRecord) {
+    micBtn.hidden = false;
+    micBtn.setAttribute('aria-label', Rec
+      ? 'Нажмите, чтобы продиктовать; удерживайте, чтобы записать голосовое'
+      : 'Удерживайте, чтобы записать голосовое');
+  }
+
   function say(text, err) {
     hint.textContent = text;
     hint.className = 'chat__hint' + (err ? ' chat__hint--err' : '');
   }
 
-  /* --- диктовка --- */
   let rec = null;
   function dictate() {
     if (rec) { try { rec.stop(); } catch (e) {} return; }
     rec = new Rec();
-    // Распознаём речь на языке страницы: ru → ru-RU, vi → vi-VN и т. д.
     const pageLang = window.AELangs && window.AELangs.get(document.documentElement.lang);
     rec.lang = pageLang ? pageLang.bcp : 'ru-RU';
     rec.interimResults = true;
@@ -348,15 +487,13 @@
     } catch (e) { rec = null; }
   }
 
-  /* --- голосовое сообщение --- */
   let mediaRec = null, chunks = [], startedAt = 0, tick = 0, cancelled = false;
-
   function pickMime() {
     const want = ['audio/ogg;codecs=opus', 'audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
     for (const t of want) {
       if (window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t;
     }
-    return '';   // Safari сам выберет mp4
+    return '';
   }
 
   async function startRecording() {
@@ -392,7 +529,7 @@
       const s = Math.round((Date.now() - startedAt) / 1000);
       say('Запись ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') +
           ' — отпустите, чтобы отправить. Esc отменит.');
-      if (s >= 60) stopRecording();      // дальше Telegram и так режет
+      if (s >= 60) stopRecording();
     }, 250);
     say('Запись 0:00 — отпустите, чтобы отправить. Esc отменит.');
   }
@@ -422,12 +559,11 @@
       delete local.pending;
       if (!r.ok || !data.ok) {
         local.failed = true;
-        // 404 — мост обновлён на сайте, но ещё не на воркере: это не вина гостя
         say(r.status === 404
           ? 'Голосовые пока не включены. Напишите текстом — ответим сразу.'
           : (data.message || 'Запись не ушла. Попробуйте ещё раз или напишите текстом.'), true);
       } else {
-        say('Отправили. Алена послушает и ответит сюда же.');
+        say('Отправили. Менеджер послушает и ответит сюда же.');
       }
     } catch (e) {
       delete local.pending;
@@ -437,14 +573,13 @@
     save(); render();
   }
 
-  /* --- одна кнопка, два жеста --- */
   const HOLD_MS = 350;
   let holdTimer = 0, held = false;
 
   function pressStart(e) {
     if (e.button != null && e.button !== 0) return;
     e.preventDefault();
-    if (mediaRec) return;                 // уже пишем — отпускание остановит
+    if (mediaRec) return;
     held = false;
     holdTimer = setTimeout(() => { held = true; startRecording(); }, HOLD_MS);
   }
@@ -453,7 +588,7 @@
     if (mediaRec) { stopRecording(); return; }
     if (held) return;
     if (Rec) dictate();
-    else startRecording();                // без распознавания короткое нажатие пишет голос
+    else startRecording();
   }
 
   micBtn.addEventListener('pointerdown', pressStart);
