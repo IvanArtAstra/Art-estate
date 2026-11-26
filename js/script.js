@@ -1223,6 +1223,37 @@
   const openCalcBtn = document.getElementById('openCalcBtn');
   openCalcBtn && openCalcBtn.addEventListener('click', openCalculator);
 
+  /* ---------- 3D / VR-ВИТРИНА НА ГЛАВНОЙ ---------- */
+  const showcaseTabs = document.getElementById('showcaseTabs');
+  if (showcaseTabs) {
+    const vid = document.getElementById('showcaseVideo');
+    const img = document.getElementById('showcaseImg');
+    const tag = document.getElementById('showcaseStageTag');
+    const link = document.getElementById('showcaseStageLink');
+    showcaseTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-sc-stage]');
+      if (!btn) return;
+      showcaseTabs.querySelectorAll('[data-sc-stage]').forEach(b => b.classList.toggle('is-active', b === btn));
+      const kind = btn.dataset.scKind;
+      const src = btn.dataset.scSrc;
+      const stage = btn.dataset.scStage;
+      if (kind === 'video' && vid && img) {
+        img.hidden = true;
+        vid.hidden = false;
+        if (btn.dataset.scPoster) vid.poster = btn.dataset.scPoster;
+        if (vid.getAttribute('src') !== src) { vid.setAttribute('src', src); vid.load(); }
+        vid.play().catch(() => {});
+      } else if (vid && img) {
+        vid.pause();
+        vid.hidden = true;
+        img.hidden = false;
+        img.src = src;
+      }
+      if (tag && btn.dataset.scTag) tag.textContent = btn.dataset.scTag;
+      if (link && stage) link.href = 'tour/aurelia/#' + stage;
+    });
+  }
+
   /* ---------- БОКОВОЕ МЕНЮ (DRAWER) ---------- */
   const drawer = document.getElementById('drawer');
   const burger = document.getElementById('burger');

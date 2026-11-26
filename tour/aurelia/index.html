@@ -1,0 +1,3284 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Aurelia Bay Phuket — Sales OS · 4K Инверсионный Скролл, 3D Разрез, 360° VR и Локации Пхукета</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="description" content="Интерактивный 3D-обзор The Aurelia Bay на Пхукете: пролёт от бухты Bang Tao к фасаду, 3D-разрез планировки, выбор квартиры и 4K 360° WebGL VR-тур по комнатам и пляжам." />
+  <meta name="theme-color" content="#061a18" />
+  <link rel="canonical" href="https://estateart.homes/tour/aurelia/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="The Aurelia Bay Phuket — 3D-влёт, разрез и 4K 360° VR-тур | Estate Art" />
+  <meta property="og:description" content="8 шагов инверсионного скролла от бухты Bang Tao и фасада через 3D-разрез внутрь всех 5 комнат в 4K 360°." />
+  <meta property="og:url" content="https://estateart.homes/tour/aurelia/" />
+  <meta property="og:image" content="https://estateart.homes/assets/tour/aurelia/masterplan-16x9.webp" />
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../../css/tour-tokens.css?v=4d07a816" />
+  <style>
+    /* ========================================================================
+       The Aurelia Bay — Full-Viewport Sales OS (100dvh)
+       Permanent 8-Stop Continuous Inverted Scroll + Cutaway-Matched 4K VR + POI Drone Flights
+       ======================================================================== */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--obsidian);
+      color: var(--ink-on-dark);
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    .os-app {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Floating Glass Sales OS Top Bar */
+    .os-topbar {
+      position: fixed;
+      top: 12px;
+      inset-inline: 16px;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(6, 26, 24, 0.72);
+      border: 1px solid rgba(227, 195, 120, 0.28);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.34);
+      color: var(--cream);
+      transition: background 240ms ease, color 240ms ease, border-color 240ms ease;
+    }
+    .os-topbar.is-light {
+      background: rgba(255, 253, 248, 0.88);
+      border-color: rgba(20, 32, 31, 0.14);
+      color: var(--ink);
+      box-shadow: 0 10px 30px rgba(8, 40, 37, 0.1);
+    }
+
+    .os-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      min-height: 44px;
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+    .os-brand__mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(227, 195, 120, 0.16);
+      border: 1px solid var(--hairline-gold);
+      color: var(--gold-light);
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .os-topbar.is-light .os-brand__mark {
+      background: var(--teal-deep);
+      color: var(--gold-light);
+    }
+    .os-brand__name {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* 4-View Switcher */
+    .os-views {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 253, 248, 0.06);
+      border: 1px solid rgba(227, 195, 120, 0.18);
+    }
+    .os-topbar.is-light .os-views {
+      background: var(--sand);
+      border-color: var(--hairline);
+    }
+    @media (min-width: 1040px) {
+      .os-views { display: flex; }
+    }
+    .os-view-btn {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+    .os-view-btn[aria-selected="true"] {
+      background: var(--gold-light);
+      color: var(--obsidian);
+    }
+    .os-topbar.is-light .os-view-btn[aria-selected="true"] {
+      background: var(--teal-deep);
+      color: var(--gold-light);
+    }
+
+    .os-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .os-pill {
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(227, 195, 120, 0.3);
+      background: rgba(255, 253, 248, 0.08);
+      color: inherit;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: all 180ms ease;
+    }
+    .os-topbar.is-light .os-pill {
+      background: var(--sand);
+      border-color: var(--hairline-strong);
+      color: var(--ink);
+    }
+    .os-pill:hover { border-color: var(--gold-light); }
+    .os-pill[aria-pressed="true"] {
+      background: var(--gold-light);
+      color: var(--obsidian);
+      border-color: var(--gold-light);
+    }
+    .os-topbar.is-light .os-pill[aria-pressed="true"] {
+      background: var(--teal-deep);
+      color: var(--gold-light);
+      border-color: var(--teal-deep);
+    }
+
+    @media (max-width: 1039px) {
+      .os-desktop-only { display: none !important; }
+    }
+    @media (max-width: 560px) {
+      .os-topbar { top: 8px; inset-inline: 8px; padding: 4px 6px; gap: 4px; }
+      .os-brand__name { display: none; }
+      .os-pill { padding: 0 9px; font-size: 11px; }
+    }
+
+    /* Mobile Bottom View Switcher (<1040px) */
+    .os-mobile-bar {
+      position: fixed;
+      bottom: 8px;
+      inset-inline: 8px;
+      z-index: 82;
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      background: rgba(6, 26, 24, 0.88);
+      border: 1px solid rgba(227, 195, 120, 0.3);
+      backdrop-filter: blur(16px);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .os-mobile-bar::-webkit-scrollbar { display: none; }
+    @media (min-width: 1040px) {
+      .os-mobile-bar { display: none; }
+    }
+    .os-mobile-bar .os-view-btn {
+      flex: 1 0 auto;
+      padding: 0 12px;
+      font-size: 11px;
+    }
+
+    /* 60fps Canvas .fseq AI Camera Flight Overlay */
+    .cinema-flight-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 45;
+      pointer-events: none;
+      opacity: 0;
+      background: transparent;
+      display: block;
+    }
+
+    /* Flight Status Pill during Auto-Flight / Room Glide */
+    .flight-hud-bar {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 6px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(6, 26, 24, 0.86);
+      border: 1px solid var(--hairline-gold);
+      backdrop-filter: blur(14px);
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-dark);
+    }
+    .flight-hud-bar.is-active { display: inline-flex; }
+
+    /* Draggable Right-Edge 8-Stop Inverted Scroll Depth Rail */
+    .depth-rail {
+      position: fixed;
+      top: 50%;
+      inset-inline-end: 16px;
+      transform: translateY(-50%);
+      z-index: 75;
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 10px 8px;
+      border-radius: var(--radius-md);
+      background: rgba(6, 26, 24, 0.72);
+      border: 1px solid rgba(227, 195, 120, 0.28);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--cream);
+      user-select: none;
+      cursor: ns-resize;
+      transition: background 240ms ease, color 240ms ease, border-color 240ms ease;
+    }
+    .depth-rail.is-light {
+      background: rgba(255, 253, 248, 0.88);
+      border-color: rgba(20, 32, 31, 0.16);
+      color: var(--ink);
+    }
+    @media (min-width: 1040px) {
+      .depth-rail { display: flex; }
+    }
+    .depth-rail__track {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding-inline-end: 12px;
+    }
+    .depth-rail__bar {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      inset-inline-end: 2px;
+      width: 4px;
+      border-radius: 99px;
+      background: rgba(227, 195, 120, 0.22);
+      overflow: hidden;
+    }
+    .depth-rail__fill {
+      width: 100%;
+      height: 0%;
+      background: var(--gold-light);
+      border-radius: 99px;
+    }
+    .depth-rail.is-light .depth-rail__fill {
+      background: var(--teal-deep);
+    }
+    .depth-step {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.68;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 4px;
+      transition: opacity 160ms ease, color 160ms ease;
+      white-space: nowrap;
+    }
+    .depth-step:hover,
+    .depth-step.is-active {
+      opacity: 1;
+      color: var(--gold-light);
+    }
+    .depth-rail.is-light .depth-step.is-active,
+    .depth-rail.is-light .depth-step:hover {
+      color: var(--teal-deep);
+    }
+    .depth-rail__hint {
+      font-size: 10px;
+      opacity: 0.76;
+      padding-top: 5px;
+      border-top: 1px solid rgba(227, 195, 120, 0.2);
+      text-align: end;
+      width: 100%;
+    }
+    .depth-rail.is-light .depth-rail__hint {
+      border-top-color: var(--hairline);
+    }
+
+    /* Stage Views */
+    .stage-view {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .stage-view.is-active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* Inverse-scroll HUD motion helper */
+    .inv-motion {
+      will-change: transform, opacity;
+      transition: transform 60ms linear, opacity 100ms linear;
+    }
+
+    /* ========================================================================
+       CLIENT START SCREEN OVERLAY
+       ======================================================================== */
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: var(--obsidian);
+      transition: opacity 520ms var(--ease-luxury), visibility 520ms ease;
+    }
+    .welcome-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .welcome-bg {
+      position: absolute;
+      inset: 0;
+      background: url('../../assets/tour/aurelia/masterplan-16x9.webp') center/cover no-repeat;
+      filter: brightness(0.76) saturate(1.06);
+    }
+    .living-video-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+    .welcome-scrim {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 45%, rgba(6, 26, 24, 0.35), rgba(6, 26, 24, 0.88));
+    }
+    .welcome-card {
+      position: relative;
+      z-index: 2;
+      width: min(660px, 100%);
+      padding: clamp(24px, 4vw, 42px);
+      border-radius: var(--radius-lg);
+      background: rgba(6, 26, 24, 0.82);
+      border: 1px solid var(--hairline-gold);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: var(--shadow-dark);
+      color: var(--cream);
+      text-align: center;
+      display: grid;
+      gap: 16px;
+    }
+    .welcome-title {
+      font-size: clamp(34px, 5vw, 56px);
+      color: var(--cream);
+      line-height: 1.04;
+    }
+    .welcome-title em { color: var(--gold-light); font-style: italic; font-weight: 500; }
+    .welcome-stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 18px;
+      font-size: 13px;
+      color: var(--gold-light);
+      padding-block: 10px;
+      border-block: 1px solid rgba(227, 195, 120, 0.22);
+    }
+
+    /* ========================================================================
+       VIEW 1: COASTAL MASTERPLAN + RICH POI CARDS
+       ======================================================================== */
+    .masterplan-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--obsidian);
+    }
+    .masterplan-img-wrap {
+      position: absolute;
+      inset: 0;
+      transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) scale(var(--ms, 1));
+      transition: transform 200ms ease-out;
+    }
+    .masterplan-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: filter 420ms ease;
+    }
+    #seaShimmerCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .mp-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(227, 195, 120, 0.72);
+      background: rgba(6, 26, 24, 0.84);
+      color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+      transition: transform 220ms var(--ease-spring), background 180ms ease, border-color 180ms ease;
+      white-space: nowrap;
+    }
+    .mp-pin:hover,
+    .mp-pin.is-poi-active { transform: translate(-50%, -50%) scale(1.06); background: var(--teal-deep); border-color: var(--gold-light); color: var(--gold-light); }
+    .mp-pin--hero {
+      background: var(--gold-light);
+      color: var(--obsidian);
+      border-color: #fffdf8;
+      font-weight: 700;
+      box-shadow: 0 0 0 8px rgba(227, 195, 120, 0.22), 0 14px 36px rgba(0, 0, 0, 0.55);
+      animation: heroBeacon 2.6s infinite ease-in-out;
+    }
+    @keyframes heroBeacon {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(227, 195, 120, 0.25), 0 14px 36px rgba(0, 0, 0, 0.55); }
+      50% { box-shadow: 0 0 0 16px rgba(227, 195, 120, 0.06), 0 14px 36px rgba(0, 0, 0, 0.55); }
+    }
+    @media (max-width: 640px) {
+      .mp-pin:not(.mp-pin--hero) { padding: 6px 10px; font-size: 11px; }
+    }
+
+    /* Interactive POI Card Overlay */
+    .poi-card-overlay {
+      position: absolute;
+      top: 76px;
+      inset-inline-start: 18px;
+      z-index: 26;
+      width: min(410px, calc(100% - 36px));
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(6, 26, 24, 0.9);
+      border: 1px solid var(--hairline-gold);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      color: var(--cream);
+      box-shadow: var(--shadow-dark);
+      display: none;
+      gap: 12px;
+      animation: poiPop 240ms var(--ease-luxury);
+    }
+    .poi-card-overlay.is-open { display: grid; }
+    @keyframes poiPop {
+      from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.98); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @media (max-width: 1039px) {
+      .poi-card-overlay {
+        top: 68px;
+        bottom: 126px;
+        inset-inline: 10px;
+        width: auto;
+        overflow-y: auto;
+        padding: 14px;
+      }
+    }
+    .poi-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .poi-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      border: 1px solid rgba(227, 195, 120, 0.35);
+      display: block;
+    }
+    .poi-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .poi-chip {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 253, 248, 0.08);
+      border: 1px solid rgba(227, 195, 120, 0.25);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold-light);
+    }
+
+    .os-bottom-dock {
+      position: absolute;
+      bottom: 18px;
+      inset-inline: 18px;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .os-bottom-dock > * { pointer-events: auto; }
+    @media (min-width: 1040px) {
+      .os-bottom-dock { inset-inline-end: 150px; }
+    }
+    @media (max-width: 1039px) {
+      .os-bottom-dock { bottom: 64px; inset-inline: 10px; }
+    }
+
+    .glass-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(6, 26, 24, 0.78);
+      border: 1px solid rgba(227, 195, 120, 0.3);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      color: var(--cream);
+      box-shadow: var(--shadow-dark);
+    }
+
+    /* ========================================================================
+       VIEW 2: INTERACTIVE FACADE FLOOR SELECTOR (1920x1080 Pixel-Locked)
+       ======================================================================== */
+    .facade-svg-stage {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #0d2324;
+    }
+    .facade-bay {
+      fill: transparent;
+      stroke: transparent;
+      stroke-width: 2.5;
+      cursor: pointer;
+      transition: fill 180ms ease, stroke 180ms ease;
+    }
+    .facade-bay:hover,
+    .facade-bay.is-floor-hover {
+      fill: rgba(227, 195, 120, 0.24);
+      stroke: rgba(227, 195, 120, 0.9);
+    }
+    .facade-bay.is-avail-mode[data-status="available"] {
+      fill: rgba(31, 143, 125, 0.34);
+      stroke: rgba(110, 231, 183, 0.85);
+    }
+    .facade-bay.is-avail-mode[data-status="reserved"] {
+      fill: rgba(227, 195, 120, 0.32);
+      stroke: rgba(243, 217, 153, 0.9);
+    }
+    .facade-bay.is-avail-mode[data-status="sold"] {
+      fill: rgba(20, 32, 31, 0.56);
+      stroke: rgba(148, 163, 184, 0.45);
+    }
+    .facade-bay.is-avail-mode:hover {
+      fill: rgba(227, 195, 120, 0.45);
+      stroke: #fffdf8;
+      stroke-width: 3.5;
+    }
+    .facade-bay-label {
+      pointer-events: none;
+      font-family: Manrope, sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      fill: #fffdf8;
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+    .facade-bay-label.is-visible { opacity: 1; }
+
+    .facade-tooltip {
+      position: absolute;
+      z-index: 30;
+      pointer-events: none;
+      display: none;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 253, 248, 0.95);
+      color: var(--ink);
+      border: 1px solid rgba(143, 114, 49, 0.4);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(12px);
+      min-width: 210px;
+      font-size: 12px;
+    }
+    .facade-tooltip.is-show { display: block; }
+
+    .facade-picker-card {
+      width: min(410px, 100%);
+      display: grid;
+      gap: 10px;
+    }
+    .floor-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .floor-pill-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(227, 195, 120, 0.3);
+      background: rgba(255, 253, 248, 0.08);
+      color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .floor-pill-btn.is-active {
+      background: var(--gold-light);
+      color: var(--obsidian);
+      border-color: var(--gold-light);
+    }
+
+    /* ========================================================================
+       VIEW 3: FULL-BLEED 3D CUTAWAY FLOOR PLAN (Pixel-Locked)
+       ======================================================================== */
+    .cutaway-view {
+      background: #ede5d2;
+      color: var(--ink);
+    }
+    .cutaway-fullbleed {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      transform-origin: center center;
+      will-change: transform;
+    }
+    .cutaway-fullbleed__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+    }
+    .cutaway-pins-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+    }
+    .cutaway-pin {
+      position: absolute;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+      min-height: 44px;
+      padding: 6px 13px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(143, 114, 49, 0.6);
+      background: rgba(255, 253, 248, 0.92);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 26px rgba(8, 40, 37, 0.18);
+      backdrop-filter: blur(10px);
+      transition: transform 200ms var(--ease-spring), background 180ms ease, color 180ms ease;
+      white-space: nowrap;
+      z-index: 6;
+    }
+    .cutaway-pin:hover,
+    .cutaway-pin.is-highlight {
+      background: var(--teal-deep);
+      color: var(--gold-light);
+      border-color: var(--gold-light);
+      transform: translate(-50%, -50%) scale(1.08);
+      z-index: 9;
+    }
+    @media (max-width: 640px) {
+      .cutaway-pin { font-size: 10px; padding: 4px 8px; min-height: 36px; }
+    }
+
+    /* Floating Collapsible Unit Card over Full-Bleed Cutaway */
+    .apt-spec-panel {
+      position: absolute;
+      top: 76px;
+      inset-inline-start: 18px;
+      z-index: 22;
+      width: min(365px, calc(100% - 36px));
+      max-height: calc(100dvh - 102px);
+      overflow-y: auto;
+      display: grid;
+      gap: 12px;
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 253, 248, 0.92);
+      border: 1px solid rgba(143, 114, 49, 0.34);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 22px 50px rgba(8, 40, 37, 0.16);
+      transition: transform 280ms var(--ease-luxury), opacity 220ms ease;
+    }
+    .apt-spec-panel.is-collapsed { display: none; }
+    .apt-panel-toggle {
+      position: absolute;
+      top: 76px;
+      inset-inline-start: 18px;
+      z-index: 21;
+      display: none;
+      background: rgba(255, 253, 248, 0.92);
+      color: var(--ink);
+      border-color: rgba(143, 114, 49, 0.45);
+      box-shadow: var(--shadow-soft);
+    }
+    .apt-panel-toggle.is-visible { display: inline-flex; }
+    @media (max-width: 1039px) {
+      .apt-spec-panel {
+        top: auto;
+        bottom: 66px;
+        inset-inline: 10px;
+        width: auto;
+        max-height: 54dvh;
+        padding: 14px 16px;
+      }
+      .apt-panel-toggle {
+        top: auto;
+        bottom: 66px;
+        inset-inline-start: 10px;
+      }
+    }
+
+    .apt-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding-block: 10px;
+      border-block: 1px solid var(--hairline);
+    }
+    .apt-metric b {
+      display: block;
+      font-family: var(--font-serif);
+      font-size: 25px;
+      font-weight: 600;
+      color: var(--teal-deep);
+      line-height: 1.05;
+    }
+    .apt-metric span { font-size: 11px; color: var(--ink-muted); }
+
+    .apt-room-list { display: grid; gap: 3px; }
+    .apt-room-row {
+      width: 100%;
+      min-height: 44px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: start;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+    .apt-room-row:hover,
+    .apt-room-row.is-highlight {
+      background: var(--sand);
+      border-color: var(--gold-fill);
+    }
+
+    /* ========================================================================
+       VIEW 4 & POI 4K EXPLORER: FULL-SCREEN 360° VR TOUR
+       ======================================================================== */
+    #view-vr::after,
+    #view-poi-vr::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: 220px;
+      background: linear-gradient(to top, rgba(6, 26, 24, 0.88) 0%, rgba(6, 26, 24, 0.46) 55%, transparent 100%);
+      pointer-events: none;
+      z-index: 15;
+    }
+    #view-vr .os-pill:not([aria-pressed="true"]),
+    #view-poi-vr .os-pill:not([aria-pressed="true"]) {
+      background: rgba(6, 26, 24, 0.78);
+      color: var(--cream);
+    }
+    #vrCanvas, #poiCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+    #vrCanvas:active, #poiCanvas:active { cursor: grabbing; }
+    .vr-hotspots { position: absolute; inset: 0; pointer-events: none; z-index: 12; }
+    .vr-hs {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      min-height: 44px;
+      padding: 6px 13px 6px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(227, 195, 120, 0.72);
+      background: rgba(6, 26, 24, 0.84);
+      color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+    .vr-hs:hover { background: var(--gold-light); color: var(--obsidian); border-color: #fff; }
+    .vr-hs__orb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold-light);
+      color: var(--obsidian);
+      font-weight: 700;
+    }
+    .vr-beacon {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(6, 26, 24, 0.76);
+      border: 1px solid rgba(227, 195, 120, 0.55);
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+    .minimap-card {
+      position: absolute;
+      top: 74px;
+      inset-inline-start: 16px;
+      z-index: 22;
+      width: 164px;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: rgba(6, 26, 24, 0.8);
+      border: 1px solid rgba(227, 195, 120, 0.34);
+      backdrop-filter: blur(14px);
+      color: var(--cream);
+    }
+    @media (max-width: 640px) {
+      .minimap-card { width: 132px; top: 66px; inset-inline-start: 8px; padding: 7px; }
+    }
+    .vr-cinema-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 14;
+      background: #061a18;
+      display: none;
+    }
+    .vr-cinema-layer.is-active { display: block; }
+    .vr-cinema-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .vr-cinema-badge {
+      position: absolute;
+      top: 74px;
+      inset-inline-end: 16px;
+      padding: 7px 13px;
+      border-radius: var(--radius-pill);
+      background: rgba(6, 26, 24, 0.82);
+      border: 1px solid var(--gold-light);
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+    @media (min-width: 1040px) {
+      .vr-cinema-badge { inset-inline-end: 154px; }
+    }
+    .vr-ref-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 16;
+      display: none;
+      place-items: center;
+      padding: 76px 16px 110px;
+      background: rgba(4, 17, 16, 0.94);
+    }
+    .vr-ref-overlay.is-active { display: grid; }
+    .vr-ref-box {
+      position: relative;
+      width: min(100%, 960px);
+      aspect-ratio: 2 / 1;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gold-light);
+      overflow: hidden;
+    }
+    .vr-ref-box img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Guided Presentation Caption Pill */
+    .tour-caption-pill {
+      position: fixed;
+      bottom: 92px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 88;
+      display: none;
+      width: min(520px, calc(100% - 24px));
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(6, 26, 24, 0.88);
+      border: 1px solid var(--gold-light);
+      backdrop-filter: blur(16px);
+      color: var(--cream);
+      text-align: center;
+      box-shadow: var(--shadow-dark);
+    }
+    .tour-caption-pill.is-show { display: block; }
+    @media (max-width: 1039px) {
+      .tour-caption-pill { bottom: 132px; }
+    }
+
+    /* Modal & Toast */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 140;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(6, 26, 24, 0.78);
+      backdrop-filter: blur(8px);
+    }
+    .modal.is-open { display: grid; }
+    .modal__box {
+      width: min(520px, 100%);
+      background: var(--cream);
+      color: var(--ink);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--hairline-gold);
+      padding: 22px;
+      box-shadow: var(--shadow-dark);
+    }
+    .field-stack { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field-stack label { font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+    .field-input {
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--hairline-strong);
+      font-family: var(--font-sans);
+      font-size: 14px;
+    }
+    .ae-toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translate(-50%, -12px);
+      z-index: 200;
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      background: var(--teal-deep);
+      color: var(--gold-light);
+      border: 1px solid var(--gold-light);
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+    .ae-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* Scoped Estate Art AI Chat Widget (bottom-left so it never overlaps #depthRail) */
+    .chat { position: fixed; left: 16px; right: auto; bottom: 18px; z-index: 96; font-family: var(--font-sans); }
+    .chat__fab {
+      position: relative; width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(227,195,120,.45);
+      cursor: pointer; display: grid; place-items: center; color: var(--cream); background: var(--teal);
+      box-shadow: 0 14px 30px -8px rgba(0,0,0,.55);
+      transition: transform 200ms ease, background 180ms ease;
+    }
+    .chat__fab:hover { background: var(--teal-deep); transform: translateY(-2px); }
+    .chat.is-open .chat__fab { background: var(--gold-fill); }
+    .chat__badge {
+      position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px;
+      border-radius: 10px; background: #c0392b; color: #fff; font-size: 11px; font-weight: 700;
+      display: grid; place-items: center;
+    }
+    .chat__panel {
+      position: absolute; left: 0; right: auto; bottom: 64px; width: min(370px, calc(100vw - 32px));
+      display: flex; flex-direction: column; max-height: min(540px, calc(100dvh - 140px));
+      background: var(--sand); color: var(--ink); border: 1px solid var(--hairline);
+      border-radius: 16px; box-shadow: 0 30px 70px -28px rgba(0,0,0,.7); overflow: hidden;
+    }
+    .chat__panel[hidden] { display: none; }
+    .chat__head {
+      display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+      padding: .95rem 1.05rem; background: var(--teal-deep); color: var(--cream);
+    }
+    .chat__who { display: flex; flex-direction: column; line-height: 1.3; }
+    .chat__who b { font-family: var(--font-serif); font-size: 1.15rem; letter-spacing: .04em; }
+    .chat__who span { font-size: 11px; color: rgba(255,253,248,.68); }
+    .chat__head-actions { display: flex; align-items: center; gap: .45rem; }
+    .chat__mgr {
+      min-height: 32px; padding: .2rem .65rem; border-radius: 100px;
+      border: 1px solid rgba(227,195,120,.55); background: rgba(227,195,120,.14);
+      color: var(--gold-light); font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .chat__mgr:hover { background: var(--gold-fill); color: #fff; border-color: var(--gold-fill); }
+    .chat__close {
+      flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
+      background: rgba(255,255,255,.12); color: var(--cream); display: grid; place-items: center;
+    }
+    .chat__ctx {
+      display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+      padding: .5rem 1rem; background: var(--cream); border-bottom: 1px solid var(--hairline);
+      font-size: 11px; color: var(--ink-soft);
+    }
+    .chat__ctx[hidden] { display: none; }
+    .chat__ctx b { color: var(--teal); }
+    .chat__ctx-clear { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--sand-deep); color: var(--ink); cursor: pointer; font-weight: 700; }
+    .chat__log { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .65rem; }
+    .chat__empty { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0; }
+    .chat__msg { max-width: 86%; display: flex; flex-direction: column; gap: .2rem; }
+    .chat__msg p { margin: 0; padding: .65rem .9rem; border-radius: 10px; font-size: 13.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .chat__msg time { font-size: 11px; color: var(--ink-soft); }
+    .chat__msg--user { align-self: flex-end; align-items: flex-end; }
+    .chat__msg--user p { background: var(--teal); color: var(--cream); }
+    .chat__msg--agent { align-self: flex-start; }
+    .chat__msg--agent p { background: var(--cream); color: var(--ink); border: 1px solid var(--hairline); }
+    .chat__form { border-top: 1px solid var(--hairline); padding: .8rem 1rem; background: var(--cream); }
+    .chat__intro { display: flex; flex-direction: column; gap: .5rem; margin-bottom: .7rem; }
+    .chat__intro[hidden] { display: none; }
+    .chat__intro label { display: flex; flex-direction: column; gap: .2rem; }
+    .chat__intro label > span { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
+    .chat__intro input[type=text] { font: inherit; font-size: 14px; color: var(--ink); background: var(--sand); border: 1px solid rgba(15,63,58,.2); border-radius: 8px; padding: .5rem .75rem; }
+    .chat__consent { flex-direction: row !important; align-items: flex-start; gap: .5rem; font-size: 11px; line-height: 1.4; color: var(--ink-soft); cursor: pointer; }
+    .chat__consent a { color: var(--gold-ink); text-decoration: underline; }
+    .chat__row { display: flex; align-items: flex-end; gap: .5rem; }
+    .chat__input { flex: 1; font: inherit; font-size: 14px; color: var(--ink); background: var(--sand); border: 1px solid rgba(15,63,58,.2); border-radius: 8px; padding: .55rem .8rem; resize: none; max-height: 110px; }
+    .chat__send, .chat__mic { flex: none; width: 42px; height: 42px; border-radius: 8px; cursor: pointer; display: grid; place-items: center; }
+    .chat__send { border: 0; background: var(--gold-fill); color: #fff; }
+    .chat__mic { border: 1px solid rgba(15,63,58,.2); background: var(--sand); color: var(--teal); }
+    .chat__mic[hidden] { display: none; }
+    .chat__hint { margin: .4rem 0 0; font-size: 11px; color: var(--ink-soft); min-height: 1em; }
+    .chat__hint--err { color: #c0392b; }
+    @media (max-width: 1039px) { .chat { bottom: 76px; } }
+    @media (max-width: 560px) {
+      .chat__panel { position: fixed; inset: auto 0 0 0; width: 100%; max-height: 82dvh; border-radius: 16px 16px 0 0; bottom: 0; }
+    }
+  </style>
+</head>
+<body data-chat-endpoint="https://estate-art-chat.ivan-art-astra-888.workers.dev" data-root="../../">
+  <div id="osApp" class="os-app">
+    <!-- Floating Glass Sales OS Header (Inverted Scroll Built-In Permanently) -->
+    <header id="osTopBar" class="os-topbar">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <a class="os-brand" href="../../" title="На главную Estate Art">
+          <span class="os-brand__mark">EA</span>
+          <span class="os-brand__name">The Aurelia Bay</span>
+        </a>
+        <a class="os-pill os-desktop-only" href="../../#catalog" style="padding:0 12px;font-size:11px;">← Каталог</a>
+        <a class="os-pill os-desktop-only" href="../../cabinet/" style="padding:0 12px;font-size:11px;">Кабинет</a>
+      </div>
+
+      <nav class="os-views" role="tablist" aria-label="Режимы Sales OS">
+        <button class="os-view-btn" type="button" role="tab" data-view="street" aria-selected="true">Улица</button>
+        <button class="os-view-btn" type="button" role="tab" data-view="facade" aria-selected="false">Дом</button>
+        <button class="os-view-btn" type="button" role="tab" data-view="unit" aria-selected="false">Квартира</button>
+        <button class="os-view-btn" type="button" role="tab" data-view="vr" aria-selected="false">360° VR · 4K</button>
+      </nav>
+
+      <div class="os-actions">
+        <button id="availToggleBtn" class="os-pill" type="button" aria-pressed="false" title="Подсветить статус квартир на фасаде">Доступность</button>
+        <button id="guidedTourTopBtn" class="os-pill os-desktop-only" type="button" aria-pressed="false">Экскурсия ▶</button>
+        <button id="audioToggleBtn" class="os-pill" type="button" aria-pressed="false" aria-label="Фоновый звук">🔇</button>
+        <button id="currCycleBtn" class="os-pill tabular" type="button" aria-label="Сменить валюту">USD $</button>
+        <button id="openContactTopBtn" class="btn btn--thai btn--sm os-desktop-only" type="button">Связаться</button>
+      </div>
+    </header>
+
+    <!-- Mobile Bottom Switcher -->
+    <nav class="os-mobile-bar" role="tablist" aria-label="Режимы Sales OS (мобильный)">
+      <button class="os-view-btn" type="button" data-view="street" aria-selected="true">Улица</button>
+      <button class="os-view-btn" type="button" data-view="facade" aria-selected="false">Дом</button>
+      <button class="os-view-btn" type="button" data-view="unit" aria-selected="false">Квартира</button>
+      <button class="os-view-btn" type="button" data-view="vr" aria-selected="false">360° VR</button>
+    </nav>
+
+    <!-- Draggable Right-Edge 8-Stop Inverted Scroll Rail -->
+    <aside id="depthRail" class="depth-rail" aria-label="8-шаговая шкала инверсионного скролла">
+      <div class="depth-rail__track">
+        <div class="depth-rail__bar"><div id="depthRailFill" class="depth-rail__fill"></div></div>
+        <button class="depth-step is-active" type="button" data-depth-stop="0">01 Бухта</button>
+        <button class="depth-step" type="button" data-depth-stop="1">02 Фасад</button>
+        <button class="depth-step" type="button" data-depth-stop="2">03 Разрез</button>
+        <button class="depth-step" type="button" data-depth-stop="3">04 Гостиная</button>
+        <button class="depth-step" type="button" data-depth-stop="4">05 Терраса</button>
+        <button class="depth-step" type="button" data-depth-stop="5">06 Спальня</button>
+        <button class="depth-step" type="button" data-depth-stop="6">07 Ванная</button>
+        <button class="depth-step" type="button" data-depth-stop="7">08 Бассейн</button>
+      </div>
+      <div class="depth-rail__hint">Скролл ↕ · <span id="depthPctEl">0%</span></div>
+    </aside>
+
+    <!-- 60fps Canvas .fseq AI Camera Flight Renderer -->
+    <canvas id="flightCanvas" class="cinema-flight-canvas" aria-hidden="true"></canvas>
+
+    <!-- Flight HUD Bar -->
+    <div id="flightHudBar" class="flight-hud-bar" aria-live="polite">
+      <span id="flightHudLabel">Подлёт камеры…</span>
+      <button id="skipFlightBtn" class="os-pill" type="button" style="min-height:32px;padding:0 10px;font-size:11px;">Пропустить ⏭</button>
+    </div>
+
+    <!-- VIEW 1: LIVING COASTAL MASTERPLAN + NEARBY POI CARDS -->
+    <section id="view-street" class="stage-view is-active" aria-label="Мастер-план бухты">
+      <div id="masterplanStage" class="masterplan-stage">
+        <div id="masterplanParallax" class="masterplan-img-wrap">
+          <img id="masterplanImg" src="../../assets/tour/aurelia/masterplan-16x9.webp" alt="Мастер-план The Aurelia Bay над бухтой Bang Tao и Layan" />
+          <video id="masterplanVideo" class="living-video-bg" src="../../assets/tour/aurelia/video/loop-masterplan.mp4" autoplay loop muted playsinline poster="../../assets/tour/aurelia/masterplan-16x9.webp"></video>
+          <canvas id="seaShimmerCanvas" aria-hidden="true"></canvas>
+        </div>
+
+        <div id="streetPinsLayer" class="inv-motion" style="position:absolute;inset:0;pointer-events:none;z-index:6;">
+          <button class="mp-pin mp-pin--hero" type="button" id="mpHeroPin" style="left:50%;top:53%;pointer-events:auto;">
+            <span>✦ The Aurelia Bay · 11 свободных юнитов</span>
+          </button>
+          <button class="mp-pin" type="button" id="mpPin-bangtao" data-poi="bangtao" style="left:74%;top:34%;pointer-events:auto;">
+            <span>Пляж Bang Tao · 4 мин</span>
+          </button>
+          <button class="mp-pin" type="button" id="mpPin-layan" data-poi="layan" style="left:24%;top:18%;pointer-events:auto;">
+            <span>Мыс Layan · 3 мин</span>
+          </button>
+          <button class="mp-pin" type="button" id="mpPin-boatave" data-poi="boatave" style="left:86%;top:24%;pointer-events:auto;">
+            <span>Boat Ave · 7 мин</span>
+          </button>
+        </div>
+
+        <!-- Rich Nearby POI Card Overlay -->
+        <aside id="poiCardOverlay" class="poi-card-overlay inv-motion" aria-label="Карточка локации">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span class="badge badge--gold tabular" id="poiBadge">4 мин пешком · 350 м</span>
+            <button id="closePoiCardBtn" class="iconbtn" type="button" aria-label="Закрыть карточку локации" style="background:rgba(255,253,248,0.1);color:var(--cream);border-color:rgba(227,195,120,0.4);">✕</button>
+          </div>
+          <div>
+            <h3 id="poiTitle" class="h-serif" style="font-size:28px;color:var(--cream);margin:0;line-height:1.08;">Пляж Bang Tao</h3>
+            <p id="poiSub" style="margin:4px 0 0;font-size:12px;color:var(--ink-on-dark-soft);"></p>
+          </div>
+          <div class="poi-gallery">
+            <img id="poiImg1" class="poi-thumb" src="../../assets/tour/aurelia/poi/bangtao-1.webp" alt="Превью локации 1" />
+            <img id="poiImg2" class="poi-thumb" src="../../assets/tour/aurelia/poi/bangtao-2.webp" alt="Превью локации 2" />
+          </div>
+          <div class="poi-metrics" id="poiMetrics"></div>
+          <button id="flyToPoiBtn" class="btn btn--arab" type="button" style="width:100%;">
+            <span>✈ Подлететь и прогуляться 360°</span>
+            <span class="btn__arrow">→</span>
+          </button>
+        </aside>
+
+        <div id="streetDock" class="os-bottom-dock inv-motion">
+          <div class="glass-card" style="max-width:445px;">
+            <span class="eyebrow" style="color:var(--gold-light);">Living Masterplan · Инверсионный скролл ↕</span>
+            <p id="mpCaption" style="margin:6px 0 0;font-size:13px;color:var(--ink-on-dark-soft);">
+              Скролльте вверх/вниз для плавного подлёта сквозь весь объект (от бухты до комнат) или нажмите на пляж и локации рядом — откроются карточки с AI-пролётом 360°.
+            </p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <div class="glass-card" style="padding:6px;display:flex;gap:4px;">
+              <button class="os-pill" type="button" data-tod="morning" aria-pressed="false">Утро</button>
+              <button class="os-pill" type="button" data-tod="sunset" aria-pressed="true">Закат</button>
+              <button class="os-pill" type="button" data-tod="night" aria-pressed="false">Ночь</button>
+            </div>
+            <button id="flyToFacadeBtn" class="btn btn--arab" type="button">
+              <span>Подлететь к фасаду</span>
+              <span class="btn__arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FULL-SCREEN FACADE FLOOR SELECTOR (1920x1080 Pixel-Locked) -->
+    <section id="view-facade" class="stage-view" aria-label="Выбор квартиры на фасаде дома">
+      <svg id="facadeSvg" class="facade-svg-stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Интерактивный фасад The Aurelia Bay">
+        <defs>
+          <filter id="facadeLightFilter">
+            <feColorMatrix id="facadeColorMat" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+          </filter>
+          <radialGradient id="nightWinGlow" cx="50%" cy="50%" r="55%">
+            <stop offset="0%" stop-color="rgba(255, 214, 130, 0.72)"/>
+            <stop offset="100%" stop-color="rgba(255, 190, 90, 0)"/>
+          </radialGradient>
+        </defs>
+        <image id="facadeBgImg" href="../../assets/tour/aurelia/facade-front-16x9.webp" width="1920" height="1080" filter="url(#facadeLightFilter)" />
+        <g id="facadeNightLayer" opacity="0" style="transition:opacity 320ms ease;pointer-events:none;"></g>
+        <g id="facadeInteractiveLayer"></g>
+      </svg>
+
+      <div id="facadeTooltip" class="facade-tooltip"></div>
+
+      <div id="facadeDock" class="os-bottom-dock inv-motion">
+        <div class="glass-card facade-picker-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <h2 class="h-serif" style="font-size:26px;color:var(--cream);margin:0;">Выберите квартиру</h2>
+            <span class="badge badge--dark tabular" id="facadeHoverFloorTag">Этаж 5</span>
+          </div>
+          <p style="margin:0;font-size:12px;color:var(--ink-on-dark-soft);">Кликните по секции или скролльте вперёд — фасад плавно раскроется в 3D-разрез планировки.</p>
+          <div class="floor-pills-row" id="facadeFloorPills"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;" id="facadeFloorUnits"></div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button id="replayFlyStreetBtn" class="os-pill" type="button">◀ Отлететь к бухте</button>
+          <div class="glass-card" style="padding:6px;display:flex;gap:4px;">
+            <button class="os-pill" type="button" data-tod="morning" aria-pressed="false">Утро</button>
+            <button class="os-pill" type="button" data-tod="sunset" aria-pressed="true">Закат</button>
+            <button class="os-pill" type="button" data-tod="night" aria-pressed="false">Ночь</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: FULL-BLEED 3D CUTAWAY FLOOR PLAN -->
+    <section id="view-unit" class="stage-view cutaway-view" aria-label="3D-разрез и параметры квартиры">
+      <div id="cutawayCanvasWrap" class="cutaway-fullbleed">
+        <img id="cutawayFullImg" class="cutaway-fullbleed__img" src="../../assets/tour/aurelia/cutaway-3d-plan-16x9.webp" alt="Полноэкранный 3D-разрез планировки квартиры в The Aurelia Bay" />
+        <div id="cutawayPinsLayer" class="cutaway-pins-layer">
+          <button class="cutaway-pin" type="button" data-pin-room="bedroom" data-stop="5" data-norm-x="0.245" data-norm-y="0.44">
+            <span>Мастер-спальня 360° · 34 м²</span>
+          </button>
+          <button class="cutaway-pin" type="button" data-pin-room="bath" data-stop="6" data-norm-x="0.39" data-norm-y="0.27">
+            <span>Спа-ванная 360° · 20 м²</span>
+          </button>
+          <button class="cutaway-pin" type="button" data-pin-room="living" data-stop="3" data-norm-x="0.535" data-norm-y="0.49">
+            <span>Влететь в гостиную 4K →</span>
+          </button>
+          <button class="cutaway-pin" type="button" data-pin-room="terrace" data-stop="4" data-norm-x="0.485" data-norm-y="0.76">
+            <span>Терраса 360° →</span>
+          </button>
+          <button class="cutaway-pin" type="button" data-pin-room="guest" data-stop="7" data-norm-x="0.72" data-norm-y="0.64">
+            <span>Sky-бассейн крыши →</span>
+          </button>
+        </div>
+      </div>
+
+      <button id="openUnitPanelBtn" class="os-pill apt-panel-toggle" type="button">☰ Параметры юнита</button>
+
+      <aside id="aptSpecPanel" class="apt-spec-panel inv-motion" aria-label="Карточка квартиры">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <span class="eyebrow" id="unitEyebrow">5 этаж · Крыло Andaman</span>
+          <div style="display:flex;gap:4px;">
+            <button id="prevUnitBtn" class="iconbtn" type="button" aria-label="Предыдущая квартира">←</button>
+            <button id="nextUnitBtn" class="iconbtn" type="button" aria-label="Следующая квартира">→</button>
+            <button id="collapseUnitPanelBtn" class="iconbtn" type="button" aria-label="Свернуть панель параметров" title="Скрыть панель">✕</button>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;">
+          <h2 class="h-serif" style="font-size:34px;margin:0;" id="unitHeading">Резиденция A-501</h2>
+          <span class="badge badge--ok" id="unitStatusBadge">Свободна</span>
+        </div>
+
+        <p style="margin:0;font-size:12px;color:var(--ink-soft);" id="unitLead">
+          Просторные апартаменты с угловым остеклением и прямой террасой на закат над заливом Bang Tao.
+        </p>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+          <strong class="h-serif tabular" style="font-size:28px;color:var(--teal-deep);" id="unitPriceEl">$715,000</strong>
+          <span class="tabular" style="font-size:11px;color:var(--ink-muted);" id="unitSqmPriceEl">$4,831 / м² · ROI 8.4%</span>
+        </div>
+
+        <div class="apt-metrics tabular">
+          <div class="apt-metric"><b id="mArea">148 м²</b><span>общая площадь</span></div>
+          <div class="apt-metric"><b id="mBeds">2</b><span>спальни</span></div>
+          <div class="apt-metric"><b>3,6 м</b><span>высота потолков</span></div>
+          <div class="apt-metric"><b id="mTerrace">36 м²</b><span>терраса у моря</span></div>
+        </div>
+
+        <div class="apt-room-list" id="aptRoomList">
+          <button class="apt-room-row" type="button" data-room-focus="living" data-stop="3">
+            <span>Гостиная-кухня с островом</span><strong class="tabular">58 м² →</strong>
+          </button>
+          <button class="apt-room-row" type="button" data-room-focus="terrace" data-stop="4">
+            <span>Приватная терраса (2 шезлонга)</span><strong class="tabular" id="rTerraceArea">36 м² →</strong>
+          </button>
+          <button class="apt-room-row" type="button" data-room-focus="bedroom" data-stop="5">
+            <span>Мастер-спальня (решётка в ванную)</span><strong class="tabular">34 м² →</strong>
+          </button>
+          <button class="apt-room-row" type="button" data-room-focus="bath" data-stop="6">
+            <span>Спа-ванная с пальмой в душе</span><strong class="tabular">20 м² →</strong>
+          </button>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button id="goVrBtn" class="btn btn--thai" type="button" style="flex:1 1 150px;">
+            <span>Войти в 360° VR</span>
+            <span class="btn__arrow">→</span>
+          </button>
+          <button id="bookUnitBtn" class="btn btn--us" type="button" style="flex:1 1 100px;">Бронь</button>
+          <button id="askAiUnitBtn" class="btn btn--us" type="button" style="flex:1 1 120px;">Спросить ИИ</button>
+        </div>
+        <button id="replayFlyCutawayBtn" class="btn btn--us" type="button" style="width:100%;">◀ Отлететь к фасаду</button>
+      </aside>
+    </section>
+
+    <!-- VIEW 4: FULL-SCREEN 4K 360° WEBGL VR TOUR (5 Cutaway-Matched Rooms) -->
+    <section id="view-vr" class="stage-view" aria-label="360 WebGL VR-тур по комнатам">
+      <canvas id="vrCanvas" tabindex="0" aria-label="Сферическая 4K панорама 360 градусов"></canvas>
+      <div id="vrHotspots" class="vr-hotspots"></div>
+
+      <div class="minimap-card">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gold-light);margin-bottom:4px;">
+          <span>ПЛАН · 4K 360°</span>
+          <span class="tabular" id="vrCompassText">270°</span>
+        </div>
+        <svg id="vrMiniSvg" viewBox="0 0 140 82" style="width:100%;height:auto;display:block;"></svg>
+      </div>
+
+      <!-- AI Cinema Living Mode -->
+      <div id="vrCinemaLayer" class="vr-cinema-layer" aria-hidden="true">
+        <video id="vrCinemaVideo" src="../../assets/tour/aurelia/video/loop-living-cinema.mp4" loop muted playsinline poster="../../assets/tour/aurelia/cinema-living.png"></video>
+        <span class="vr-cinema-badge">AI Cinema · Согласованная 4K сцена</span>
+      </div>
+
+      <!-- 2D Reference Overlay -->
+      <div id="vrRefOverlay" class="vr-ref-overlay" aria-hidden="true">
+        <div class="vr-ref-box">
+          <img id="vrRefImg" src="../../assets/tour/aurelia/pano-living-4k.webp" alt="Исходная бесшовная 4K 2:1 панорама" />
+          <div style="position:absolute;inset:0;background-image:linear-gradient(to right,rgba(227,195,120,0.22) 1px,transparent 1px),linear-gradient(to bottom,rgba(227,195,120,0.22) 1px,transparent 1px);background-size:12.5% 25%;"></div>
+          <span style="position:absolute;bottom:10px;inset-inline-end:10px;padding:6px 12px;border-radius:999px;background:rgba(6,26,24,0.9);border:1px solid var(--gold-light);color:var(--gold-light);font-size:11px;font-weight:600;">
+            Нативный 4K 2:1 Equirectangular (4096×2048) по 3D-разрезу
+          </span>
+        </div>
+      </div>
+
+      <div id="vrDock" class="os-bottom-dock inv-motion">
+        <div style="max-width:460px;">
+          <span class="eyebrow" style="color:var(--gold-light);" id="vrUnitLabel">Резиденция A-501 · 360° VR · 4K</span>
+          <h2 class="h-serif" style="font-size:clamp(28px,3.8vw,44px);color:var(--cream);margin:2px 0 4px;" id="vrRoomName">Гостиная и кухня</h2>
+          <p style="margin:0;font-size:13px;color:var(--ink-on-dark-soft);" id="vrRoomSub">58 м² • Диван-уголок, ТВ-стена, остров на 3 стула и выход на террасу</p>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+          <button id="vrPrevRoomBtn" class="iconbtn" type="button" style="background:rgba(6,26,24,0.82);color:var(--cream);border-color:var(--hairline-gold);" aria-label="Предыдущий шаг">←</button>
+          <button id="vrNextRoomBtn" class="iconbtn" type="button" style="background:rgba(6,26,24,0.82);color:var(--cream);border-color:var(--hairline-gold);" aria-label="Следующий шаг">→</button>
+          <button id="vrZoomOutBtn" class="iconbtn" type="button" style="background:rgba(6,26,24,0.82);color:var(--cream);border-color:var(--hairline-gold);" aria-label="Отдалить обзор">−</button>
+          <button id="vrZoomInBtn" class="iconbtn" type="button" style="background:rgba(6,26,24,0.82);color:var(--cream);border-color:var(--hairline-gold);" aria-label="Приблизить обзор">+</button>
+          <button id="vrCinemaToggleBtn" class="os-pill" type="button" aria-pressed="false">Живое видео (AI)</button>
+          <button id="vrStereoToggleBtn" class="os-pill" type="button" aria-pressed="false">VR Стерео</button>
+          <button id="vrRefToggleBtn" class="os-pill" type="button" aria-pressed="false">2D Референс</button>
+          <button id="vrBackPlanBtn" class="os-pill" type="button">← Вылететь в разрез</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5 (ON-DEMAND): FULL-SCREEN 4K 360° NEARBY POI & BEACH EXPLORER -->
+    <section id="view-poi-vr" class="stage-view" aria-label="4K 360° прогулка по локации рядом">
+      <canvas id="poiCanvas" tabindex="0" aria-label="Сферическая 4K панорама локации Пхукета"></canvas>
+      <div id="poiBeacons" class="vr-hotspots"></div>
+
+      <div id="poiDock" class="os-bottom-dock">
+        <div style="max-width:480px;">
+          <span class="eyebrow" style="color:var(--gold-light);" id="poiVrEyebrow">Локация рядом · 4K 360°</span>
+          <h2 class="h-serif" style="font-size:clamp(28px,3.8vw,44px);color:var(--cream);margin:2px 0 4px;" id="poiVrTitle">Пляж Bang Tao</h2>
+          <p style="margin:0;font-size:13px;color:var(--ink-on-dark-soft);" id="poiVrSub">4 мин пешком по тенистой пальмовой тропе от The Aurelia Bay.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+          <button class="os-pill" type="button" data-poi-switch="bangtao">Bang Tao</button>
+          <button class="os-pill" type="button" data-poi-switch="layan">Мыс Layan</button>
+          <button class="os-pill" type="button" data-poi-switch="boatave">Boat Ave</button>
+          <button id="poiBackBtn" class="btn btn--arab btn--sm" type="button">← Вернуться к The Aurelia Bay</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Photorealistic Auto-Presentation Caption Pill -->
+    <div id="tourCaptionPill" class="tour-caption-pill">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
+        <span class="eyebrow" style="color:var(--gold-light);" id="tourStepTag">Презентация · 1 / 6</span>
+        <strong class="tabular" style="font-size:12px;color:var(--gold-light);" id="tourStepArea">Bang Tao</strong>
+      </div>
+      <h3 class="h-serif" style="font-size:25px;color:var(--cream);margin:0;" id="tourStepTitle">Побережье Bang Tao & Layan</h3>
+      <p style="margin:4px 0 0;font-size:13px;color:var(--ink-on-dark-soft);" id="tourStepBenefit">Непрерывный инверсионный полёт от бухты сквозь весь пентхаус в 4K.</p>
+    </div>
+
+    <!-- CLIENT START SCREEN -->
+    <div id="welcomeOverlay" class="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="welcomeHeading">
+      <div class="welcome-bg" aria-hidden="true">
+        <video id="welcomeVideo" class="living-video-bg" src="../../assets/tour/aurelia/video/loop-masterplan.mp4" autoplay loop muted playsinline poster="../../assets/tour/aurelia/masterplan-16x9.webp"></video>
+      </div>
+      <div class="welcome-scrim" aria-hidden="true"></div>
+      <div class="welcome-card">
+        <span class="eyebrow" style="color:var(--gold-light);justify-content:center;">Estate Art · Preconstruction Sales OS</span>
+        <h1 id="welcomeHeading" class="h-serif welcome-title">The <em>Aurelia Bay</em> Residences</h1>
+        <p style="margin:0;font-size:14px;color:var(--ink-on-dark-soft);">
+          Пхукет, бухта Bang Tao &amp; Layan. Непрерывный инверсионный скролл ведёт вас от побережья и живого пляжа 360° через фасад и 3D-разрез по всем 5 согласованным комнатам в нативном 4K.
+        </p>
+        <div class="welcome-stats tabular">
+          <span>6 этажей</span>
+          <span>·</span>
+          <span>8 шагов скролла ↕</span>
+          <span>·</span>
+          <span>Пляж &amp; Локации 360°</span>
+          <span>·</span>
+          <span>4K по 3D-разрезу</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;">
+          <button id="startTourWelcomeBtn" class="btn btn--arab" type="button">
+            <span>Начать презентацию</span>
+            <span class="btn__arrow">→</span>
+          </button>
+          <button id="startVrWelcomeBtn" class="btn btn--thai" type="button">
+            <span>Сразу в 360° VR (4K)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT / RESERVE MODAL -->
+    <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+      <div class="modal__box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <span class="eyebrow">Estate Art · Пхукет</span>
+            <h3 id="contactModalTitle" class="h-serif" style="font-size:28px;margin-top:4px;">Забронировать юнит A-501</h3>
+          </div>
+          <button id="closeContactBtn" class="iconbtn" type="button" aria-label="Закрыть окно">✕</button>
+        </div>
+        <p id="contactSummary" style="margin:0 0 12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--sand);font-size:13px;" class="tabular"></p>
+        <form id="contactForm" novalidate>
+          <div class="field-stack">
+            <label for="cName">Ваше имя *</label>
+            <input id="cName" class="field-input" type="text" placeholder="Например, Иван" required />
+          </div>
+          <div class="field-stack">
+            <label for="cPhone">Телефон или Telegram *</label>
+            <input id="cPhone" class="field-input" type="text" placeholder="+66 ... или @username" required />
+          </div>
+          <p id="cErr" style="display:none;margin:0 0 10px;font-size:12px;color:var(--rose-fill);"></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn--thai" type="submit" style="flex:1 1 160px;">Отправить заявку</button>
+            <button id="cancelContactBtn" class="btn btn--us" type="button">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast" class="ae-toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const DEG = Math.PI / 180;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const CURR = {
+        USD: { sym: '$', rate: 1, pre: true },
+        RUB: { sym: '₽', rate: 96, pre: false },
+        THB: { sym: '฿', rate: 34.5, pre: true },
+        VND: { sym: '₫', rate: 25400, pre: false },
+        AED: { sym: 'AED ', rate: 3.67, pre: true }
+      };
+
+      const STATUS_INFO = {
+        available: { label: 'Свободна', cls: 'badge--ok' },
+        reserved: { label: 'Бронь', cls: 'badge--gold' },
+        sold: { label: 'Продана', cls: 'badge--dark' }
+      };
+
+      const FLOOR_BOUNDS = {
+        6: { y: 146, h: 115 },
+        5: { y: 270, h: 127 },
+        4: { y: 405, h: 141 },
+        3: { y: 557, h: 132 },
+        2: { y: 698, h: 135 },
+        1: { y: 844, h: 129 }
+      };
+      const BAY_BOUNDS = {
+        left: { x: 378, w: 385 },
+        mid: { x: 766, w: 388 },
+        right: { x: 1157, w: 385 }
+      };
+
+      const UNITS = [
+        { id: 'A-601', floor: 6, bay: 'left', wing: 'Andaman', beds: 3, area: 260, terrace: 68, status: 'available', priceUSD: 1420000, roi: 9.1, desc: 'Пентхаус с прямым доступом к Sky-бассейну и потолками 4.2 м.' },
+        { id: 'A-602', floor: 6, bay: 'mid', wing: 'Andaman', beds: 2, area: 162, terrace: 40, status: 'reserved', priceUSD: 825000, roi: 8.6, desc: 'Верхний видовой сьют на уровне кровельного инфинити-бассейна.' },
+        { id: 'B-603', floor: 6, bay: 'right', wing: 'Lagoon', beds: 2, area: 144, terrace: 34, status: 'available', priceUSD: 695000, roi: 8.5, desc: 'Двойная терраса с видом на лагуну и мыс Лайан.' },
+
+        { id: 'A-501', floor: 5, bay: 'left', wing: 'Andaman', beds: 2, area: 148, terrace: 36, status: 'available', priceUSD: 715000, roi: 8.4, desc: 'Просторные апартаменты с угловым остеклением, островом на 3 стула и прямой террасой с шезлонгами.' },
+        { id: 'A-502', floor: 5, bay: 'mid', wing: 'Andaman', beds: 2, area: 132, terrace: 30, status: 'available', priceUSD: 620000, roi: 8.3, desc: 'Видовая планировка с решётчатой стеклянной стеной в спа-ванную и душем с зеленью.' },
+        { id: 'B-503', floor: 5, bay: 'right', wing: 'Lagoon', beds: 1, area: 86, terrace: 20, status: 'reserved', priceUSD: 385000, roi: 8.8, desc: 'Ликвидный односпальный сьют с доходностью 8.8%.' },
+
+        { id: 'A-401', floor: 4, bay: 'left', wing: 'Andaman', beds: 3, area: 198, terrace: 46, status: 'available', priceUSD: 940000, roi: 8.2, desc: 'Семейная резиденция с двумя мастер-спальнями и джакузи.' },
+        { id: 'A-402', floor: 4, bay: 'mid', wing: 'Andaman', beds: 2, area: 128, terrace: 30, status: 'sold', priceUSD: 590000, roi: 8.1, desc: 'Панорамная гостиная с тиковыми жалюзи и островом.' },
+        { id: 'B-403', floor: 4, bay: 'right', wing: 'Lagoon', beds: 1, area: 82, terrace: 18, status: 'available', priceUSD: 358000, roi: 8.7, desc: 'Апартаменты с тропическим душем и видом на склон.' },
+
+        { id: 'A-301', floor: 3, bay: 'left', wing: 'Andaman', beds: 2, area: 138, terrace: 32, status: 'available', priceUSD: 615000, roi: 8.4, desc: 'Терраса в обрамлении пальм с видом на Андаманское море.' },
+        { id: 'A-302', floor: 3, bay: 'mid', wing: 'Andaman', beds: 1, area: 78, terrace: 18, status: 'available', priceUSD: 342000, roi: 8.9, desc: 'Максимальный спрос в высокий сезон Пхукета.' },
+        { id: 'B-303', floor: 3, bay: 'right', wing: 'Lagoon', beds: 1, area: 74, terrace: 16, status: 'reserved', priceUSD: 318000, roi: 8.5, desc: 'Тихое крыло у ботанического атриума.' },
+
+        { id: 'A-201', floor: 2, bay: 'left', wing: 'Andaman', beds: 2, area: 134, terrace: 30, status: 'reserved', priceUSD: 575000, roi: 8.2, desc: 'Увеличенная терраса сквозь пальмовую рощу к океану.' },
+        { id: 'A-202', floor: 2, bay: 'mid', wing: 'Andaman', beds: 1, area: 72, terrace: 16, status: 'available', priceUSD: 298000, roi: 8.6, desc: 'Сбалансированный входной лот с отделкой под ключ.' },
+        { id: 'B-203', floor: 2, bay: 'right', wing: 'Lagoon', beds: 1, area: 68, terrace: 14, status: 'sold', priceUSD: 279000, roi: 8.4, desc: 'Компактный курортный формат с кухней-островом.' },
+
+        { id: 'A-101', floor: 1, bay: 'left', wing: 'Andaman', beds: 2, area: 156, terrace: 48, status: 'available', priceUSD: 610000, roi: 8.3, desc: 'Приватное садовое патио с прямым выходом на пляжную тропу.' },
+        { id: 'A-102', floor: 1, bay: 'mid', wing: 'Andaman', beds: 1, area: 80, terrace: 22, status: 'sold', priceUSD: 289000, roi: 8.2, desc: 'Резиденция у лобби-подиума с безбарьерным доступом.' },
+        { id: 'B-103', floor: 1, bay: 'right', wing: 'Lagoon', beds: 1, area: 76, terrace: 20, status: 'available', priceUSD: 276000, roi: 8.6, desc: 'Собственная дзен-терраса среди тропической зелени.' }
+      ];
+
+      // Cutaway-Matched 4K VR Rooms (aligned pixel-for-pixel with prep_v2_keyframes.py)
+      const VR_ROOMS = {
+        living: {
+          key: 'living',
+          stop: 3,
+          name: 'Гостиная и кухня',
+          sub: '58 м² • L-диван, ТВ-стена, обеденный стол, травертиновый остров и терраса',
+          src: '../../assets/tour/aurelia/pano-living-4k.webp',
+          initYaw: 0,
+          initPitch: -4 * DEG,
+          pos: { x: 42, y: 42 },
+          hotspots: [
+            { yaw: 0, pitch: -4, label: 'Выйти на террасу (дальше ↕)', targetStop: 4 },
+            { yaw: -115, pitch: -4, label: 'В мастер-спальню', targetStop: 5 },
+            { yaw: 24, pitch: -6, label: 'На Sky-бассейн', targetStop: 7 }
+          ]
+        },
+        terrace: {
+          key: 'terrace',
+          stop: 4,
+          name: 'Приватная терраса 36 м²',
+          sub: '36 м² • Два белых шезлонга, тиковый декинг, пальмы и вид на Bang Tao',
+          src: '../../assets/tour/aurelia/pano-terrace-4k.webp',
+          initYaw: 0,
+          initPitch: -5 * DEG,
+          pos: { x: 42, y: 20 },
+          hotspots: [
+            { yaw: -135, pitch: -4, label: 'В мастер-спальню (дальше ↕)', targetStop: 5 },
+            { yaw: 140, pitch: -4, label: 'Назад в гостиную', targetStop: 3 }
+          ]
+        },
+        bedroom: {
+          key: 'bedroom',
+          stop: 5,
+          name: 'Мастер-спальня',
+          sub: '34 м² • Кровать из дуба в полоску, реечный тик и стеклянная стена в ванную',
+          src: '../../assets/tour/aurelia/pano-bedroom-4k.webp',
+          initYaw: 10 * DEG,
+          initPitch: -5 * DEG,
+          pos: { x: 88, y: 26 },
+          hotspots: [
+            { yaw: 100, pitch: -6, label: 'Через стекло в спа-ванную (дальше ↕)', targetStop: 6 },
+            { yaw: -145, pitch: -4, label: 'Назад на террасу', targetStop: 4 }
+          ]
+        },
+        bath: {
+          key: 'bath',
+          stop: 6,
+          name: 'Спа-ванная с атриумом',
+          sub: '20 м² • Овальная купель у окна, душ с пальмой и двойная раковина',
+          src: '../../assets/tour/aurelia/pano-spa-bath-4k.webp',
+          initYaw: 12 * DEG,
+          initPitch: -5 * DEG,
+          pos: { x: 112, y: 54 },
+          hotspots: [
+            { yaw: 0, pitch: 8, label: 'Подняться на Sky-бассейн (дальше ↕)', targetStop: 7 },
+            { yaw: -115, pitch: -4, label: 'Назад в спальню', targetStop: 5 }
+          ]
+        },
+        rooftop: {
+          key: 'rooftop',
+          stop: 7,
+          name: 'Rooftop Sky-бассейн 28 м',
+          sub: 'Крыша комплекса • Инфинити-кромка над бухтой Bang Tao и лаунж-павильон',
+          src: '../../assets/tour/aurelia/pano-rooftop-4k.webp',
+          initYaw: 0,
+          initPitch: -5 * DEG,
+          pos: { x: 42, y: 66 },
+          hotspots: [
+            { yaw: 162, pitch: -3, label: 'Спуститься в спа-ванную', targetStop: 6 },
+            { yaw: -158, pitch: -3, label: 'Назад в гостиную', targetStop: 3 }
+          ]
+        }
+      };
+
+      // Nearby POI Cards & 4K 360° Explorers
+      const POI_DATA = {
+        bangtao: {
+          key: 'bangtao',
+          title: 'Пляж Bang Tao',
+          badge: '4 мин пешком · 350 м',
+          sub: '6-километровый полумесяц мягкого белого кораллового песка без волн с ноябрь по май и тенистая тропа от лобби комплекса.',
+          img1: '../../assets/tour/aurelia/poi/bangtao-1.webp',
+          img2: '../../assets/tour/aurelia/poi/bangtao-2.webp',
+          chips: ['6 км белого песка', 'Пляжные клубы Catch & Maya', 'Прямая тропа 4 мин'],
+          pano: '../../assets/tour/aurelia/poi-bangtao-4k.webp',
+          fseqKey: 'poi_bangtao',
+          initYaw: 0,
+          initPitch: -2 * DEG,
+          beacons: [
+            { yaw: 0, pitch: 2, label: '✦ Чистейший залив Bang Tao' },
+            { yaw: -130, pitch: 4, label: '✦ The Aurelia Bay · 350 м за пальмами' },
+            { yaw: 92, pitch: -2, label: '✦ Кабаны и бич-лаунж' }
+          ]
+        },
+        layan: {
+          key: 'layan',
+          title: 'Мыс Layan и парк Sirinat',
+          badge: '3 мин на багги · Заповедник',
+          sub: 'Уединённая бухта среди высоких казуариновых сосен нацпарка Сиринат: бирюзовая лагуна, традиционные лодки лонгтейл и лучшие закаты северного Пхукета.',
+          img1: '../../assets/tour/aurelia/poi/layan-1.webp',
+          img2: '../../assets/tour/aurelia/poi/layan-2.webp',
+          chips: ['Нацпарк Sirinat', 'Спокойная лагуна', 'Закатный бич-клаб'],
+          pano: '../../assets/tour/aurelia/poi-layan-4k.webp',
+          fseqKey: 'poi_layan',
+          initYaw: 0,
+          initPitch: -2 * DEG,
+          beacons: [
+            { yaw: 18, pitch: -2, label: '✦ Лодки в спокойной лагуне Layan' },
+            { yaw: -65, pitch: 5, label: '✦ Хвойный берег парка Sirinat' },
+            { yaw: 130, pitch: -1, label: '✦ Прибрежный лаунж на песке' }
+          ]
+        },
+        boatave: {
+          key: 'boatave',
+          title: 'Boat Avenue & Porto de Phuket',
+          badge: '7 мин · Гастро и лайфстайл',
+          sub: 'Вечерняя набережная у озера, более 40 ресторанов высокой кухни, фермерский Villa Market и чемпионское гольф-поле Laguna 18 лунок.',
+          img1: '../../assets/tour/aurelia/poi/boatave-1.webp',
+          img2: '../../assets/tour/aurelia/poi/boatave-2.webp',
+          chips: ['40+ ресторанов и кафе', 'Villa Market & бутики', 'Laguna Golf 18 лунок'],
+          pano: '../../assets/tour/aurelia/poi-boatave-4k.webp',
+          fseqKey: 'poi_boatave',
+          initYaw: 0,
+          initPitch: -2 * DEG,
+          beacons: [
+            { yaw: 0, pitch: 3, label: '✦ Променад у лагуны' },
+            { yaw: 68, pitch: 2, label: '✦ Ресторанные террасы на воде' },
+            { yaw: -110, pitch: 2, label: '✦ Галерея бутиков и бистро' }
+          ]
+        }
+      };
+
+      // 8-Stop Continuous Depth Map (0.0 -> 7.0)
+      const STOP_META = [
+        { stop: 0, view: 'street', room: null },
+        { stop: 1, view: 'facade', room: null },
+        { stop: 2, view: 'unit', room: null },
+        { stop: 3, view: 'vr', room: 'living' },
+        { stop: 4, view: 'vr', room: 'terrace' },
+        { stop: 5, view: 'vr', room: 'bedroom' },
+        { stop: 6, view: 'vr', room: 'bath' },
+        { stop: 7, view: 'vr', room: 'rooftop' }
+      ];
+
+      // 7 Seamless AI Camera Flight Segments (k -> k+1)
+      const CHAIN_SEGMENTS = [
+        { seq: 's2f', labelForward: 'Подлёт к фасаду…', labelBack: 'Отлёт к бухте…' },
+        { seq: 'f2c', labelForward: 'Раскрытие 3D-разреза…', labelBack: 'Сборка фасада…' },
+        { seq: 'c2l', labelForward: 'Влёт в гостиную 4K…', labelBack: 'Вылет в 3D-разрез…', arrYaw: 0, arrPitch: -4 * DEG },
+        { seq: 'w_lt', labelForward: 'Выход на террасу…', labelBack: 'Возврат в гостиную…', depYaw: 0, depPitch: -4 * DEG, arrYaw: 0, arrPitch: -5 * DEG },
+        { seq: 'w_tb', labelForward: 'В мастер-спальню…', labelBack: 'Назад на террасу…', depYaw: -135 * DEG, depPitch: -4 * DEG, arrYaw: 10 * DEG, arrPitch: -5 * DEG },
+        { seq: 'w_bb', labelForward: 'Через стекло в спа-ванную…', labelBack: 'Назад в спальню…', depYaw: 100 * DEG, depPitch: -6 * DEG, arrYaw: 12 * DEG, arrPitch: -5 * DEG },
+        { seq: 'w_br', labelForward: 'Подъём на Sky-бассейн…', labelBack: 'Спуск в спа-ванную…', depYaw: 0, depPitch: 8 * DEG, arrYaw: 0, arrPitch: -5 * DEG }
+      ];
+
+      const app = {
+        view: 'street',
+        currency: 'USD',
+        unitId: 'A-501',
+        availMode: false,
+        tod: 'sunset',
+        activeFloor: 5,
+        vrRoom: 'living',
+        vrStereo: false,
+        vrRef: false,
+        vrCinema: false,
+        vrUserDragged: false,
+        autoTour: false,
+        audioOn: false,
+        depth: 0,
+        targetDepth: 0,
+        autoFlight: false,
+        flightFrom: 0,
+        flightTo: 0,
+        flightStart: 0,
+        flightDur: 2200,
+        flightNonce: 0,
+        lastWheelDir: 1,
+        activePoiKey: null,
+        poiMode: false,
+        poiFlight: null
+      };
+
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('is-show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('is-show'), 2400);
+      }
+
+      function fmtMoney(usd) {
+        const c = CURR[app.currency] || CURR.USD;
+        const n = Math.round(usd * c.rate).toLocaleString('ru-RU').replace(/\u00a0/g, ' ');
+        return c.pre ? (c.sym + n) : (n + ' ' + c.sym);
+      }
+
+      function getUnit() {
+        return UNITS.find((u) => u.id === app.unitId) || UNITS[3];
+      }
+
+      // ======================================================================
+      // Procedural Web Audio Luxury Ambient Synth
+      // ======================================================================
+      let audioCtx = null;
+      let masterGain = null;
+
+      function startAmbientAudio() {
+        try {
+          if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            audioCtx = new Ctx();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.0001;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 620;
+            masterGain.connect(filter);
+            filter.connect(audioCtx.destination);
+
+            const chords = [
+              [220.0, 261.63, 329.63, 415.3],
+              [174.61, 220.0, 261.63, 329.63],
+              [196.0, 246.94, 293.66, 369.99],
+              [164.81, 196.0, 246.94, 329.63]
+            ];
+            let ci = 0;
+            const playChord = () => {
+              if (!audioCtx || !app.audioOn) return;
+              const now = audioCtx.currentTime;
+              chords[ci % chords.length].forEach((freq) => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                g.gain.setValueAtTime(0.0001, now);
+                g.gain.linearRampToValueAtTime(0.032, now + 1.4);
+                g.gain.linearRampToValueAtTime(0.0001, now + 4.4);
+                osc.connect(g);
+                g.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 4.6);
+              });
+              ci++;
+            };
+            playChord();
+            setInterval(playChord, 4200);
+          }
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          masterGain.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.8);
+        } catch (e) {}
+      }
+
+      function setAudio(on) {
+        app.audioOn = on;
+        const btn = document.getElementById('audioToggleBtn');
+        btn.setAttribute('aria-pressed', String(on));
+        btn.textContent = on ? '🔊' : '🔇';
+        if (on) {
+          startAmbientAudio();
+        } else if (audioCtx && masterGain) {
+          try {
+            masterGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+          } catch (e) {}
+        }
+      }
+      document.getElementById('audioToggleBtn').addEventListener('click', () => setAudio(!app.audioOn));
+
+      // ======================================================================
+      // Safari-Proof .fseq WebP Decoder & 60fps Canvas Flight Renderer
+      // ======================================================================
+      const FSEQ_URLS = {
+        s2f: '../../assets/tour/aurelia/fseq/street-to-facade.fseq',
+        f2c: '../../assets/tour/aurelia/fseq/facade-to-cutaway.fseq',
+        c2l: '../../assets/tour/aurelia/fseq/cutaway-to-living.fseq',
+        w_lt: '../../assets/tour/aurelia/fseq/walk-living-terrace.fseq',
+        w_tb: '../../assets/tour/aurelia/fseq/walk-terrace-bedroom.fseq',
+        w_bb: '../../assets/tour/aurelia/fseq/walk-bedroom-bath.fseq',
+        w_br: '../../assets/tour/aurelia/fseq/walk-bath-rooftop.fseq',
+        poi_bangtao: '../../assets/tour/aurelia/fseq/fly-to-bangtao.fseq',
+        poi_layan: '../../assets/tour/aurelia/fseq/fly-to-layan.fseq',
+        poi_boatave: '../../assets/tour/aurelia/fseq/fly-to-boatave.fseq'
+      };
+      const seqCache = {};
+      const seqPromises = {};
+      const flightCanvas = document.getElementById('flightCanvas');
+      const flightCtx = flightCanvas.getContext('2d', { alpha: true });
+
+      function decodeWebpBlob(blob) {
+        if (typeof createImageBitmap === 'function') {
+          return createImageBitmap(blob).catch(() => decodeViaImg(blob));
+        }
+        return decodeViaImg(blob);
+      }
+
+      function decodeViaImg(blob) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(blob);
+          const im = new Image();
+          im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
+          im.onerror = (err) => { URL.revokeObjectURL(url); reject(err); };
+          im.src = url;
+        });
+      }
+
+      function ensureSeqLoaded(key) {
+        if (seqCache[key]) return Promise.resolve(seqCache[key]);
+        if (seqPromises[key]) return seqPromises[key];
+        const url = FSEQ_URLS[key];
+        if (!url) return Promise.resolve(null);
+        seqPromises[key] = fetch(url)
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.arrayBuffer();
+          })
+          .then((buf) => {
+            const view = new DataView(buf);
+            const count = view.getUint32(0, true);
+            let offset = 4 + count * 4;
+            const jobs = [];
+            for (let i = 0; i < count; i++) {
+              const len = view.getUint32(4 + i * 4, true);
+              const blob = new Blob([new Uint8Array(buf, offset, len)], { type: 'image/webp' });
+              offset += len;
+              jobs.push(decodeWebpBlob(blob));
+            }
+            return Promise.all(jobs);
+          })
+          .then((frames) => {
+            seqCache[key] = frames;
+            return frames;
+          })
+          .catch(() => null);
+        return seqPromises[key];
+      }
+
+      function drawFlightFrame(frames, progress, alpha) {
+        if (!frames || !frames.length || alpha <= 0.005) {
+          flightCanvas.style.opacity = '0';
+          return;
+        }
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const cw = Math.max(300, Math.round(window.innerWidth * dpr));
+        const ch = Math.max(240, Math.round(window.innerHeight * dpr));
+        if (flightCanvas.width !== cw || flightCanvas.height !== ch) {
+          flightCanvas.width = cw;
+          flightCanvas.height = ch;
+        }
+        const idx = Math.min(frames.length - 1, Math.max(0, Math.round(progress * (frames.length - 1))));
+        const frameImg = frames[idx];
+        const fw = frameImg.naturalWidth || frameImg.width || 1280;
+        const fh = frameImg.naturalHeight || frameImg.height || 720;
+        const imgAspect = fw / Math.max(1, fh);
+        const canAspect = cw / ch;
+        let dw, dh, dx, dy;
+        if (canAspect > imgAspect) {
+          dw = cw; dh = cw / imgAspect;
+          dx = 0; dy = (ch - dh) * 0.5;
+        } else {
+          dh = ch; dw = ch * imgAspect;
+          dx = (cw - dw) * 0.5; dy = 0;
+        }
+        flightCtx.clearRect(0, 0, cw, ch);
+        flightCtx.drawImage(frameImg, dx, dy, dw, dh);
+        flightCanvas.style.opacity = Math.min(1, Math.max(0, alpha)).toFixed(3);
+      }
+
+      // ======================================================================
+      // Stage Activation & 8-Stop Continuous Inverted Depth Visuals (0.0 -> 7.0)
+      // ======================================================================
+      const flightHudBar = document.getElementById('flightHudBar');
+      const flightHudLabel = document.getElementById('flightHudLabel');
+      const streetPinsLayer = document.getElementById('streetPinsLayer');
+      const streetDock = document.getElementById('streetDock');
+      const facadeDock = document.getElementById('facadeDock');
+      const aptSpecPanel = document.getElementById('aptSpecPanel');
+      const vrDock = document.getElementById('vrDock');
+
+      function activateDomStage(domViewId) {
+        if (app.view === domViewId) return;
+        app.view = domViewId;
+        document.querySelectorAll('.stage-view').forEach((s) => {
+          s.classList.toggle('is-active', s.id === 'view-' + domViewId);
+        });
+        const navHighlight = (domViewId === 'poi-vr') ? 'street' : domViewId;
+        document.querySelectorAll('[data-view]').forEach((b) => {
+          b.setAttribute('aria-selected', String(b.dataset.view === navHighlight));
+        });
+        const isLight = (domViewId === 'unit');
+        document.getElementById('osTopBar').classList.toggle('is-light', isLight);
+        document.getElementById('depthRail').classList.toggle('is-light', isLight);
+        document.getElementById('depthRail').style.display = (domViewId === 'poi-vr') ? 'none' : '';
+
+        const mpVid = document.getElementById('masterplanVideo');
+        if (mpVid && !prefersReducedMotion) {
+          if (domViewId === 'street') mpVid.play().catch(() => {});
+          else mpVid.pause();
+        }
+        const cinVid = document.getElementById('vrCinemaVideo');
+        if (cinVid) {
+          if (domViewId === 'vr' && app.vrCinema && !prefersReducedMotion) cinVid.play().catch(() => {});
+          else cinVid.pause();
+        }
+        if (domViewId === 'unit') layoutCutawayPins();
+      }
+
+      function applyDepthVisuals() {
+        if (app.poiMode) return;
+        const d = Math.max(0, Math.min(7, app.depth));
+        const nearestStop = Math.round(d);
+        const settledMeta = STOP_META[nearestStop];
+
+        // Update 8-stop right depth rail
+        document.getElementById('depthRailFill').style.height = ((d / 7) * 100).toFixed(1) + '%';
+        document.getElementById('depthPctEl').textContent = Math.round((d / 7) * 100) + '%';
+        document.querySelectorAll('[data-depth-stop]').forEach((btn) => {
+          btn.classList.toggle('is-active', Number(btn.dataset.depthStop) === nearestStop);
+        });
+
+        const segIdx = Math.min(6, Math.floor(d));
+        const p = d - segIdx;
+        const inTransition = (p > 0.004 && p < 0.996) && (d > 0.004 && d < 6.996);
+
+        let drewFlight = false;
+
+        if (inTransition) {
+          const fromMeta = STOP_META[segIdx];
+          const toMeta = STOP_META[segIdx + 1];
+          const seg = CHAIN_SEGMENTS[segIdx];
+          const underMeta = (p >= 0.5) ? toMeta : fromMeta;
+          activateDomStage(underMeta.view);
+
+          if (underMeta.view === 'vr' && underMeta.room) {
+            const wantYaw = (p >= 0.5) ? seg.arrYaw : seg.depYaw;
+            const wantPitch = (p >= 0.5) ? seg.arrPitch : seg.depPitch;
+            setVrRoomImmediate(underMeta.room, wantYaw, wantPitch, true);
+          }
+
+          // Inverted opposing parallax motion on HUD elements
+          if (segIdx === 0) {
+            streetPinsLayer.style.transform = `translate3d(0, ${(-p * 95).toFixed(1)}px, 0) scale(${(1 - p * 0.06).toFixed(3)})`;
+            streetPinsLayer.style.opacity = String(Math.max(0, 1 - p * 2.2));
+            streetDock.style.transform = `translate3d(0, ${(p * 70).toFixed(1)}px, 0)`;
+            streetDock.style.opacity = String(Math.max(0, 1 - p * 2.4));
+            facadeDock.style.transform = `translate3d(0, ${((1 - p) * 70).toFixed(1)}px, 0)`;
+            facadeDock.style.opacity = String(Math.max(0, (p - 0.58) / 0.42));
+          } else if (segIdx === 1) {
+            facadeDock.style.transform = `translate3d(0, ${(p * 70).toFixed(1)}px, 0)`;
+            facadeDock.style.opacity = String(Math.max(0, 1 - p * 2.4));
+            aptSpecPanel.style.transform = `translate3d(${(-(1 - p) * 60).toFixed(1)}px, 0, 0)`;
+            aptSpecPanel.style.opacity = String(Math.max(0, (p - 0.58) / 0.42));
+          } else if (segIdx === 2) {
+            aptSpecPanel.style.transform = `translate3d(${(-p * 75).toFixed(1)}px, 0, 0)`;
+            aptSpecPanel.style.opacity = String(Math.max(0, 1 - p * 2.2));
+            vrDock.style.transform = `translate3d(0, ${((1 - p) * 55).toFixed(1)}px, 0)`;
+          } else {
+            vrDock.style.transform = `translate3d(0, ${(Math.sin(p * Math.PI) * 28).toFixed(1)}px, 0)`;
+          }
+
+          if (seqCache[seg.seq]) {
+            const alpha = Math.min(1, p / 0.08, (1 - p) / 0.08);
+            drawFlightFrame(seqCache[seg.seq], p, alpha);
+            drewFlight = true;
+          } else {
+            ensureSeqLoaded(seg.seq);
+          }
+        } else {
+          // Exact settled stop 0..7
+          activateDomStage(settledMeta.view);
+          if (settledMeta.view === 'vr' && settledMeta.room && vrState.roomB !== settledMeta.room) {
+            setVrRoomImmediate(settledMeta.room);
+          }
+          streetPinsLayer.style.transform = ''; streetPinsLayer.style.opacity = '';
+          streetDock.style.transform = ''; streetDock.style.opacity = '';
+          facadeDock.style.transform = ''; facadeDock.style.opacity = '';
+          aptSpecPanel.style.transform = ''; aptSpecPanel.style.opacity = '';
+          vrDock.style.transform = '';
+        }
+
+        if (!drewFlight) flightCanvas.style.opacity = '0';
+        if (drewFlight) {
+          const mpWrap = document.getElementById('masterplanParallax');
+          mpWrap.style.setProperty('--mx', '0px');
+          mpWrap.style.setProperty('--my', '0px');
+          mpWrap.style.setProperty('--ms', '1');
+        }
+      }
+
+      let settleTimer = null;
+      function scheduleMagneticSettle() {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(() => {
+          if (app.autoFlight || app.autoTour || app.poiMode || app.poiFlight) return;
+          const frac = app.targetDepth - Math.floor(app.targetDepth);
+          if (frac < 0.005 || frac > 0.995) return;
+          const threshold = app.lastWheelDir > 0 ? 0.14 : 0.86;
+          const snapped = frac >= threshold ? Math.ceil(app.targetDepth) : Math.floor(app.targetDepth);
+          app.targetDepth = Math.max(0, Math.min(7, snapped));
+        }, 520);
+      }
+
+      function cancelAutoFlight() {
+        app.autoFlight = false;
+        app.flightNonce++;
+        flightHudBar.classList.remove('is-active');
+      }
+
+      async function flyToDepthStop(stopIdx, instant = false) {
+        if (app.poiMode) await exitPoiExplorer(true);
+        const clamped = Math.max(0, Math.min(7, stopIdx));
+        clearTimeout(settleTimer);
+        app.flightNonce++;
+        const myNonce = app.flightNonce;
+
+        if (instant || Math.abs(clamped - app.depth) < 0.02) {
+          app.autoFlight = false;
+          app.depth = clamped;
+          app.targetDepth = clamped;
+          if (STOP_META[clamped].room) setVrRoomImmediate(STOP_META[clamped].room);
+          flightHudBar.classList.remove('is-active');
+          applyDepthVisuals();
+          return;
+        }
+
+        const dirFwd = clamped > app.depth;
+        const firstSegIdx = dirFwd ? Math.floor(app.depth) : Math.max(0, Math.ceil(app.depth) - 1);
+        const firstSeg = CHAIN_SEGMENTS[Math.min(6, Math.max(0, firstSegIdx))];
+        flightHudLabel.textContent = dirFwd ? firstSeg.labelForward : firstSeg.labelBack;
+        flightHudBar.classList.add('is-active');
+
+        const loSeg = Math.floor(Math.min(app.depth, clamped));
+        const hiSeg = Math.min(6, Math.ceil(Math.max(app.depth, clamped)) - 1);
+        const needed = [];
+        for (let s = loSeg; s <= hiSeg; s++) {
+          if (CHAIN_SEGMENTS[s]) needed.push(CHAIN_SEGMENTS[s].seq);
+        }
+        if (needed.length) await Promise.all(needed.map(ensureSeqLoaded));
+
+        if (myNonce !== app.flightNonce) return;
+
+        app.autoFlight = true;
+        app.flightFrom = app.depth;
+        app.flightTo = clamped;
+        app.flightStart = performance.now();
+        app.flightDur = Math.min(5400, Math.max(1350, Math.abs(clamped - app.depth) * 1900));
+      }
+
+      document.getElementById('skipFlightBtn').addEventListener('click', () => {
+        if (app.poiFlight) {
+          const pf = app.poiFlight;
+          app.poiFlight = null;
+          flightCanvas.style.opacity = '0';
+          flightHudBar.classList.remove('is-active');
+          if (pf.reverse) {
+            app.poiMode = false;
+            activateDomStage('street');
+          } else {
+            openPoiSphere(pf.key);
+          }
+          return;
+        }
+        if (app.autoFlight) {
+          flyToDepthStop(Math.round(app.flightTo), true);
+        }
+      });
+
+      // Top/Mobile Tab & 8-Stop Depth Rail Clicks
+      document.querySelectorAll('[data-view]').forEach((b) => {
+        b.addEventListener('click', () => {
+          if (app.autoTour) stopAutoTour();
+          closePoiCard();
+          const mapStop = { street: 0, facade: 1, unit: 2, vr: 3 };
+          const targetStop = mapStop[b.dataset.view] ?? 0;
+          flyToDepthStop(targetStop);
+        });
+      });
+      document.querySelectorAll('[data-depth-stop]').forEach((b) => {
+        b.addEventListener('click', () => {
+          if (app.autoTour) stopAutoTour();
+          closePoiCard();
+          flyToDepthStop(Number(b.dataset.depthStop));
+        });
+      });
+
+      // Draggable 8-Stop Right Depth Rail
+      const depthRail = document.getElementById('depthRail');
+      let railDrag = false;
+      function scrubRailToY(clientY) {
+        const track = depthRail.querySelector('.depth-rail__track');
+        const r = track.getBoundingClientRect();
+        const frac = Math.max(0, Math.min(1, (clientY - r.top) / Math.max(1, r.height)));
+        cancelAutoFlight();
+        if (app.autoTour) stopAutoTour();
+        app.targetDepth = frac * 7;
+        scheduleMagneticSettle();
+      }
+      depthRail.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button')) return;
+        railDrag = true;
+        depthRail.setPointerCapture(e.pointerId);
+        scrubRailToY(e.clientY);
+      });
+      depthRail.addEventListener('pointermove', (e) => {
+        if (railDrag) scrubRailToY(e.clientY);
+      });
+      depthRail.addEventListener('pointerup', () => { railDrag = false; });
+
+      // ======================================================================
+      // PERMANENT CONTINUOUS INVERTED SCROLL HANDLER (0.0 <-> 7.0 + POI exit)
+      // ======================================================================
+      const osApp = document.getElementById('osApp');
+      osApp.addEventListener('wheel', (e) => {
+        if (!document.getElementById('welcomeOverlay').classList.contains('is-hidden')) return;
+        if (document.getElementById('contactModal').classList.contains('is-open')) return;
+        const inPanel = e.target.closest('.apt-spec-panel') || e.target.closest('.poi-card-overlay');
+        if (inPanel && inPanel.scrollHeight > inPanel.clientHeight + 4) {
+          const atTop = inPanel.scrollTop <= 0 && e.deltaY < 0;
+          const atBot = inPanel.scrollTop + inPanel.clientHeight >= inPanel.scrollHeight - 2 && e.deltaY > 0;
+          if (!atTop && !atBot) return;
+        }
+
+        e.preventDefault();
+        if (app.poiMode) {
+          if (e.deltaY < -20 && !app.poiFlight) exitPoiExplorer(false);
+          return;
+        }
+        if (e.shiftKey && app.view === 'vr') {
+          vrState.tFov = Math.max(0.62, Math.min(1.50, vrState.tFov + e.deltaY * 0.0012));
+          return;
+        }
+        if (app.autoTour) stopAutoTour();
+        cancelAutoFlight();
+        closePoiCard();
+
+        const rawDelta = Math.max(-160, Math.min(160, e.deltaY));
+        const step = rawDelta * 0.0042;
+        if (Math.abs(step) < 0.0001) return;
+        app.lastWheelDir = step > 0 ? 1 : -1;
+        app.targetDepth = Math.max(0, Math.min(7, app.targetDepth + step));
+        scheduleMagneticSettle();
+      }, { passive: false });
+
+      // Touch swipe navigation on mobile
+      let touchY0 = null;
+      osApp.addEventListener('touchstart', (e) => {
+        if (e.target.id === 'vrCanvas' || e.target.id === 'poiCanvas' || e.target.closest('.apt-spec-panel') || e.target.closest('.poi-card-overlay')) {
+          touchY0 = null; return;
+        }
+        touchY0 = e.touches[0].clientY;
+      }, { passive: true });
+      osApp.addEventListener('touchmove', (e) => {
+        if (touchY0 === null || app.poiMode) return;
+        const dy = touchY0 - e.touches[0].clientY;
+        touchY0 = e.touches[0].clientY;
+        app.lastWheelDir = dy > 0 ? 1 : -1;
+        app.targetDepth = Math.max(0, Math.min(7, app.targetDepth + dy * 0.005));
+        scheduleMagneticSettle();
+      }, { passive: true });
+
+      // Welcome Screen Actions
+      const welcomeEl = document.getElementById('welcomeOverlay');
+      const welcomeVid = document.getElementById('welcomeVideo');
+      if (prefersReducedMotion) {
+        if (welcomeVid) welcomeVid.pause();
+        const mpVid = document.getElementById('masterplanVideo');
+        if (mpVid) mpVid.pause();
+      }
+      document.getElementById('startTourWelcomeBtn').addEventListener('click', () => {
+        welcomeEl.classList.add('is-hidden');
+        if (welcomeVid) welcomeVid.pause();
+        setAudio(true);
+        flyToDepthStop(0, true);
+      });
+      document.getElementById('startVrWelcomeBtn').addEventListener('click', () => {
+        welcomeEl.classList.add('is-hidden');
+        if (welcomeVid) welcomeVid.pause();
+        setAudio(true);
+        flyToDepthStop(3, true);
+      });
+
+      // ======================================================================
+      // VIEW 1: COASTAL MASTERPLAN + RICH POI CARDS & AI DRONE FLY-OUT 360°
+      // ======================================================================
+      const mpStage = document.getElementById('masterplanStage');
+      const mpWrap = document.getElementById('masterplanParallax');
+      const shimmerCanvas = document.getElementById('seaShimmerCanvas');
+      const shimmerCtx = shimmerCanvas.getContext('2d');
+
+      if (!prefersReducedMotion) {
+        mpStage.addEventListener('pointermove', (e) => {
+          if (app.depth > 0.02 || app.poiMode) return;
+          const r = mpStage.getBoundingClientRect();
+          const nx = (e.clientX - r.left) / r.width - 0.5;
+          const ny = (e.clientY - r.top) / r.height - 0.5;
+          mpWrap.style.setProperty('--ms', '1.012');
+          mpWrap.style.setProperty('--mx', (-nx * 6).toFixed(1) + 'px');
+          mpWrap.style.setProperty('--my', (-ny * 4).toFixed(1) + 'px');
+        });
+        mpStage.addEventListener('pointerleave', () => {
+          mpWrap.style.setProperty('--mx', '0px');
+          mpWrap.style.setProperty('--my', '0px');
+          mpWrap.style.setProperty('--ms', '1');
+        });
+      }
+
+      document.getElementById('mpHeroPin').addEventListener('click', () => { closePoiCard(); flyToDepthStop(1); });
+      document.getElementById('flyToFacadeBtn').addEventListener('click', () => { closePoiCard(); flyToDepthStop(1); });
+      document.getElementById('replayFlyStreetBtn').addEventListener('click', () => flyToDepthStop(0));
+      document.getElementById('replayFlyCutawayBtn').addEventListener('click', () => flyToDepthStop(1));
+
+      const poiCardEl = document.getElementById('poiCardOverlay');
+      function openPoiCard(key) {
+        const poi = POI_DATA[key];
+        if (!poi) return;
+        app.activePoiKey = key;
+        document.getElementById('poiBadge').textContent = poi.badge;
+        document.getElementById('poiTitle').textContent = poi.title;
+        document.getElementById('poiSub').textContent = poi.sub;
+        document.getElementById('poiImg1').src = poi.img1;
+        document.getElementById('poiImg2').src = poi.img2;
+        document.getElementById('poiMetrics').innerHTML = poi.chips.map((c) => `<span class="poi-chip">${c}</span>`).join('');
+        document.getElementById('mpCaption').textContent = `${poi.title} (${poi.badge}) — нажмите «✈ Подлететь и прогуляться 360°» для реального перелёта дрона.`;
+        document.querySelectorAll('[data-poi]').forEach((p) => p.classList.toggle('is-poi-active', p.dataset.poi === key));
+        poiCardEl.classList.add('is-open');
+        // Preload drone flight & 4K panorama immediately while user reads the card
+        ensureSeqLoaded(poi.fseqKey);
+        loadPoiTexture(key);
+      }
+
+      function closePoiCard() {
+        poiCardEl.classList.remove('is-open');
+        document.querySelectorAll('[data-poi]').forEach((p) => p.classList.remove('is-poi-active'));
+      }
+
+      document.querySelectorAll('[data-poi]').forEach((pin) => {
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPoiCard(pin.dataset.poi);
+        });
+      });
+      document.getElementById('closePoiCardBtn').addEventListener('click', closePoiCard);
+      document.getElementById('flyToPoiBtn').addEventListener('click', () => {
+        if (app.activePoiKey) flyToPoiExplorer(app.activePoiKey);
+      });
+
+      function renderSeaShimmer(now) {
+        if (app.view !== 'street' || app.depth > 0.25) return;
+        const r = shimmerCanvas.getBoundingClientRect();
+        const w = Math.max(200, Math.round(r.width));
+        const h = Math.max(200, Math.round(r.height));
+        if (shimmerCanvas.width !== w || shimmerCanvas.height !== h) {
+          shimmerCanvas.width = w;
+          shimmerCanvas.height = h;
+        }
+        shimmerCtx.clearRect(0, 0, w, h);
+        for (let i = 0; i < 20; i++) {
+          const sx = (0.06 + (i * 0.029) % 0.68) * w + Math.sin(now * 0.001 + i) * 14;
+          const sy = (0.17 + ((i * 17) % 24) * 0.011) * h;
+          const alpha = (0.12 + 0.12 * Math.sin(now * 0.003 + i * 1.3)) * Math.max(0, 1 - app.depth * 4);
+          shimmerCtx.fillStyle = `rgba(255, 224, 155, ${alpha.toFixed(3)})`;
+          shimmerCtx.fillRect(sx, sy, 18 + (i % 4) * 8, 1.6);
+        }
+      }
+
+      // ======================================================================
+      // VIEW 2: FACADE FLOOR SELECTOR (1920x1080) + AVAILABILITY + TIME OF DAY
+      // ======================================================================
+      const facadeInteractiveLayer = document.getElementById('facadeInteractiveLayer');
+      const facadeNightLayer = document.getElementById('facadeNightLayer');
+      const facadeTooltip = document.getElementById('facadeTooltip');
+
+      function applyTimeOfDay(tod) {
+        app.tod = tod;
+        document.querySelectorAll('[data-tod]').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b.dataset.tod === tod));
+        });
+        const mpImg = document.getElementById('masterplanImg');
+        const mpVid = document.getElementById('masterplanVideo');
+        const mat = document.getElementById('facadeColorMat');
+        if (tod === 'morning') {
+          const f = 'brightness(1.06) saturate(0.95) hue-rotate(-4deg)';
+          mpImg.style.filter = f;
+          if (mpVid) mpVid.style.filter = f;
+          mat.setAttribute('values', '0.98 0 0 0 0.03  0 1.03 0 0 0.04  0 0 1.1 0 0.06  0 0 0 1 0');
+          facadeNightLayer.setAttribute('opacity', '0');
+        } else if (tod === 'sunset') {
+          mpImg.style.filter = 'none';
+          if (mpVid) mpVid.style.filter = 'none';
+          mat.setAttribute('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0');
+          facadeNightLayer.setAttribute('opacity', '0.18');
+        } else {
+          const f = 'brightness(0.56) contrast(1.12) saturate(1.15)';
+          mpImg.style.filter = f;
+          if (mpVid) mpVid.style.filter = f;
+          mat.setAttribute('values', '0.45 0 0 0 0  0 0.50 0 0 0.02  0 0 0.68 0 0.06  0 0 0 1 0');
+          facadeNightLayer.setAttribute('opacity', '0.92');
+        }
+      }
+      document.querySelectorAll('[data-tod]').forEach((b) => {
+        b.addEventListener('click', () => applyTimeOfDay(b.dataset.tod));
+      });
+
+      function buildFacadeOverlay() {
+        const NS = 'http://www.w3.org/2000/svg';
+        facadeInteractiveLayer.innerHTML = '';
+        facadeNightLayer.innerHTML = '';
+
+        UNITS.forEach((u) => {
+          const fb = FLOOR_BOUNDS[u.floor];
+          const bb = BAY_BOUNDS[u.bay];
+
+          const glow = document.createElementNS(NS, 'rect');
+          glow.setAttribute('x', bb.x + 24);
+          glow.setAttribute('y', fb.y + 16);
+          glow.setAttribute('width', bb.w - 48);
+          glow.setAttribute('height', fb.h - 32);
+          glow.setAttribute('rx', '8');
+          glow.setAttribute('fill', 'url(#nightWinGlow)');
+          facadeNightLayer.appendChild(glow);
+
+          const rect = document.createElementNS(NS, 'rect');
+          rect.setAttribute('x', bb.x);
+          rect.setAttribute('y', fb.y);
+          rect.setAttribute('width', bb.w);
+          rect.setAttribute('height', fb.h);
+          rect.setAttribute('rx', '6');
+          rect.setAttribute('class', 'facade-bay');
+          rect.dataset.unitId = u.id;
+          rect.dataset.floor = String(u.floor);
+          rect.dataset.status = u.status;
+
+          const lbl = document.createElementNS(NS, 'text');
+          lbl.setAttribute('x', bb.x + bb.w * 0.5);
+          lbl.setAttribute('y', fb.y + fb.h * 0.5 + 7);
+          lbl.setAttribute('text-anchor', 'middle');
+          lbl.setAttribute('class', 'facade-bay-label');
+          lbl.dataset.floor = String(u.floor);
+          lbl.textContent = `${u.id} · ${u.beds}BR`;
+
+          rect.addEventListener('pointerenter', () => highlightFloor(u.floor));
+          rect.addEventListener('pointermove', (e) => {
+            const st = STATUS_INFO[u.status];
+            facadeTooltip.innerHTML = `
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
+                <strong>${u.floor} этаж · Юнит ${u.id}</strong>
+                <span class="badge ${st.cls}" style="font-size:10px;padding:2px 7px;">${st.label}</span>
+              </div>
+              <div style="margin-top:4px;color:var(--ink-soft);" class="tabular">${u.beds} спальни · ${u.area} м² · терраса ${u.terrace} м²</div>
+              <div style="margin-top:3px;font-weight:700;color:var(--teal-deep);" class="tabular">${fmtMoney(u.priceUSD)}</div>
+            `;
+            const hostR = document.getElementById('view-facade').getBoundingClientRect();
+            facadeTooltip.style.left = Math.min(hostR.width - 230, Math.max(12, e.clientX + 16)) + 'px';
+            facadeTooltip.style.top = Math.min(hostR.height - 140, Math.max(70, e.clientY - 20)) + 'px';
+            facadeTooltip.classList.add('is-show');
+          });
+          rect.addEventListener('pointerleave', () => {
+            facadeTooltip.classList.remove('is-show');
+            highlightFloor(null);
+          });
+          rect.addEventListener('click', () => {
+            selectUnit(u.id);
+            flyToDepthStop(2);
+          });
+
+          facadeInteractiveLayer.append(rect, lbl);
+        });
+      }
+
+      function highlightFloor(fl) {
+        facadeInteractiveLayer.querySelectorAll('.facade-bay').forEach((r) => {
+          r.classList.toggle('is-floor-hover', fl !== null && Number(r.dataset.floor) === fl);
+        });
+        if (fl !== null) {
+          app.activeFloor = fl;
+          renderFacadePicker();
+        }
+      }
+
+      function syncAvailMode() {
+        facadeInteractiveLayer.querySelectorAll('.facade-bay').forEach((r) => {
+          r.classList.toggle('is-avail-mode', app.availMode);
+        });
+        facadeInteractiveLayer.querySelectorAll('.facade-bay-label').forEach((l) => {
+          l.classList.toggle('is-visible', app.availMode);
+        });
+      }
+
+      function renderFacadePicker() {
+        document.getElementById('facadeHoverFloorTag').textContent = `Этаж ${app.activeFloor}`;
+        const fPills = document.getElementById('facadeFloorPills');
+        fPills.innerHTML = '';
+        for (let fl = 6; fl >= 1; fl--) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'floor-pill-btn tabular' + (fl === app.activeFloor ? ' is-active' : '');
+          b.textContent = String(fl);
+          b.addEventListener('click', () => {
+            app.activeFloor = fl;
+            highlightFloor(fl);
+          });
+          fPills.appendChild(b);
+        }
+
+        const uRow = document.getElementById('facadeFloorUnits');
+        uRow.innerHTML = '';
+        UNITS.filter((u) => u.floor === app.activeFloor).forEach((u) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'os-pill tabular';
+          b.setAttribute('aria-pressed', String(u.id === app.unitId));
+          b.textContent = `${u.id} · ${u.area}м² · ${STATUS_INFO[u.status].label}`;
+          b.addEventListener('click', () => {
+            selectUnit(u.id);
+            flyToDepthStop(2);
+          });
+          uRow.appendChild(b);
+        });
+      }
+
+      document.getElementById('availToggleBtn').addEventListener('click', (e) => {
+        app.availMode = !app.availMode;
+        e.currentTarget.setAttribute('aria-pressed', String(app.availMode));
+        syncAvailMode();
+        if (app.view !== 'facade') flyToDepthStop(1);
+      });
+
+      // ======================================================================
+      // VIEW 3: FULL-BLEED 3D CUTAWAY + COLLAPSIBLE OVERLAY + CLAMPED PINS
+      // ======================================================================
+      function layoutCutawayPins() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const imgAspect = 16 / 9;
+        const viewAspect = vw / Math.max(1, vh);
+        let renW, renH, offX, offY;
+        if (viewAspect > imgAspect) {
+          renW = vw; renH = vw / imgAspect;
+          offX = 0; offY = (vh - renH) * 0.5;
+        } else {
+          renH = vh; renW = vh * imgAspect;
+          offX = (vw - renW) * 0.5; offY = 0;
+        }
+        document.querySelectorAll('.cutaway-pin').forEach((pin) => {
+          const nx = parseFloat(pin.dataset.normX || '0.5');
+          const ny = parseFloat(pin.dataset.normY || '0.5');
+          let px = offX + nx * renW;
+          let py = offY + ny * renH;
+          if (vw < 640) {
+            px = Math.max(76, Math.min(vw - 76, px));
+            py = Math.max(76, Math.min(vh - 90, py));
+          }
+          pin.style.left = px.toFixed(1) + 'px';
+          pin.style.top = py.toFixed(1) + 'px';
+        });
+      }
+
+      const openUnitPanelBtn = document.getElementById('openUnitPanelBtn');
+      document.getElementById('collapseUnitPanelBtn').addEventListener('click', () => {
+        aptSpecPanel.classList.add('is-collapsed');
+        openUnitPanelBtn.classList.add('is-visible');
+      });
+      openUnitPanelBtn.addEventListener('click', () => {
+        aptSpecPanel.classList.remove('is-collapsed');
+        openUnitPanelBtn.classList.remove('is-visible');
+      });
+      if (window.innerWidth < 1040) {
+        aptSpecPanel.classList.add('is-collapsed');
+        openUnitPanelBtn.classList.add('is-visible');
+      }
+
+      function selectUnit(id) {
+        app.unitId = id;
+        const u = getUnit();
+        app.activeFloor = u.floor;
+        document.getElementById('unitEyebrow').textContent = `${u.floor} этаж · Крыло ${u.wing}`;
+        document.getElementById('unitHeading').textContent = `Резиденция ${u.id}`;
+        const st = STATUS_INFO[u.status];
+        const sb = document.getElementById('unitStatusBadge');
+        sb.textContent = st.label;
+        sb.className = 'badge ' + st.cls;
+        document.getElementById('unitLead').textContent = u.desc;
+        document.getElementById('unitPriceEl').textContent = fmtMoney(u.priceUSD);
+        document.getElementById('unitSqmPriceEl').textContent = `${fmtMoney(u.priceUSD / u.area)} / м² · ROI ${u.roi}%`;
+        document.getElementById('mArea').textContent = `${u.area} м²`;
+        document.getElementById('mBeds').textContent = String(u.beds);
+        document.getElementById('mTerrace').textContent = `${u.terrace} м²`;
+        document.getElementById('rTerraceArea').textContent = `${u.terrace} м² →`;
+        document.getElementById('vrUnitLabel').textContent = `Резиденция ${u.id} · ${u.area} м² · 4K 360° VR`;
+        renderFacadePicker();
+      }
+
+      document.getElementById('prevUnitBtn').addEventListener('click', () => {
+        const idx = UNITS.findIndex((u) => u.id === app.unitId);
+        selectUnit(UNITS[(idx - 1 + UNITS.length) % UNITS.length].id);
+      });
+      document.getElementById('nextUnitBtn').addEventListener('click', () => {
+        const idx = UNITS.findIndex((u) => u.id === app.unitId);
+        selectUnit(UNITS[(idx + 1) % UNITS.length].id);
+      });
+
+      function highlightCutawayRoom(roomFocus) {
+        document.querySelectorAll('.apt-room-row').forEach((el) => {
+          el.classList.toggle('is-highlight', roomFocus && el.dataset.roomFocus === roomFocus);
+        });
+        document.querySelectorAll('.cutaway-pin').forEach((el) => {
+          el.classList.toggle('is-highlight', roomFocus && el.dataset.pinRoom === roomFocus);
+        });
+      }
+
+      document.querySelectorAll('.apt-room-row').forEach((row) => {
+        row.addEventListener('pointerenter', () => highlightCutawayRoom(row.dataset.roomFocus));
+        row.addEventListener('pointerleave', () => highlightCutawayRoom(null));
+        row.addEventListener('click', () => flyToDepthStop(Number(row.dataset.stop || '3')));
+      });
+
+      document.querySelectorAll('.cutaway-pin').forEach((pin) => {
+        pin.addEventListener('pointerenter', () => highlightCutawayRoom(pin.dataset.pinRoom));
+        pin.addEventListener('pointerleave', () => highlightCutawayRoom(null));
+        pin.addEventListener('click', () => flyToDepthStop(Number(pin.dataset.stop || '3')));
+      });
+
+      document.getElementById('goVrBtn').addEventListener('click', () => flyToDepthStop(3));
+      document.getElementById('vrBackPlanBtn').addEventListener('click', () => flyToDepthStop(2));
+
+      // ======================================================================
+      // SHARED WEBGL 4K 360° SPHERE ENGINE (Used by View 4 Interior + POI Explorer)
+      // ======================================================================
+      function createSphereViewer(canvasEl) {
+        const state = {
+          yaw: 0, pitch: -4 * DEG, fov: 74 * DEG,
+          tYaw: 0, tPitch: -4 * DEG, tFov: 74 * DEG,
+          tex: null
+        };
+        let gl = null, prog = null, uni = {}, anisoExt = null, maxAniso = 1;
+        try {
+          gl = canvasEl.getContext('webgl', { antialias: true, preserveDrawingBuffer: true });
+          if (!gl) return { gl: null, state, upload: () => null, draw: () => {} };
+          anisoExt = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+          if (anisoExt) maxAniso = Math.min(8, gl.getParameter(anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 4);
+
+          const vs = `attribute vec2 p; varying vec2 v; void main(){ v=p*0.5+0.5; gl_Position=vec4(p,0.,1.); }`;
+          const fs = `
+            precision highp float; varying vec2 v;
+            uniform sampler2D uTex; uniform float uYaw, uPitch, uFov, uAsp, uMood, uSte;
+            const float PI = 3.14159265;
+            vec3 smp(vec3 d){
+              return texture2D(uTex, vec2(0.5 + atan(d.x, d.z)/(2.0*PI), 0.5 - asin(clamp(d.y,-0.999,0.999))/PI)).rgb;
+            }
+            void main(){
+              vec2 uv = v; float yw = uYaw, asp = uAsp, mask = 1.0;
+              if (uSte > 0.5) {
+                float rEye = step(0.5, uv.x);
+                uv = vec2(fract(uv.x * 2.0), uv.y);
+                asp *= 0.5; yw += (rEye*2.0 - 1.0) * 0.018;
+                mask = smoothstep(0.62, 0.44, length((uv - 0.5)*vec2(1.0, 1.15)));
+                if (abs(v.x - 0.5) < 0.004) mask = 0.0;
+              }
+              vec2 ndc = uv*2.0 - 1.0;
+              float cy=cos(yw), sy=sin(yw), cp=cos(uPitch), sp=sin(uPitch), ht=tan(uFov*0.5);
+              vec3 F=vec3(cp*sy, sp, cp*cy), R=vec3(cy, 0., -sy), U=vec3(-sp*sy, cp, -sp*cy);
+              vec3 d = normalize(F + ndc.x*asp*ht*R + ndc.y*ht*U);
+              vec3 col = smp(d);
+              if (uMood < 0.5) col = col * vec3(0.95, 1.02, 1.08) + 0.02;
+              else if (uMood > 1.5) col = pow(col, vec3(1.16)) * vec3(0.76, 0.78, 0.92);
+              gl_FragColor = vec4(col * mask, 1.0);
+            }
+          `;
+          const mk = (t, s) => { const sh = gl.createShader(t); gl.shaderSource(sh, s); gl.compileShader(sh); return sh; };
+          prog = gl.createProgram();
+          gl.attachShader(prog, mk(gl.VERTEX_SHADER, vs));
+          gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, fs));
+          gl.linkProgram(prog);
+          gl.useProgram(prog);
+          const b = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, b);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+          const loc = gl.getAttribLocation(prog, 'p');
+          gl.enableVertexAttribArray(loc);
+          gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+          ['uTex','uYaw','uPitch','uFov','uAsp','uMood','uSte'].forEach((k) => { uni[k] = gl.getUniformLocation(prog, k); });
+        } catch (e) { gl = null; }
+
+        function upload(sourceCanvas) {
+          if (!gl) return null;
+          const t = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, t);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          if (anisoExt) gl.texParameterf(gl.TEXTURE_2D, anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, maxAniso);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+          return t;
+        }
+
+        function draw(texObj, moodNum, stereo) {
+          const rect = canvasEl.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const w = Math.max(300, Math.round(rect.width * dpr));
+          const h = Math.max(260, Math.round(rect.height * dpr));
+          if (canvasEl.width !== w || canvasEl.height !== h) { canvasEl.width = w; canvasEl.height = h; }
+          if (!gl || !texObj) return rect;
+          gl.viewport(0, 0, w, h);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, texObj);
+          gl.uniform1i(uni.uTex, 0);
+          gl.uniform1f(uni.uYaw, state.yaw);
+          gl.uniform1f(uni.uPitch, state.pitch);
+          gl.uniform1f(uni.uFov, state.fov);
+          gl.uniform1f(uni.uAsp, w / h);
+          gl.uniform1f(uni.uMood, moodNum);
+          gl.uniform1f(uni.uSte, stereo ? 1.0 : 0.0);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          return rect;
+        }
+
+        return { gl, state, upload, draw };
+      }
+
+      // View 4 Interior Sphere Viewer
+      const vrCanvas = document.getElementById('vrCanvas');
+      const vrViewer = createSphereViewer(vrCanvas);
+      const vrState = vrViewer.state;
+      vrState.roomB = 'living';
+      const vrTex = {};
+      const emptyPano = document.createElement('canvas');
+      emptyPano.width = 16; emptyPano.height = 8;
+      emptyPano.getContext('2d').fillStyle = '#082825';
+      emptyPano.getContext('2d').fillRect(0, 0, 16, 8);
+
+      Object.values(VR_ROOMS).forEach((rm) => {
+        vrTex[rm.key] = vrViewer.upload(emptyPano);
+        const im = new Image();
+        im.onload = () => {
+          const off = document.createElement('canvas');
+          off.width = 4096; off.height = 2048;
+          off.getContext('2d').drawImage(im, 0, 0, 4096, 2048);
+          const t = vrViewer.upload(off);
+          if (t) vrTex[rm.key] = t;
+        };
+        im.src = rm.src;
+      });
+
+      const vrHotspotsEl = document.getElementById('vrHotspots');
+      let vrHsNodes = [];
+      function buildVrHotspots() {
+        vrHotspotsEl.innerHTML = '';
+        vrHsNodes = [];
+        VR_ROOMS[vrState.roomB].hotspots.forEach((hs) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'vr-hs';
+          b.innerHTML = `<span class="vr-hs__orb">→</span><span>${hs.label}</span>`;
+          b.addEventListener('click', (e) => { e.stopPropagation(); flyToDepthStop(hs.targetStop); });
+          vrHotspotsEl.appendChild(b);
+          vrHsNodes.push({ hs, el: b });
+        });
+      }
+
+      function renderVrMinimap() {
+        const svg = document.getElementById('vrMiniSvg');
+        const dots = Object.values(VR_ROOMS).map((r) => `
+          <circle cx="${r.pos.x}" cy="${r.pos.y}" r="${r.key === vrState.roomB ? 5.5 : 3.8}"
+            fill="${r.key === vrState.roomB ? '#e3c378' : 'rgba(246,241,231,0.45)'}"
+            style="cursor:pointer;" data-vr-stop="${r.stop}"/>
+        `).join('');
+        svg.innerHTML = `
+          <rect x="6" y="8" width="128" height="66" rx="4" fill="rgba(255,253,248,0.05)" stroke="rgba(227,195,120,0.34)"/>
+          <path id="vrMiniCone" d="" fill="rgba(227,195,120,0.35)" stroke="#e3c378" stroke-width="0.9"/>
+          ${dots}
+        `;
+        svg.querySelectorAll('[data-vr-stop]').forEach((c) => {
+          c.addEventListener('click', () => flyToDepthStop(Number(c.getAttribute('data-vr-stop'))));
+        });
+      }
+
+      function shortestYaw(fromYaw, targetYaw) {
+        let diff = ((targetYaw - fromYaw + Math.PI) % (2 * Math.PI)) - Math.PI;
+        if (diff < -Math.PI) diff += 2 * Math.PI;
+        return fromYaw + diff;
+      }
+
+      function setVrRoomImmediate(key, yawOverride, pitchOverride, steerOnly = false) {
+        if (!VR_ROOMS[key]) return;
+        const r = VR_ROOMS[key];
+        const changed = (vrState.roomB !== key);
+        app.vrRoom = key;
+        vrState.roomB = key;
+        const y = (typeof yawOverride === 'number') ? yawOverride : r.initYaw;
+        const p = (typeof pitchOverride === 'number') ? pitchOverride : r.initPitch;
+        if (steerOnly) {
+          vrState.tYaw = shortestYaw(vrState.yaw, y);
+          vrState.tPitch = p;
+        } else if (changed) {
+          app.vrUserDragged = false;
+          vrState.yaw = y; vrState.tYaw = y;
+          vrState.pitch = p; vrState.tPitch = p;
+          vrState.fov = 74 * DEG; vrState.tFov = 74 * DEG;
+        }
+        if (changed) {
+          if (app.vrCinema && key !== 'living') setVrCinema(false);
+          document.getElementById('vrRoomName').textContent = r.name;
+          document.getElementById('vrRoomSub').textContent = r.sub;
+          document.getElementById('vrRefImg').src = r.src;
+          buildVrHotspots();
+          renderVrMinimap();
+        }
+      }
+
+      function setVrCinema(on) {
+        app.vrCinema = on;
+        const btn = document.getElementById('vrCinemaToggleBtn');
+        const layer = document.getElementById('vrCinemaLayer');
+        const vid = document.getElementById('vrCinemaVideo');
+        btn.setAttribute('aria-pressed', String(on));
+        layer.classList.toggle('is-active', on);
+        layer.setAttribute('aria-hidden', String(!on));
+        if (on && !prefersReducedMotion) vid.play().catch(() => {});
+        else vid.pause();
+      }
+      document.getElementById('vrCinemaToggleBtn').addEventListener('click', () => {
+        if (app.vrRoom !== 'living') flyToDepthStop(3, true);
+        setVrCinema(!app.vrCinema);
+      });
+      document.getElementById('vrPrevRoomBtn').addEventListener('click', () => {
+        setVrCinema(false);
+        const cur = Math.round(app.depth);
+        flyToDepthStop(Math.max(2, cur - 1));
+      });
+      document.getElementById('vrNextRoomBtn').addEventListener('click', () => {
+        setVrCinema(false);
+        const cur = Math.round(app.depth);
+        flyToDepthStop(cur >= 7 ? 3 : cur + 1);
+      });
+      document.getElementById('vrZoomInBtn').addEventListener('click', () => {
+        vrState.tFov = Math.max(0.62, vrState.tFov - 0.16);
+      });
+      document.getElementById('vrZoomOutBtn').addEventListener('click', () => {
+        vrState.tFov = Math.min(1.50, vrState.tFov + 0.16);
+      });
+      document.getElementById('vrStereoToggleBtn').addEventListener('click', (e) => {
+        app.vrStereo = !app.vrStereo;
+        e.currentTarget.setAttribute('aria-pressed', String(app.vrStereo));
+      });
+      document.getElementById('vrRefToggleBtn').addEventListener('click', (e) => {
+        app.vrRef = !app.vrRef;
+        e.currentTarget.setAttribute('aria-pressed', String(app.vrRef));
+        document.getElementById('vrRefOverlay').classList.toggle('is-active', app.vrRef);
+      });
+
+      let vrDrag = null;
+      vrCanvas.addEventListener('pointerdown', (e) => {
+        vrCanvas.setPointerCapture(e.pointerId);
+        vrDrag = { x: e.clientX, y: e.clientY };
+        app.vrUserDragged = true;
+        if (app.autoTour) stopAutoTour();
+      });
+      vrCanvas.addEventListener('pointermove', (e) => {
+        if (!vrDrag) return;
+        const dx = e.clientX - vrDrag.x, dy = e.clientY - vrDrag.y;
+        vrDrag.x = e.clientX; vrDrag.y = e.clientY;
+        vrState.tYaw -= dx * 0.003;
+        vrState.tPitch = Math.max(-1.0, Math.min(1.0, vrState.tPitch + dy * 0.003));
+      });
+      vrCanvas.addEventListener('pointerup', () => { vrDrag = null; });
+
+      function projectLabels(rect, state, nodes, hidden) {
+        const asp = rect.width / Math.max(1, rect.height), ht = Math.tan(state.fov * 0.5);
+        const cy = Math.cos(state.yaw), sy = Math.sin(state.yaw), cp = Math.cos(state.pitch), sp = Math.sin(state.pitch);
+        const F = [cp * sy, sp, cp * cy], R = [cy, 0, -sy], U = [-sp * sy, cp, -sp * cy];
+        nodes.forEach(({ hs, el }) => {
+          if (hidden) { el.style.display = 'none'; return; }
+          const hy = hs.yaw * DEG, hp = hs.pitch * DEG;
+          const P = [Math.cos(hp) * Math.sin(hy), Math.sin(hp), Math.cos(hp) * Math.cos(hy)];
+          const fwd = P[0]*F[0] + P[1]*F[1] + P[2]*F[2];
+          if (fwd <= 0.2) { el.style.display = 'none'; return; }
+          const rx = (P[0]*R[0] + P[1]*R[1] + P[2]*R[2]) / (fwd * asp * ht);
+          const ry = (P[0]*U[0] + P[1]*U[1] + P[2]*U[2]) / (fwd * ht);
+          if (Math.abs(rx) > 1.05 || Math.abs(ry) > 1.05) { el.style.display = 'none'; return; }
+          el.style.display = 'inline-flex';
+          el.style.left = ((rx * 0.5 + 0.5) * rect.width).toFixed(1) + 'px';
+          el.style.top = ((0.5 - ry * 0.5) * rect.height).toFixed(1) + 'px';
+        });
+      }
+
+      function renderVrLoop(now) {
+        if (app.view !== 'vr') return;
+        const moving = Math.abs(app.depth - Math.round(app.depth)) > 0.005;
+        if (!vrDrag && !app.vrUserDragged && !moving && !prefersReducedMotion && !app.vrRef) {
+          vrState.tYaw = VR_ROOMS[vrState.roomB].initYaw + Math.sin(now * 0.00028) * 0.3;
+        }
+        vrState.yaw += (vrState.tYaw - vrState.yaw) * 0.18;
+        vrState.pitch += (vrState.tPitch - vrState.pitch) * 0.18;
+        vrState.fov += (vrState.tFov - vrState.fov) * 0.18;
+
+        const moodNum = app.tod === 'morning' ? 0 : app.tod === 'sunset' ? 1 : 2;
+        const rect = vrViewer.draw(vrTex[vrState.roomB], moodNum, app.vrStereo);
+        if (rect) {
+          projectLabels(rect, vrState, vrHsNodes, app.vrStereo || app.vrRef || app.vrCinema || moving);
+        }
+        const cone = document.getElementById('vrMiniCone');
+        if (cone) {
+          const p = VR_ROOMS[vrState.roomB].pos, len = 24, a0 = vrState.yaw - Math.PI * 0.5;
+          cone.setAttribute('d', `M ${p.x} ${p.y} L ${(p.x + Math.cos(a0 - vrState.fov*0.5)*len).toFixed(1)} ${(p.y + Math.sin(a0 - vrState.fov*0.5)*len).toFixed(1)} A ${len} ${len} 0 0 1 ${(p.x + Math.cos(a0 + vrState.fov*0.5)*len).toFixed(1)} ${(p.y + Math.sin(a0 + vrState.fov*0.5)*len).toFixed(1)} Z`);
+        }
+        const hdg = Math.round(((270 + vrState.yaw * 180 / Math.PI) % 360 + 360) % 360);
+        document.getElementById('vrCompassText').textContent = `${hdg}°`;
+      }
+
+      // ======================================================================
+      // NEARBY POI 4K 360° BEACH & LIFESTYLE EXPLORER (#view-poi-vr)
+      // ======================================================================
+      const poiCanvas = document.getElementById('poiCanvas');
+      const poiViewer = createSphereViewer(poiCanvas);
+      const poiState = poiViewer.state;
+      const poiTex = {};
+      const poiTexLoading = {};
+      const poiBeaconsEl = document.getElementById('poiBeacons');
+      let poiBeaconNodes = [];
+      let poiUserDragged = false;
+
+      function loadPoiTexture(key) {
+        if (poiTex[key] || poiTexLoading[key] || !POI_DATA[key]) return;
+        poiTexLoading[key] = true;
+        const im = new Image();
+        im.onload = () => {
+          const off = document.createElement('canvas');
+          off.width = 4096; off.height = 2048;
+          off.getContext('2d').drawImage(im, 0, 0, 4096, 2048);
+          const t = poiViewer.upload(off);
+          if (t) poiTex[key] = t;
+        };
+        im.src = POI_DATA[key].pano;
+      }
+
+      function openPoiSphere(key) {
+        const poi = POI_DATA[key];
+        if (!poi) return;
+        app.poiMode = true;
+        app.activePoiKey = key;
+        poiUserDragged = false;
+        loadPoiTexture(key);
+        poiState.yaw = poi.initYaw; poiState.tYaw = poi.initYaw;
+        poiState.pitch = poi.initPitch; poiState.tPitch = poi.initPitch;
+        poiState.fov = 74 * DEG; poiState.tFov = 74 * DEG;
+
+        document.getElementById('poiVrEyebrow').textContent = `${poi.badge} · 4K 360°`;
+        document.getElementById('poiVrTitle').textContent = poi.title;
+        document.getElementById('poiVrSub').textContent = poi.sub;
+        document.querySelectorAll('[data-poi-switch]').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b.dataset.poiSwitch === key));
+        });
+
+        poiBeaconsEl.innerHTML = '';
+        poiBeaconNodes = [];
+        poi.beacons.forEach((b) => {
+          const el = document.createElement('div');
+          el.className = 'vr-beacon';
+          el.textContent = b.label;
+          poiBeaconsEl.appendChild(el);
+          poiBeaconNodes.push({ hs: b, el });
+        });
+        activateDomStage('poi-vr');
+      }
+
+      async function flyToPoiExplorer(key) {
+        const poi = POI_DATA[key];
+        if (!poi) return;
+        closePoiCard();
+        cancelAutoFlight();
+        if (app.autoTour) stopAutoTour();
+        app.activePoiKey = key;
+        loadPoiTexture(key);
+
+        flightHudLabel.textContent = `Подлёт дрона: ${poi.title}…`;
+        flightHudBar.classList.add('is-active');
+        const frames = await ensureSeqLoaded(poi.fseqKey);
+        if (!frames) {
+          flightHudBar.classList.remove('is-active');
+          openPoiSphere(key);
+          return;
+        }
+        app.poiFlight = {
+          key,
+          frames,
+          reverse: false,
+          start: performance.now(),
+          dur: 2100,
+          swapped: false
+        };
+      }
+
+      async function exitPoiExplorer(instant = false) {
+        const key = app.activePoiKey || 'bangtao';
+        const poi = POI_DATA[key];
+        if (instant || !poi) {
+          app.poiFlight = null;
+          app.poiMode = false;
+          flightCanvas.style.opacity = '0';
+          flightHudBar.classList.remove('is-active');
+          activateDomStage('street');
+          return;
+        }
+        flightHudLabel.textContent = 'Возврат дрона к The Aurelia Bay…';
+        flightHudBar.classList.add('is-active');
+        const frames = await ensureSeqLoaded(poi.fseqKey);
+        if (!frames) {
+          await exitPoiExplorer(true);
+          return;
+        }
+        app.poiFlight = {
+          key,
+          frames,
+          reverse: true,
+          start: performance.now(),
+          dur: 1950,
+          swapped: false
+        };
+      }
+
+      document.getElementById('poiBackBtn').addEventListener('click', () => exitPoiExplorer(false));
+      document.querySelectorAll('[data-poi-switch]').forEach((b) => {
+        b.addEventListener('click', () => openPoiSphere(b.dataset.poiSwitch));
+      });
+
+      let poiDrag = null;
+      poiCanvas.addEventListener('pointerdown', (e) => {
+        poiCanvas.setPointerCapture(e.pointerId);
+        poiDrag = { x: e.clientX, y: e.clientY };
+        poiUserDragged = true;
+      });
+      poiCanvas.addEventListener('pointermove', (e) => {
+        if (!poiDrag) return;
+        const dx = e.clientX - poiDrag.x, dy = e.clientY - poiDrag.y;
+        poiDrag.x = e.clientX; poiDrag.y = e.clientY;
+        poiState.tYaw -= dx * 0.003;
+        poiState.tPitch = Math.max(-1.0, Math.min(1.0, poiState.tPitch + dy * 0.003));
+      });
+      poiCanvas.addEventListener('pointerup', () => { poiDrag = null; });
+
+      function renderPoiLoop(now) {
+        if (app.view !== 'poi-vr' || !app.activePoiKey) return;
+        if (!poiDrag && !poiUserDragged && !prefersReducedMotion) {
+          poiState.tYaw = POI_DATA[app.activePoiKey].initYaw + Math.sin(now * 0.00025) * 0.28;
+        }
+        poiState.yaw += (poiState.tYaw - poiState.yaw) * 0.18;
+        poiState.pitch += (poiState.tPitch - poiState.pitch) * 0.18;
+        const moodNum = app.tod === 'morning' ? 0 : app.tod === 'sunset' ? 1 : 2;
+        const rect = poiViewer.draw(poiTex[app.activePoiKey] || vrTex.living, moodNum, false);
+        if (rect) projectLabels(rect, poiState, poiBeaconNodes, Boolean(app.poiFlight));
+      }
+
+      // ======================================================================
+      // PHOTOREALISTIC CINEMATIC AUTO-PRESENTATION (0 -> 1 -> 2 -> 3 -> 4 -> 6)
+      // ======================================================================
+      const tourCaptionPill = document.getElementById('tourCaptionPill');
+      const tourTimers = [];
+
+      function showTourCaption(step, total, area, title, benefit) {
+        document.getElementById('tourStepTag').textContent = `Презентация · ${step} / ${total}`;
+        document.getElementById('tourStepArea').textContent = area;
+        document.getElementById('tourStepTitle').textContent = title;
+        document.getElementById('tourStepBenefit').textContent = benefit;
+        tourCaptionPill.classList.add('is-show');
+      }
+
+      function stopAutoTour() {
+        app.autoTour = false;
+        while (tourTimers.length) clearTimeout(tourTimers.pop());
+        document.getElementById('guidedTourTopBtn').setAttribute('aria-pressed', 'false');
+        tourCaptionPill.classList.remove('is-show');
+      }
+
+      function startAutoTour() {
+        stopAutoTour();
+        closePoiCard();
+        app.autoTour = true;
+        document.getElementById('guidedTourTopBtn').setAttribute('aria-pressed', 'true');
+        flyToDepthStop(0, true);
+        showTourCaption(1, 6, 'Bang Tao Bay', 'Живой мастер-план побережья', 'Первая линия в заповедной части бухты Bang Tao & Layan.');
+
+        const script = [
+          [2000, 1, 2, '5 этаж · A-501', 'Подлёт дрона к фасаду', 'Плавный спуск к фасаду комплекса — выберите этаж или статус юнита.'],
+          [5200, 2, 3, '148 м² · 2BR', 'Раскрытие 3D-разреза', 'Изометрия квартиры в натуральном масштабе с мебелью.'],
+          [8600, 3, 4, '58 м² · 4K VR', 'Гостиная и кухня-остров', 'Полное 1:1 совпадение интерьера с 3D-разрезом в 4K 360°.'],
+          [12200, 4, 5, '36 м² · 4K VR', 'Приватная терраса', 'Два шезлонга, тиковый декинг и панорама залива Bang Tao.'],
+          [15800, 6, 6, '20 м² · 4K VR', 'Спа-ванная с тропическим душем', 'Овальная купель у окна, зелень в душе и двойная раковина.']
+        ];
+        script.forEach(([ms, stop, step, area, title, benefit]) => {
+          tourTimers.push(setTimeout(() => {
+            if (!app.autoTour) return;
+            flyToDepthStop(stop);
+            showTourCaption(step, 6, area, title, benefit);
+          }, ms));
+        });
+        tourTimers.push(setTimeout(() => stopAutoTour(), 20200));
+      }
+
+      document.getElementById('guidedTourTopBtn').addEventListener('click', () => {
+        app.autoTour ? stopAutoTour() : startAutoTour();
+      });
+
+      // ======================================================================
+      // Currency & Contact Modal
+      // ======================================================================
+      const CURR_ORDER = ['USD', 'RUB', 'THB', 'VND', 'AED'];
+      const currCycleBtn = document.getElementById('currCycleBtn');
+      currCycleBtn.addEventListener('click', () => {
+        const next = CURR_ORDER[(CURR_ORDER.indexOf(app.currency) + 1) % CURR_ORDER.length];
+        app.currency = next;
+        const c = CURR[next];
+        currCycleBtn.textContent = next === 'AED' ? 'AED' : `${next} ${c.sym.trim()}`;
+        selectUnit(app.unitId);
+        toast(`Валюта: ${next}`);
+      });
+
+      const contactModal = document.getElementById('contactModal');
+      let lastFocus = null;
+      function openContact(trigger) {
+        lastFocus = trigger;
+        const u = getUnit();
+        document.getElementById('contactModalTitle').textContent = `Забронировать юнит ${u.id}`;
+        document.getElementById('contactSummary').textContent = `The Aurelia Bay · ${u.floor} этаж · ${u.beds}BR · ${u.area} м² · ${fmtMoney(u.priceUSD)}`;
+        document.getElementById('cErr').style.display = 'none';
+        contactModal.classList.add('is-open');
+        document.getElementById('cName').focus();
+      }
+      function closeContact() {
+        contactModal.classList.remove('is-open');
+        if (lastFocus) lastFocus.focus();
+      }
+      document.getElementById('openContactTopBtn').addEventListener('click', (e) => openContact(e.currentTarget));
+      document.getElementById('bookUnitBtn').addEventListener('click', (e) => openContact(e.currentTarget));
+      document.getElementById('closeContactBtn').addEventListener('click', closeContact);
+      document.getElementById('cancelContactBtn').addEventListener('click', closeContact);
+      contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeContact(); });
+      function resolveLeadEndpoint() {
+        let ep = (document.body.dataset.chatEndpoint || '').replace(/\/+$/, '');
+        const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (isLocal) {
+          try {
+            const q = new URLSearchParams(location.search).get('api');
+            if (q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(q)) {
+              ep = q.replace(/\/+$/, '');
+              sessionStorage.setItem('ae_api_override', ep);
+            } else {
+              const saved = sessionStorage.getItem('ae_api_override');
+              if (saved) ep = saved;
+            }
+          } catch (e) {}
+        }
+        return ep;
+      }
+
+      const askAiUnitBtn = document.getElementById('askAiUnitBtn');
+      if (askAiUnitBtn) {
+        askAiUnitBtn.addEventListener('click', () => {
+          const u = getUnit();
+          if (window.EstateChat && window.EstateChat.askAbout) {
+            window.EstateChat.askAbout({
+              id: u.id,
+              title: `The Aurelia Bay · ${u.id}`,
+              city: 'Пхукет',
+              price: fmtMoney(u.priceUSD),
+              deal: 'sale',
+            });
+          }
+        });
+      }
+
+      document.getElementById('contactForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nm = document.getElementById('cName').value.trim();
+        const ph = document.getElementById('cPhone').value.trim();
+        if (nm.length < 2 || ph.length < 3) {
+          document.getElementById('cErr').textContent = 'Укажите имя и контакт.';
+          document.getElementById('cErr').style.display = 'block';
+          return;
+        }
+        const u = getUnit();
+        const summary = `3D-тур The Aurelia Bay · юнит ${u.id} (${u.floor} эт., ${u.beds}BR, ${u.area} м², ${fmtMoney(u.priceUSD)})`;
+        const ep = resolveLeadEndpoint();
+        if (ep) {
+          let geo = null;
+          try { geo = JSON.parse(sessionStorage.getItem('ae_geo') || 'null'); } catch (err) {}
+          fetch(ep + '/api/lead', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              name: nm,
+              contact: ph,
+              message: summary,
+              source: 'aurelia_3d_tour',
+              geo,
+              listing: { id: u.id, title: `The Aurelia Bay · ${u.id}`, city: 'Пхукет', price: fmtMoney(u.priceUSD) },
+            }),
+            keepalive: true,
+          }).catch(() => {});
+        }
+        closeContact();
+        e.target.reset();
+        toast(`Заявка на ${app.unitId} отправлена менеджеру`);
+      });
+
+      window.addEventListener('resize', layoutCutawayPins);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (contactModal.classList.contains('is-open')) closeContact();
+          else if (poiCardEl.classList.contains('is-open')) closePoiCard();
+        }
+      });
+
+      // Boot & Background Priority Preload of Core 7 Chain Flights
+      buildFacadeOverlay();
+      selectUnit('A-501');
+      buildVrHotspots();
+      renderVrMinimap();
+      layoutCutawayPins();
+      applyDepthVisuals();
+
+      const hashStage = (location.hash || '').replace('#', '').toLowerCase();
+      if (['street', 'facade', 'unit', 'vr'].includes(hashStage)) {
+        welcomeEl.classList.add('is-hidden');
+        if (welcomeVid) welcomeVid.pause();
+        const stopMap = { street: 0, facade: 1, unit: 2, vr: 3 };
+        flyToDepthStop(stopMap[hashStage], true);
+      }
+
+      Promise.all(['s2f', 'f2c', 'c2l'].map(ensureSeqLoaded)).then(() => {
+        ['w_lt', 'w_tb', 'w_bb', 'w_br'].forEach(ensureSeqLoaded);
+      });
+
+      function frame(now) {
+        if (app.poiFlight) {
+          const pf = app.poiFlight;
+          const t = Math.min(1, (now - pf.start) / pf.dur);
+          const ease = t * t * (3 - 2 * t);
+          if (t >= 0.5 && !pf.swapped) {
+            pf.swapped = true;
+            if (pf.reverse) {
+              app.poiMode = false;
+              activateDomStage('street');
+            } else {
+              openPoiSphere(pf.key);
+            }
+          }
+          const seqP = pf.reverse ? (1 - ease) : ease;
+          const alpha = Math.min(1, t / 0.08, (1 - t) / 0.08);
+          drawFlightFrame(pf.frames, seqP, alpha);
+          if (t >= 1) {
+            app.poiFlight = null;
+            flightCanvas.style.opacity = '0';
+            flightHudBar.classList.remove('is-active');
+          }
+        } else if (app.autoFlight) {
+          const t = Math.min(1, (now - app.flightStart) / app.flightDur);
+          const ease = t * t * (3 - 2 * t);
+          app.depth = app.flightFrom + (app.flightTo - app.flightFrom) * ease;
+          app.targetDepth = app.depth;
+          if (t >= 1) {
+            app.autoFlight = false;
+            app.depth = app.flightTo;
+            app.targetDepth = app.flightTo;
+            flightHudBar.classList.remove('is-active');
+          }
+          applyDepthVisuals();
+        } else if (Math.abs(app.targetDepth - app.depth) > 0.0008) {
+          app.depth += (app.targetDepth - app.depth) * 0.16;
+          if (Math.abs(app.targetDepth - app.depth) < 0.001) app.depth = app.targetDepth;
+          applyDepthVisuals();
+        }
+
+        renderSeaShimmer(now);
+        renderVrLoop(now);
+        renderPoiLoop(now);
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+  <script src="../../js/chat.js?v=fe39cd86" defer></script>
+</body>
+</html>

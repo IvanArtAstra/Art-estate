@@ -2089,3 +2089,92 @@ html[lang=ka] * { text-transform: none !important; }
 @media (max-width: 560px) {
   .onboard__grid, .onboard__row { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   ФЛАГМАНСКИЙ 3D / VR-ОБЗОР НА ГЛАВНОЙ (#showcase-3d)
+   ============================================================ */
+.showcase3d {
+  background: radial-gradient(circle at 14% 18%, rgba(31, 111, 99, .38), transparent 55%),
+              linear-gradient(155deg, var(--teal-deep), #051614);
+  color: var(--cream);
+  padding: clamp(3.2rem, 6vw, 5.2rem) clamp(1.2rem, 4vw, 3.2rem);
+  border-block: 1px solid rgba(227, 195, 120, .26);
+}
+.showcase3d__inner {
+  max-width: var(--maxw); margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  gap: clamp(1.8rem, 4vw, 3.4rem); align-items: center;
+}
+.showcase3d .eyebrow { color: var(--gold-light); }
+.showcase3d__title { color: var(--cream); margin-bottom: 1rem; }
+.showcase3d__title em { color: var(--gold-light); font-style: italic; font-weight: 500; }
+.showcase3d__lead { color: rgba(255, 253, 248, .82); font-size: var(--fs-lead); font-weight: 300; max-width: 52ch; }
+.showcase3d__points {
+  list-style: none; display: grid; gap: .75rem; margin: 1.5rem 0 1.8rem;
+}
+.showcase3d__points li {
+  display: flex; flex-direction: column; gap: .12rem;
+  padding-inline-start: .95rem; border-inline-start: 2px solid rgba(227, 195, 120, .55);
+}
+.showcase3d__points b { color: var(--gold-light); font-size: var(--fs-sm); font-weight: 700; }
+.showcase3d__points span { color: rgba(255, 253, 248, .78); font-size: var(--fs-sm); }
+.showcase3d__actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.showcase3d__btn-vr { border-color: rgba(255, 253, 248, .4); color: var(--cream); }
+.showcase3d__btn-vr:hover { background: rgba(255, 253, 248, .12); border-color: var(--gold-light); }
+.showcase3d__owner-link {
+  display: inline-block; margin-top: 1rem; font-size: var(--fs-xs); font-weight: 600;
+  color: var(--gold-light); text-decoration: underline; text-underline-offset: 4px;
+}
+.showcase3d__owner-link:hover { color: #fff; }
+
+.showcase3d__viewer { display: flex; flex-direction: column; gap: .75rem; }
+.showcase3d__stage {
+  position: relative; aspect-ratio: 16 / 10; border-radius: var(--radius); overflow: hidden;
+  background: #041311; border: 1px solid rgba(227, 195, 120, .35);
+  box-shadow: 0 28px 60px -24px rgba(0, 0, 0, .72);
+}
+.showcase3d__media {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.showcase3d__media[hidden] { display: none; }
+.showcase3d__scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(6, 26, 24, .12) 45%, rgba(6, 26, 24, .82) 100%);
+}
+.showcase3d__hud {
+  position: absolute; inset-inline: 1rem; bottom: 1rem; z-index: 2;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem;
+}
+.showcase3d__tag {
+  padding: .38rem .75rem; border-radius: 100px;
+  background: rgba(6, 26, 24, .78); border: 1px solid rgba(227, 195, 120, .38);
+  backdrop-filter: blur(10px); font-size: var(--fs-xs); font-weight: 600; color: var(--cream);
+}
+.showcase3d__launch {
+  display: inline-flex; align-items: center; min-height: 40px; padding: .4rem .95rem;
+  border-radius: 100px; background: var(--gold-fill); color: #fff;
+  font-size: var(--fs-xs); font-weight: 700; letter-spacing: .04em;
+  transition: background var(--t-quick), transform var(--t-hover) var(--ease-out);
+}
+.showcase3d__launch:hover { background: var(--teal); transform: translateY(-1px); }
+
+.showcase3d__tabs {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .45rem;
+}
+.showcase3d__tabs button {
+  min-height: 44px; padding: .45rem .5rem; border-radius: var(--radius-sm);
+  border: 1px solid rgba(227, 195, 120, .24); background: rgba(255, 253, 248, .05);
+  color: rgba(255, 253, 248, .82); font-size: var(--fs-xs); font-weight: 600;
+  cursor: pointer; transition: background var(--t-quick), border-color var(--t-quick), color var(--t-quick);
+}
+.showcase3d__tabs button:hover { border-color: var(--gold-light); color: #fff; }
+.showcase3d__tabs button.is-active {
+  background: var(--gold-fill); border-color: var(--gold-light); color: #fff;
+}
+
+@media (max-width: 960px) {
+  .showcase3d__inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .showcase3d__tabs { grid-template-columns: repeat(2, 1fr); }
+}
