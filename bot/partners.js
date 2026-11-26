@@ -239,7 +239,11 @@ function emailError(e) {
   return (code && map[code] ? `${map[code]} (${code})` : '') || (e && e.message) || 'неизвестная ошибка';
 }
 
-/** Отправить письмо. Копия — в обычные ящики из MAIL_FORWARD_TO, скрытой копией. */
+/** Отправить письмо. Ответы партнёрам уходят со скрытой копией в обычные ящики из
+    MAIL_FORWARD_TO — чтобы переписка была и в почте. Рассылка (первые письма и
+    напоминания) — без копии: её видно карточками в Telegram, а сотня одинаковых
+    писем незнакомым адресатам в почте только мешает. Какие виды писем копировать —
+    OUTBOX_BCC_KINDS через запятую. */
 export async function sendOutbox(env, deps, rec) {
   if (!env.EMAIL) throw new Error('в wrangler.toml нет привязки send_email');
   const p = await getPartner(env, rec.to);
@@ -254,7 +258,9 @@ export async function sendOutbox(env, deps, rec) {
     headers['In-Reply-To'] = rec.inReplyTo;
     headers['References'] = rec.references || rec.inReplyTo;
   }
-  const bcc = String(env.MAIL_FORWARD_TO || '').split(',').map(s => s.trim()).filter(Boolean);
+  const copyKinds = String(env.OUTBOX_BCC_KINDS ?? 'reply').split(',').map(s => s.trim());
+  const bcc = copyKinds.includes(rec.kind)
+    ? String(env.MAIL_FORWARD_TO || '').split(',').map(s => s.trim()).filter(Boolean) : [];
   try {
     const res = await env.EMAIL.send({
       from: FROM, to: rec.to, replyTo: FROM.email,

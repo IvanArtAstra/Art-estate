@@ -38,6 +38,8 @@ OUTREACH_TO_HOUR = "18"
 # Напоминание молчащему партнёру: через 5 дней, отменить можно в течение 6 часов
 REMIND_AFTER_DAYS = "5"
 REMIND_DELAY_HOURS = "6"
+# Скрытая копия в MAIL_FORWARD_TO — только у ответов партнёрам, рассылка без копии
+OUTBOX_BCC_KINDS = "reply"
 
 [[kv_namespaces]]
 binding = "CHAT"
