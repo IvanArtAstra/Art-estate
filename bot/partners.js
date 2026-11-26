@@ -622,6 +622,18 @@ async function sendDue(env, deps) {
   }
 }
 
+/* Первые письма собраны из шаблонов, которые владельцы уже утвердили, — при
+   OUTREACH_AUTO_APPROVE=1 они встают в очередь сами, без кнопки «Одобрить».
+   Ответы, написанные моделью, по-прежнему уходят только по «📤 Отправить». */
+async function autoApprove(env) {
+  if (env.OUTREACH_AUTO_APPROVE !== '1') return;
+  for (const k of await listAll(env, 'obp:')) {
+    const rec = await getOutbox(env, await env.CHAT.get(k.name));
+    if (!rec || rec.status !== 'pending') { await env.CHAT.delete(k.name); continue; }
+    if (rec.kind === 'first') { rec.status = 'approved'; await putOutbox(env, rec); }
+  }
+}
+
 async function notifyPending(env, deps) {
   const n = (await listAll(env, 'obp:')).length;
   const seen = num(await env.CHAT.get('obp:seen'), 0);
@@ -638,7 +650,7 @@ async function notifyPending(env, deps) {
 }
 
 export async function runSchedule(env, deps) {
-  for (const step of [notifyPending, planReminders, sendDue]) {
+  for (const step of [autoApprove, notifyPending, planReminders, sendDue]) {
     try { await step(env, deps); } catch (e) { console.error('schedule', step.name, e && e.stack || e); }
   }
 }

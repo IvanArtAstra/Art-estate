@@ -40,6 +40,11 @@ REMIND_AFTER_DAYS = "5"
 REMIND_DELAY_HOURS = "6"
 # Скрытая копия в MAIL_FORWARD_TO — только у ответов партнёрам, рассылка без копии
 OUTBOX_BCC_KINDS = "reply"
+# Первые письма из утверждённых шаблонов — в очередь без одобрения в Telegram
+OUTREACH_AUTO_APPROVE = "1"
+# Какие входящие письма пересылать в MAIL_FORWARD_TO: только партнёров и клиентов.
+# Спам, рассылки и служебное остаются карточками в Telegram.
+MAIL_FORWARD_KINDS = "партнёр,клиент"
 
 [[kv_namespaces]]
 binding = "CHAT"

@@ -492,18 +492,32 @@ export function forwardTargets(env, rcpt) {
   )];
 }
 
+export function shouldForward(env, digest, skipAi) {
+  if (skipAi) return false;                 // автоответы и рассылки
+  if (!digest) return true;                 // разбор не удался — пусть будет в почте
+  const kinds = String(env.MAIL_FORWARD_KINDS ?? 'партнёр,клиент').split(',').map(s => s.trim());
+  return kinds.includes(digest.category);
+}
+
 export async function handleEmail(message, env, deps) {
   const rcpt = String(message.to || '').toLowerCase();
 
-  // 1. Копии в обычные ящики — прежде всего остального
+  // Копия в обычные ящики — после разбора и только для писем, которые надо читать:
+  // партнёры и клиенты (MAIL_FORWARD_KINDS). Спам, рассылки, автоответы и служебное
+  // остаются в Telegram. Если разобрать письмо не вышло — копия уходит всё равно.
   const targets = forwardTargets(env, rcpt);
-  const results = await Promise.allSettled(targets.map(t => message.forward(t)));
-  results.forEach((r, i) => {
-    if (r.status === 'rejected') console.error('mail forward', targets[i], r.reason && r.reason.message);
-  });
+  let forwarded = false;
+  const forward = async () => {
+    if (forwarded || !targets.length) return;
+    forwarded = true;
+    const results = await Promise.allSettled(targets.map(t => message.forward(t)));
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') console.error('mail forward', targets[i], r.reason && r.reason.message);
+    });
+  };
 
   const chats = mailChats(env, deps);
-  if (!env.BOT_TOKEN || !chats.length) return;
+  if (!env.BOT_TOKEN || !chats.length) { await forward(); return; }
 
   try {
     const buf = new Uint8Array(await new Response(message.raw).arrayBuffer());
@@ -518,6 +532,7 @@ export async function handleEmail(message, env, deps) {
       : await digestMail(env, mail);
 
     const quiet = digest && ['спам', 'рассылка'].includes(digest.category);
+    if (shouldForward(env, digest, skipAi)) await forward();
     const identity = await resolveIdentity(env, {
       text: mail.text,
       email: mail.replyTo || mail.from,
@@ -571,6 +586,7 @@ export async function handleEmail(message, env, deps) {
     }
   } catch (e) {
     console.error('mail', e && e.stack || e);
+    await forward().catch(() => {});
     const text = `✉️ Пришло письмо на ${rcpt} от ${message.from}, но разобрать его не вышло. ` +
       `Копия ${targets.length ? 'в почте' : 'не настроена — проверьте MAIL_FORWARD_TO'}.`;
     await Promise.allSettled(chats.map(chat => deps.tg(env, 'sendMessage', { chat_id: chat, text })));
