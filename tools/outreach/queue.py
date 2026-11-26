@@ -159,6 +159,8 @@ def main():
         email = str(p.get("email") or "").strip().lower()
         if not EMAIL_RE.match(email) or email in skip:
             continue
+        if p.get("skip"):          # помечено в базе: конкурент, отказ, дубль
+            continue
         if a.kind != "all" and p.get("kind") not in (a.kind, "both"):
             continue
         if a.city and a.city.lower() not in str(p.get("city", "")).lower():
